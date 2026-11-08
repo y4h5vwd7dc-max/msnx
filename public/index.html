@@ -4,103 +4,174 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>MAISONAX</title>
+<meta name="theme-color" content="#04050b">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#04050b;--card:rgba(15,17,26,.72);--cyan:#00f3ff;--text:#f0f3f8;--muted:#9aa4b6;--line:rgba(0,243,255,.22);
+:root{--bg:#04050b;--card:rgba(15,17,26,.85);--cyan:#00f3ff;--cyan-soft:rgba(0,243,255,.12);--text:#f0f3f8;--muted:#9aa4b6;--line:rgba(0,243,255,.22);
+--grad:linear-gradient(135deg,#00f3ff,#6c8cff 70%,#a78bfa);
 --new:#ffd84d;--prog:#00f3ff;--done:#3dffa0;--rej:#ff5d6c;
---sans:'Manrope',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+--sans:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%}
-body{background:radial-gradient(900px 500px at 80% -10%,rgba(0,243,255,.1),transparent),var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;
+html,body{height:100%;overflow:hidden;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;position:relative;
 padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:
+radial-gradient(700px 420px at 85% -8%,rgba(0,243,255,.16),transparent 70%),
+radial-gradient(600px 420px at -10% 45%,rgba(108,140,255,.12),transparent 70%),
+radial-gradient(520px 380px at 100% 100%,rgba(167,139,250,.12),transparent 70%)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(rgba(0,243,255,.14) 1px,transparent 1.2px);background-size:26px 26px;
+-webkit-mask-image:linear-gradient(#000,transparent 65%);mask-image:linear-gradient(#000,transparent 65%)}
 button,input,textarea,select{font:inherit;color:inherit}
-#app{max-width:640px;margin:0 auto;height:100%;display:flex;flex-direction:column}
-header{padding:14px 16px 8px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-weight:800;letter-spacing:.04em;font-size:1.05rem}
-.role{font-family:var(--mono);font-size:.72rem;color:var(--cyan);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
-main{flex:1;overflow-y:auto;padding:8px 16px 16px;display:flex;flex-direction:column;gap:12px}
-nav{display:flex;gap:6px;padding:6px 16px 10px}
-.tab,.chip{flex:1;padding:10px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font-weight:700;font-size:.9rem}
-.chip{flex:none;padding:7px 14px;font-size:.8rem;white-space:nowrap}
-.tab.on,.chip.on{background:rgba(0,243,255,.12);color:var(--cyan);border-color:var(--cyan)}
-.filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-.order{cursor:pointer;display:flex;flex-direction:column;gap:6px;text-align:left;width:100%}
-.order:active{border-color:var(--cyan)}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+#app{position:relative;z-index:1;max-width:640px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+header{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,243,255,.1);flex:none;
+background:linear-gradient(180deg,rgba(4,5,11,.7),transparent)}
+.logo{display:inline-flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.05rem;letter-spacing:.2em;color:#fff;line-height:1}
+.lg-mark{width:32px;height:32px;flex:none;overflow:visible;filter:drop-shadow(0 0 8px rgba(0,243,255,.45))}
+.lg-orb{transform-box:view-box;transform-origin:50% 50%;animation:lgspin 16s linear infinite}
+.lg-node{filter:drop-shadow(0 0 4px #fff);animation:lgnode 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.lg-word span{background:linear-gradient(90deg,#00f3ff,#6c8cff 55%,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(0,243,255,.35))}
+@keyframes lgspin{to{transform:rotate(360deg)}}
+@keyframes lgnode{50%{transform:scale(1.35);opacity:.8}}
+@keyframes pulse{50%{opacity:.35}}
+.role{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);background:rgba(0,243,255,.06);border:1px solid var(--line);border-radius:50px;padding:.35rem .9rem}
+.role::before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--cyan);margin-right:.55rem;box-shadow:0 0 4px var(--cyan);animation:pulse 2s ease-in-out infinite;vertical-align:middle}
+nav{display:flex;gap:6px;padding:12px 16px 4px;flex:none}
+nav:empty{display:none}
+.tab,.chip{flex:1;padding:.7rem;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;font-weight:700;font-size:.86rem;letter-spacing:.04em;transition:.2s}
+.chip{flex:none;padding:.5rem 1rem;font-size:.78rem;white-space:nowrap;font-family:var(--mono)}
+.tab.on,.chip.on{background:rgba(0,243,255,.1);color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 18px rgba(0,243,255,.18)}
+main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px 18px;display:flex;flex-direction:column;gap:12px}
+main.chatmode{overflow:hidden;padding-bottom:10px}
+.filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;flex:none}
+.card{flex:none;position:relative;background:linear-gradient(160deg,rgba(20,24,38,.94),rgba(8,9,15,.95));border:1px solid rgba(0,243,255,.18);border-radius:20px;padding:16px;
+box-shadow:0 20px 50px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05)}
+.order{cursor:pointer;display:flex;flex-direction:column;gap:7px;text-align:left;width:100%;transition:border-color .25s,transform .25s}
+.order:active{border-color:var(--cyan);transform:scale(.99)}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.num{font-family:var(--mono);font-weight:700}
+.num{font-family:var(--mono);font-weight:700;letter-spacing:.06em}
+.order b{font-weight:800}
 .sub{color:var(--muted);font-size:.85rem;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.badge{font-family:var(--mono);font-size:.7rem;padding:3px 9px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.badge{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;padding:.28rem .8rem;border-radius:50px;border:1px solid currentColor;white-space:nowrap;background:rgba(255,255,255,.03)}
 .NEW{color:var(--new)}.IN_PROGRESS{color:var(--prog)}.COMPLETED{color:var(--done)}.REJECTED{color:var(--rej)}
-label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:5px}
-input,textarea,select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:12px;outline:none}
-input:focus,textarea:focus,select:focus{border-color:var(--cyan)}
+label{display:block;font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input,textarea,select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:.8rem .9rem;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,243,255,.12)}
 select option{background:#0b0d16}
-textarea{resize:none;min-height:110px}
-.field{margin-bottom:12px}
-.btn{width:100%;padding:14px;border:0;border-radius:12px;background:var(--cyan);color:#021014;font-weight:800;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:8px}
+textarea{resize:none;min-height:120px}
+.field{margin-bottom:14px}
+.btn{width:100%;padding:.95rem;border:0;border-radius:12px;background:var(--grad);color:#03060c;font-weight:800;letter-spacing:.06em;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:8px;box-shadow:0 8px 30px rgba(0,243,255,.28);transition:transform .2s,filter .2s}
+.btn:active{transform:scale(.98)}
 .btn:disabled{opacity:.6}
-.spin{width:16px;height:16px;border:2px solid #02101480;border-top-color:#021014;border-radius:50%;animation:r .7s linear infinite}
+.spin{width:16px;height:16px;border:2px solid #03060c80;border-top-color:#03060c;border-radius:50%;animation:r .7s linear infinite}
 @keyframes r{to{transform:rotate(360deg)}}
-.back{background:none;border:0;color:var(--cyan);font-weight:700;cursor:pointer;padding:4px 0;text-align:left}
-.info{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.88rem}
-.info dt{color:var(--muted)}.info dd{word-break:break-word}
+.back{flex:none;background:none;border:0;color:var(--cyan);font-family:var(--mono);font-size:.8rem;letter-spacing:.1em;font-weight:700;cursor:pointer;padding:2px 0;text-align:left}
+.det{padding:0}
+.det summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;padding:14px 16px}
+.det summary::-webkit-details-marker{display:none}
+.det summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--cyan);border-bottom:2px solid var(--cyan);transform:rotate(45deg);margin:-4px 2px 0 6px;transition:transform .2s;flex:none}
+.det[open] summary::after{transform:rotate(225deg);margin-top:4px}
+.det .body{padding:0 16px 16px;max-height:42vh;overflow-y:auto}
+.info{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;font-size:.88rem}
+.info dt{color:var(--muted);font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding-top:2px}
+.info dd{word-break:break-word}
 .info a,.info button.lnk{color:var(--cyan);background:none;border:0;cursor:pointer;text-decoration:underline;text-align:left;padding:0}
-.chat{display:flex;flex-direction:column;gap:6px;min-height:200px;max-height:42vh;overflow-y:auto;padding:4px}
-.msg{max-width:82%;padding:9px 12px;border-radius:14px;font-size:.92rem;white-space:pre-wrap;word-break:break-word}
+.chatcard{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px}
+.chat{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;padding:6px 4px}
+.msg{max-width:84%;padding:.6rem .8rem;border-radius:16px;font-size:.92rem;white-space:pre-wrap;word-break:break-word}
 .msg small{display:block;font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:3px}
-.me{align-self:flex-end;background:rgba(0,243,255,.16);border:1px solid var(--line);border-bottom-right-radius:4px}
-.them{align-self:flex-start;background:rgba(255,255,255,.07);border-bottom-left-radius:4px}
-.send{display:flex;gap:8px;margin-top:8px}
+.me{align-self:flex-end;background:linear-gradient(135deg,rgba(0,243,255,.2),rgba(167,139,250,.2));border:1px solid rgba(0,243,255,.3);border-bottom-right-radius:5px}
+.them{align-self:flex-start;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-bottom-left-radius:5px}
+.send{flex:none;display:flex;gap:8px;margin-top:8px;padding-top:10px;border-top:1px solid rgba(0,243,255,.1)}
 .send input{flex:1}
 .send button{width:auto;padding:0 18px}
 .att{margin-bottom:4px}
-.att img,.att video{max-width:100%;max-height:260px;border-radius:10px;display:block}
+.att img,.att video{max-width:100%;max-height:260px;border-radius:12px;display:block}
 .att audio{width:100%;max-width:240px}
 .att .ph{color:var(--muted);font-size:.8rem;padding:6px 0}
-.fbtn{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--text);cursor:pointer;text-align:left;max-width:100%}
+.fbtn{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:12px;padding:8px 10px;color:var(--text);cursor:pointer;text-align:left;max-width:100%}
 .fbtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fbtn small{display:inline;margin:0}
-.send .clip{background:transparent;border:1px solid var(--line);color:var(--cyan);font-size:1.1rem;padding:0 12px}
-.empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:.9rem}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0b0d16;border:1px solid var(--cyan);padding:10px 16px;border-radius:12px;font-size:.88rem;z-index:9}
-@media (prefers-reduced-motion:reduce){.spin{animation-duration:2s}}
+.send .clip{background:rgba(0,243,255,.08);border:1px solid var(--line);color:var(--cyan);font-size:1.1rem;padding:0 13px;box-shadow:none}
+.empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:.9rem;margin:auto}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(11,13,22,.95);border:1px solid var(--cyan);box-shadow:0 0 24px rgba(0,243,255,.25);padding:.65rem 1.1rem;border-radius:12px;font-size:.88rem;z-index:9}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2s}.lg-orb,.lg-node,.role::before{animation:none}}
+
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);margin-left:8px;vertical-align:middle}
+.prev{color:var(--muted);font-size:.8rem;border-top:1px dashed rgba(255,255,255,.1);padding-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prev.new{color:var(--cyan)}
+.search{flex:none}
+.day{align-self:center;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.05);border-radius:50px;padding:.2rem .8rem;margin:6px 0}
+.send textarea{flex:1;min-height:46px;height:46px;max-height:110px;padding:.7rem .9rem;line-height:1.35}
+.send{align-items:flex-end}
+.send button{height:46px}
+.att img{cursor:zoom-in}
+.lb{position:fixed;inset:0;z-index:20;background:rgba(2,3,8,.94);display:flex;align-items:center;justify-content:center;padding:12px}
+.lb img{max-width:100%;max-height:100%;border-radius:12px}
+.offline{flex:none;text-align:center;font-family:var(--mono);font-size:.7rem;color:var(--rej);padding:4px}
 </style>
 </head>
 <body>
 <div id="app">
-  <header><span class="logo">MAISONAX</span><span class="role" id="role"></span></header>
+  <header><span class="logo"><svg class="lg-mark" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lgG1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00f3ff"/><stop offset=".55" stop-color="#6c8cff"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs><g class="lg-orb"><circle cx="24" cy="24" r="21" fill="none" stroke="url(#lgG1)" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="52 12 22 12"/><circle cx="24" cy="3" r="2.4" fill="#fff"/></g><path d="M14 33V17l10 10 10-10v16" fill="none" stroke="url(#lgG1)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="lg-node" cx="24" cy="27" r="2.3" fill="#fff"/></svg><span class="lg-word">MAISON<span>AX</span></span></span><span class="role" id="role"></span></header>
   <nav id="nav"></nav>
   <main id="main"></main>
 </div>
 <script>
 const tg = window.Telegram?.WebApp;
 tg?.ready(); tg?.expand();
+tg?.disableVerticalSwipes?.();           // иначе свайп вниз в чате закрывает приложение
 tg?.setHeaderColor?.('#04050b'); tg?.setBackgroundColor?.('#04050b');
 
 const STATUS = {NEW:'В ожидании',IN_PROGRESS:'В работе',COMPLETED:'Исполнен',REJECTED:'Отклонён'};
 const SERVICES = ['Telegram Mini App','Чат-бот','Сайт под ключ','CRM','Автоматизация процессов','Другое'];
+const MAX_FILE = 5 * 1024 * 1024;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const time = t => new Date(t).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+const hm = t => new Date(t).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+const dayKey = t => new Date(t).toDateString();
+const dayLabel = t => { const d = new Date(t), n = new Date(); if (d.toDateString() === n.toDateString()) return 'Сегодня';
+  n.setDate(n.getDate() - 1); return d.toDateString() === n.toDateString() ? 'Вчера' : d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'}); };
+const sizeStr = n => n > 1048576 ? (n/1048576).toFixed(1) + ' МБ' : Math.ceil(n/1024) + ' КБ';
+const badge = s => `<span class="badge ${s}">${STATUS[s]}</span>`;
 
-let me = null, tab = 'new', filter = 'ALL', timers = [], openId = null;
+let me = null, tab = 'new', filter = 'ALL', query = '', timers = [], openId = null, expiredShown = false;
+const blobCache = new Map();
+
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2600)}
+function addTimer(fn, ms){ timers.push(setInterval(() => { if (!document.hidden) fn(); }, ms)); }
+function clearTimers(){ timers.forEach(clearInterval); timers = []; }
+document.addEventListener('visibilitychange', () => { if (!document.hidden) window.__tick?.(); });
 
 async function api(path, opts = {}) {
-  const r = await fetch('/api' + path, {
-    ...opts,
-    headers: {'Content-Type':'application/json','X-Init-Data': tg?.initData || '', ...(opts.headers||{})},
-    body: opts.body ? JSON.stringify(opts.body) : undefined
-  });
-  if (!r.ok) throw new Error((await r.json().catch(()=>({}))).error || r.status);
-  return r.json();
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 20000);
+  try {
+    const r = await fetch('/api' + path, { ...opts, signal: ctl.signal,
+      headers: {'Content-Type':'application/json','X-Init-Data': tg?.initData || '', ...(opts.headers||{})},
+      body: opts.body ? JSON.stringify(opts.body) : undefined });
+    if (r.status === 401 && !expiredShown) { expiredShown = true; toast('Сессия устарела. Закройте и откройте приложение заново'); }
+    if (!r.ok) throw new Error((await r.json().catch(()=>({}))).error || r.status);
+    $('#off')?.remove();
+    return await r.json();
+  } catch (e) {
+    if (e.name === 'AbortError' || e instanceof TypeError) {
+      if (!$('#off')) { const d = document.createElement('div'); d.id = 'off'; d.className = 'offline'; d.textContent = 'Нет связи, пробуем снова…'; $('#app').insertBefore(d, $('#main')); }
+    }
+    throw e;
+  } finally { clearTimeout(t); }
 }
-const sizeStr = n => n > 1048576 ? (n/1048576).toFixed(1) + ' МБ' : Math.ceil(n/1024) + ' КБ';
+
 async function fileBlob(fid) {
+  if (blobCache.has(fid)) return blobCache.get(fid);
   const r = await fetch('/api/files/' + fid, { headers: { 'X-Init-Data': tg?.initData || '' } });
   if (!r.ok) throw new Error('file');
-  return r.blob();
+  const b = await r.blob(); blobCache.set(fid, b); return b;
+}
+function lightbox(src) {
+  const d = document.createElement('div'); d.className = 'lb'; d.innerHTML = `<img src="${src}" alt="">`;
+  d.onclick = () => d.remove(); document.body.appendChild(d);
 }
 function renderFile(f, box, chat) {
   const kind = f.type.split('/')[0];
@@ -109,9 +180,9 @@ function renderFile(f, box, chat) {
     fileBlob(f.id).then(b => {
       const el = document.createElement(kind === 'image' ? 'img' : kind);
       el.src = URL.createObjectURL(b);
-      if (kind !== 'image') el.controls = true;
+      if (kind === 'image') { el.onclick = () => lightbox(el.src); el.onload = () => { if (chat.dataset.stick === '1') chat.scrollTop = chat.scrollHeight; }; }
+      else el.controls = true;
       if (kind === 'video') el.playsInline = true;
-      if (kind === 'image') el.onload = () => { chat.scrollTop = chat.scrollHeight; };
       box.innerHTML = ''; box.appendChild(el);
     }).catch(() => { box.innerHTML = '<div class="ph">Не удалось загрузить файл</div>'; });
   } else {
@@ -133,32 +204,35 @@ async function prepFile(file) {
     return new File([b], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' });
   } catch { return file; }
 }
-function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2200)}
-function clearTimers(){timers.forEach(clearInterval);timers=[]}
-const badge = s => `<span class="badge ${s}">${STATUS[s]}</span>`;
 
+/* ---- Старт и навигация ---- */
 async function init() {
   if (!tg?.initData) { $('#main').innerHTML = '<div class="empty">Откройте приложение через Telegram-бота.</div>'; return; }
   try { me = await api('/me'); } catch { $('#main').innerHTML = '<div class="empty">Не удалось авторизоваться. Перезапустите приложение.</div>'; return; }
   $('#role').textContent = me.admin ? 'admin' : 'client';
+  tg.BackButton?.onClick(() => go('orders'));   // один обработчик на всё приложение
   const m = location.hash.match(/order=(\d+)/);
   if (m) { renderNav(); return openOrder(Number(m[1])); }
   go(me.admin ? 'orders' : 'new');
 }
-
 function renderNav() {
-  const tabs = me.admin ? [['orders','Заказы']] : [['new','Новая заявка'],['orders','Мои заказы']];
-  $('#nav').innerHTML = tabs.length > 1 ? tabs.map(([k,l]) => `<button class="tab ${tab===k?'on':''}" data-t="${k}">${l}</button>`).join('') : '';
+  const tabs = me.admin ? [] : [['new','Новая заявка'],['orders','Мои заказы']];
+  $('#nav').innerHTML = tabs.map(([k,l]) => `<button class="tab ${tab===k?'on':''}" data-t="${k}">${l}</button>`).join('');
   $('#nav').querySelectorAll('.tab').forEach(b => b.onclick = () => go(b.dataset.t));
 }
-function go(t) { tab = t; openId = null; clearTimers(); tg?.BackButton?.hide(); renderNav(); t === 'new' ? renderForm() : renderList(); }
+function go(t) {
+  tab = t; openId = null; clearTimers(); window.__tick = null;
+  $('#main').className = ''; tg?.BackButton?.hide(); renderNav();
+  history.replaceState(null, '', location.pathname);
+  t === 'new' ? renderForm() : renderList();
+}
 
 /* ---- Форма заявки ---- */
 function renderForm() {
   const u = tg.initDataUnsafe?.user;
   $('#main').innerHTML = `<div class="card">
     <div class="field"><label>Имя</label><input id="f-name" maxlength="80" value="${esc(u?.first_name||'')}"></div>
-    <div class="field"><label>Телефон</label><input id="f-phone" type="tel" placeholder="+7 999 000 00 00"></div>
+    <div class="field"><label>Телефон</label><input id="f-phone" type="tel" inputmode="tel" placeholder="+7 999 000 00 00"></div>
     <div class="field"><label>Услуга</label><select id="f-svc">${SERVICES.map(s=>`<option>${s}</option>`).join('')}</select></div>
     <div class="field"><label>Описание задачи</label><textarea id="f-desc" maxlength="2000" placeholder="Что нужно сделать и в какой нише работает ваш бизнес"></textarea></div>
     <button class="btn" id="f-send">Отправить заявку</button></div>`;
@@ -169,53 +243,72 @@ function renderForm() {
     if (!/^\+?[\d\s()\-]{6,20}$/.test(body.phone.trim())) return toast('Проверьте номер телефона');
     btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Отправляем';
     try { const o = await api('/orders',{method:'POST',body}); tg.HapticFeedback?.notificationOccurred('success'); toast(`Заявка #${o.id} отправлена`); go('orders'); }
-    catch { toast('Не удалось отправить. Попробуйте ещё раз'); btn.disabled = false; btn.textContent = 'Отправить заявку'; }
+    catch (err) { toast(err.message === 'rate_limit' ? 'Слишком много заявок. Подождите несколько минут' : 'Не удалось отправить. Попробуйте ещё раз'); btn.disabled = false; btn.textContent = 'Отправить заявку'; }
   };
 }
 
 /* ---- Список заказов ---- */
 async function renderList() {
   const main = $('#main');
-  main.innerHTML = '<div class="empty">Загрузка…</div>';
-  const draw = async () => {
-    if (openId || tab !== 'orders') return;
-    let list; try { list = await api(me.admin ? '/orders/admin' : '/orders/my'); } catch { return; }
-    const shown = list.filter(o => filter === 'ALL' ? true : filter === 'DONE' ? ['COMPLETED','REJECTED'].includes(o.status) : o.status === filter);
-    const f = me.admin ? `<div class="filters">${[['ALL','Все'],['NEW','Новые'],['IN_PROGRESS','В работе'],['DONE','Завершённые']]
-      .map(([k,l])=>`<button class="chip ${filter===k?'on':''}" data-f="${k}">${l}</button>`).join('')}</div>` : '';
-    main.innerHTML = f + (shown.length ? shown.map(o => `<button class="card order" data-id="${o.id}">
-      <div class="row"><span class="num">#${o.id}</span>${badge(o.status)}</div>
+  main.innerHTML = `<div id="ctl" class="filters"></div>${me.admin ? '<input class="search" id="q" type="search" placeholder="Поиск: номер, имя, телефон" autocomplete="off">' : ''}<div id="lst" style="display:flex;flex-direction:column;gap:12px"><div class="empty">Загрузка…</div></div>`;
+  let list = [], sig = '';
+  const unread = o => me.admin ? o.unread_admin : o.unread_client;
+  const match = o => !query || [o.id, o.name, o.phone, o.username, o.service_type].join(' ').toLowerCase().includes(query);
+  const inFilter = o => filter === 'ALL' ? true : filter === 'DONE' ? ['COMPLETED','REJECTED'].includes(o.status) : o.status === filter;
+  const paint = () => {
+    if (me.admin) {
+      const cnt = k => list.filter(o => k === 'ALL' ? true : k === 'DONE' ? ['COMPLETED','REJECTED'].includes(o.status) : o.status === k).length;
+      $('#ctl').innerHTML = [['ALL','Все'],['NEW','Новые'],['IN_PROGRESS','В работе'],['DONE','Завершённые']]
+        .map(([k,l]) => `<button class="chip ${filter===k?'on':''}" data-f="${k}">${l} · ${cnt(k)}</button>`).join('');
+      $('#ctl').querySelectorAll('.chip').forEach(b => b.onclick = () => { filter = b.dataset.f; paint(); });
+    } else $('#ctl').remove();
+    const shown = list.filter(o => inFilter(o) && match(o));
+    const keep = main.scrollTop;
+    $('#lst').innerHTML = shown.length ? shown.map(o => `<button class="card order" data-id="${o.id}">
+      <div class="row"><span class="num">#${o.id}${unread(o) ? '<i class="dot"></i>' : ''}</span>${badge(o.status)}</div>
       <div class="row"><b>${esc(me.admin ? o.name : o.service_type)}</b><span class="sub">${time(o.created_at)}</span></div>
-      <div class="sub">${esc(me.admin ? o.service_type + ' · ' + o.description : o.description)}</div></button>`).join('')
-      : `<div class="empty">${me.admin ? 'Заказов с таким статусом нет' : 'Заказов пока нет. Оставьте первую заявку во вкладке «Новая заявка».'}</div>`);
-    main.querySelectorAll('.chip').forEach(b => b.onclick = () => { filter = b.dataset.f; draw(); });
-    main.querySelectorAll('.order').forEach(b => b.onclick = () => openOrder(Number(b.dataset.id)));
+      <div class="sub">${esc(me.admin ? o.service_type + ' · ' + o.description : o.description)}</div>
+      ${o.last ? `<div class="prev ${unread(o) ? 'new' : ''}">${o.last.from === 'ADMIN' ? (me.admin ? 'Вы' : 'MAISONAX') : esc(me.admin ? o.name : 'Вы')}: ${esc(o.last.text)}</div>` : ''}</button>`).join('')
+      : `<div class="empty">${me.admin ? 'Ничего не найдено' : 'Заказов пока нет. Оставьте первую заявку во вкладке «Новая заявка».'}</div>`;
+    $('#lst').querySelectorAll('.order').forEach(b => b.onclick = () => openOrder(Number(b.dataset.id)));
+    main.scrollTop = keep;
   };
-  await draw();
-  timers.push(setInterval(draw, 8000));
+  const load = async () => {
+    if (openId || tab !== 'orders') return;
+    let l; try { l = await api(me.admin ? '/orders/admin' : '/orders/my'); } catch { return; }
+    const ns = JSON.stringify(l);
+    if (ns === sig) return;           // ничего не изменилось — не перерисовываем (не сбиваем прокрутку)
+    sig = ns; list = l; paint();
+  };
+  $('#q')?.addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); paint(); });
+  window.__tick = load;
+  await load();
+  addTimer(load, 8000);
 }
 
 /* ---- Заказ + чат ---- */
 async function openOrder(id) {
-  clearTimers(); openId = id;
-  tg?.BackButton?.show(); tg.BackButton.onClick(() => go('orders'));
+  clearTimers(); openId = id; tab = 'orders'; renderNav();
+  tg?.BackButton?.show();
   const main = $('#main');
   let o; try { o = await api('/orders/' + id); } catch { main.innerHTML = '<div class="empty">Заказ не найден</div>'; return; }
-  let last = 0;
   const admin = me.admin;
-  main.innerHTML = `<button class="back" id="back">← К заказам</button>
-    <div class="card"><div class="row"><span class="num">Заказ #${o.id}</span><span id="st">${badge(o.status)}</span></div>
-      <dl class="info" style="margin-top:10px">
+  let last = 0, lastDay = '', sending = false;
+  main.className = 'chatmode';
+  main.innerHTML = `<button class="back" id="back">← К ЗАКАЗАМ</button>
+    <details class="card det"><summary><span class="num">Заказ #${o.id}</span><span id="st">${badge(o.status)}</span></summary>
+      <div class="body"><dl class="info">
         <dt>Клиент</dt><dd>${esc(o.name)}</dd>
         <dt>Услуга</dt><dd>${esc(o.service_type)}</dd>
         ${admin ? `<dt>Телефон</dt><dd><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a> · <button class="lnk" id="copy">копировать</button></dd>
         <dt>Telegram</dt><dd>${o.username ? `<a href="https://t.me/${esc(o.username)}" id="tgl">@${esc(o.username)}</a>` : `<a href="tg://user?id=${o.user_id}">открыть профиль</a>`}</dd>` : ''}
         <dt>Задача</dt><dd>${esc(o.description)}</dd>
       </dl>
-      ${admin ? `<div class="field" style="margin:12px 0 0"><label>Статус</label><select id="status">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}</select></div>` : ''}
-    </div>
-    <div class="card"><div class="chat" id="chat"><div class="empty">Сообщений пока нет</div></div>
-      <div class="send"><button class="btn clip" id="clip" type="button" aria-label="Прикрепить файл">📎</button><input type="file" id="file" hidden><input id="txt" maxlength="2000" placeholder="Сообщение" autocomplete="off"><button class="btn" id="go">Отправить</button></div></div>`;
+      ${admin ? `<div class="field" style="margin:14px 0 0"><label>Статус</label><select id="status">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}</select></div>` : ''}</div>
+    </details>
+    <div class="card chatcard"><div class="chat" id="chat" data-stick="1"><div class="empty">Сообщений пока нет</div></div>
+      <div class="send"><button class="btn clip" id="clip" type="button" aria-label="Прикрепить файл">📎</button><input type="file" id="file" hidden>
+      <textarea id="txt" rows="1" maxlength="2000" placeholder="Сообщение"></textarea><button class="btn" id="go">Отправить</button></div></div>`;
   $('#back').onclick = () => go('orders');
   $('#copy')?.addEventListener('click', () => { navigator.clipboard?.writeText(o.phone); toast('Номер скопирован'); });
   $('#tgl')?.addEventListener('click', e => { if (tg?.openTelegramLink) { e.preventDefault(); tg.openTelegramLink(e.currentTarget.href); } });
@@ -223,47 +316,60 @@ async function openOrder(id) {
     try { const r = await api(`/orders/${id}/status`,{method:'PATCH',body:{status:e.target.value}}); $('#st').innerHTML = badge(r.status); toast('Статус обновлён, клиент уведомлён'); }
     catch { toast('Не удалось сменить статус'); }
   });
-  const chat = $('#chat');
+
+  const chat = $('#chat'), ta = $('#txt');
+  chat.addEventListener('scroll', () => { chat.dataset.stick = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80 ? '1' : '0'; }, { passive: true });
+  const toBottom = () => { chat.scrollTop = chat.scrollHeight; chat.dataset.stick = '1'; };
   const add = m => {
+    if (m.id <= last) return;                       // защита от дублей
     if (!last) chat.innerHTML = '';
     last = m.id;
+    if (dayKey(m.created_at) !== lastDay) { lastDay = dayKey(m.created_at); chat.insertAdjacentHTML('beforeend', `<div class="day">${dayLabel(m.created_at)}</div>`); }
     const mine = admin ? m.sender_type === 'ADMIN' : m.sender_type === 'CLIENT';
     const d = document.createElement('div');
     d.className = 'msg ' + (mine ? 'me' : 'them');
-    d.innerHTML = (m.file ? '<div class="att"></div>' : '') + (m.text ? esc(m.text) : '') + `<small>${time(m.created_at)}</small>`;
-    if (m.file) renderFile(m.file, d.querySelector('.att'), chat);
+    d.innerHTML = (m.file ? '<div class="att"></div>' : '') + (m.text ? esc(m.text) : '') + `<small>${hm(m.created_at)}</small>`;
     chat.appendChild(d);
+    if (m.file) renderFile(m.file, d.querySelector('.att'), chat);
   };
   const poll = async () => {
     try {
       const ms = await api(`/orders/${id}/messages?after=${last}`);
-      if (ms.length) { const bottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80 || !last; ms.forEach(add); if (bottom) chat.scrollTop = chat.scrollHeight; }
+      if (ms.length) { const stick = chat.dataset.stick === '1' || !last; ms.forEach(add); if (stick) toBottom(); }
     } catch {}
   };
+  const refreshStatus = async () => {
+    try { const r = await api('/orders/' + id); $('#st').innerHTML = badge(r.status); const sel = $('#status'); if (sel && document.activeElement !== sel) sel.value = r.status; } catch {}
+  };
   const send = async () => {
-    const t = $('#txt').value.trim(); if (!t) return;
-    $('#txt').value = '';
-    try { await api(`/orders/${id}/messages`,{method:'POST',body:{text:t}}); await poll(); chat.scrollTop = chat.scrollHeight; }
-    catch { $('#txt').value = t; toast('Сообщение не отправлено'); }
+    const t = ta.value.trim(); if (!t || sending) return;
+    sending = true; ta.value = ''; ta.style.height = '';
+    try { const m = await api(`/orders/${id}/messages`,{method:'POST',body:{text:t}}); add(m); toBottom(); tg?.HapticFeedback?.impactOccurred?.('light'); }
+    catch { ta.value = t; toast('Сообщение не отправлено'); }
+    sending = false;
   };
   $('#go').onclick = send;
+  ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 110) + 'px'; });
+  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) { e.preventDefault(); send(); } });
+  ta.addEventListener('focus', () => setTimeout(toBottom, 300));
   $('#clip').onclick = () => $('#file').click();
   $('#file').onchange = async e => {
     let f = e.target.files[0]; e.target.value = ''; if (!f) return;
     f = await prepFile(f);
-    if (f.size > 5 * 1024 * 1024) return toast('Файл больше 5 МБ');
+    if (f.size > MAX_FILE) return toast('Файл больше 5 МБ');
     toast('Отправка файла…');
     try {
       const r = await fetch(`/api/orders/${id}/upload`, { method: 'POST', body: f, headers: {
         'X-Init-Data': tg?.initData || '', 'X-File-Name': encodeURIComponent(f.name), 'X-File-Type': f.type || 'application/octet-stream',
-        'X-Caption': encodeURIComponent($('#txt').value.trim()) } });
+        'X-Caption': encodeURIComponent(ta.value.trim()) } });
       if (!r.ok) throw new Error();
-      $('#txt').value = ''; await poll(); chat.scrollTop = chat.scrollHeight;
+      add(await r.json()); ta.value = ''; ta.style.height = ''; toBottom();
     } catch { toast('Не удалось отправить файл'); }
   };
-  $('#txt').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+  window.__tick = () => { poll(); refreshStatus(); };
   await poll();
-  timers.push(setInterval(poll, 3000));
+  addTimer(poll, 3000);
+  addTimer(refreshStatus, 10000);
 }
 
 init();

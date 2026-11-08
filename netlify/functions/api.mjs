@@ -52,8 +52,10 @@ async function createOrder(s, data) {
   for (;;) {
     seq++;
     const o = { ...data, id: seq };
+    if (await s.get(`order:${seq}`)) continue;
     const r = await s.set(`order:${seq}`, JSON.stringify(o), { onlyIfNew: true });
-    if (r.modified) { await s.set('seq', JSON.stringify(seq)); return o; }
+    if (r?.modified === false) continue;
+    await s.set('seq', JSON.stringify(seq)); return o;
   }
 }
 async function setStatus(s, o, status) {

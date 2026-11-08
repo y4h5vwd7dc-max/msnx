@@ -109,6 +109,8 @@ textarea{resize:none;min-height:120px}
 .att img{cursor:zoom-in}
 .lb{position:fixed;inset:0;z-index:20;background:rgba(2,3,8,.94);display:flex;align-items:center;justify-content:center;padding:12px}
 .lb img{max-width:100%;max-height:100%;border-radius:12px}
+.quick{flex:none;display:flex;gap:6px;overflow-x:auto;padding:8px 0 0}
+.quick button{flex:none;background:rgba(0,243,255,.06);border:1px solid var(--line);color:var(--cyan);border-radius:50px;padding:.35rem .8rem;font-size:.75rem;cursor:pointer;white-space:nowrap}
 .offline{flex:none;text-align:center;font-family:var(--mono);font-size:.7rem;color:var(--rej);padding:4px}
 </style>
 </head>
@@ -207,13 +209,14 @@ async function prepFile(file) {
 
 /* ---- Старт и навигация ---- */
 async function init() {
-  if (!tg?.initData) { $('#main').innerHTML = '<div class="empty">Откройте приложение через Telegram-бота.</div>'; return; }
+  if (!tg?.initData) { $('#main').innerHTML = '<div class="empty">Откройте приложение через бота: кнопка «Открыть MAISONAX» в сообщении бота или синяя кнопка меню рядом с полем ввода.</div>'; return; }
   try { me = await api('/me'); } catch { $('#main').innerHTML = '<div class="empty">Не удалось авторизоваться. Перезапустите приложение.</div>'; return; }
   $('#role').textContent = me.admin ? 'admin' : 'client';
   tg.BackButton?.onClick(() => go('orders'));   // один обработчик на всё приложение
   const m = location.hash.match(/order=(\d+)/);
   if (m) { renderNav(); return openOrder(Number(m[1])); }
-  go(me.admin ? 'orders' : 'new');
+  const h = location.hash.slice(1);
+  go(me.admin ? 'orders' : (h === 'orders' ? 'orders' : 'new'));
 }
 function renderNav() {
   const tabs = me.admin ? [] : [['new','Новая заявка'],['orders','Мои заказы']];
@@ -307,6 +310,7 @@ async function openOrder(id) {
       ${admin ? `<div class="field" style="margin:14px 0 0"><label>Статус</label><select id="status">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}</select></div>` : ''}</div>
     </details>
     <div class="card chatcard"><div class="chat" id="chat" data-stick="1"><div class="empty">Сообщений пока нет</div></div>
+      ${admin ? '<div class="quick" id="quick"><button data-t="Здравствуйте! Принял заявку, изучаю детали.">Принял заявку</button><button data-t="Уточните, пожалуйста, детали задачи.">Уточнить детали</button><button data-t="Когда вам удобно созвониться?">Созвон</button><button data-t="Готово ✅ Посмотрите, пожалуйста.">Готово ✅</button></div>' : ''}
       <div class="send"><button class="btn clip" id="clip" type="button" aria-label="Прикрепить файл">📎</button><input type="file" id="file" hidden>
       <textarea id="txt" rows="1" maxlength="2000" placeholder="Сообщение"></textarea><button class="btn" id="go">Отправить</button></div></div>`;
   $('#back').onclick = () => go('orders');
@@ -352,6 +356,7 @@ async function openOrder(id) {
   ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 110) + 'px'; });
   ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) { e.preventDefault(); send(); } });
   ta.addEventListener('focus', () => setTimeout(toBottom, 300));
+  $('#quick')?.querySelectorAll('button').forEach(b => b.onclick = () => { ta.value = b.dataset.t; ta.dispatchEvent(new Event('input')); ta.focus(); });
   $('#clip').onclick = () => $('#file').click();
   $('#file').onchange = async e => {
     let f = e.target.files[0]; e.target.value = ''; if (!f) return;

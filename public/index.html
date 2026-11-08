@@ -230,4 +230,43 @@ async function openOrder(id) {
     const mine = admin ? m.sender_type === 'ADMIN' : m.sender_type === 'CLIENT';
     const d = document.createElement('div');
     d.className = 'msg ' + (mine ? 'me' : 'them');
-    d.innerHTML = (m.file ? '<div class="att"></div>' : '') + (m.text ? esc(m.text) : '') + `<small>${time(m.created_at)}
+    d.innerHTML = (m.file ? '<div class="att"></div>' : '') + (m.text ? esc(m.text) : '') + `<small>${time(m.created_at)}</small>`;
+    if (m.file) renderFile(m.file, d.querySelector('.att'), chat);
+    chat.appendChild(d);
+  };
+  const poll = async () => {
+    try {
+      const ms = await api(`/orders/${id}/messages?after=${last}`);
+      if (ms.length) { const bottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80 || !last; ms.forEach(add); if (bottom) chat.scrollTop = chat.scrollHeight; }
+    } catch {}
+  };
+  const send = async () => {
+    const t = $('#txt').value.trim(); if (!t) return;
+    $('#txt').value = '';
+    try { await api(`/orders/${id}/messages`,{method:'POST',body:{text:t}}); await poll(); chat.scrollTop = chat.scrollHeight; }
+    catch { $('#txt').value = t; toast('Сообщение не отправлено'); }
+  };
+  $('#go').onclick = send;
+  $('#clip').onclick = () => $('#file').click();
+  $('#file').onchange = async e => {
+    let f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    f = await prepFile(f);
+    if (f.size > 5 * 1024 * 1024) return toast('Файл больше 5 МБ');
+    toast('Отправка файла…');
+    try {
+      const r = await fetch(`/api/orders/${id}/upload`, { method: 'POST', body: f, headers: {
+        'X-Init-Data': tg?.initData || '', 'X-File-Name': encodeURIComponent(f.name), 'X-File-Type': f.type || 'application/octet-stream',
+        'X-Caption': encodeURIComponent($('#txt').value.trim()) } });
+      if (!r.ok) throw new Error();
+      $('#txt').value = ''; await poll(); chat.scrollTop = chat.scrollHeight;
+    } catch { toast('Не удалось отправить файл'); }
+  };
+  $('#txt').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+  await poll();
+  timers.push(setInterval(poll, 3000));
+}
+
+init();
+</script>
+</body>
+</html>

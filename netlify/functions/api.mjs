@@ -94,7 +94,7 @@ export default async (req) => {
 
   // Разовая настройка: открыть в браузере /api/setup?key=<WEBHOOK_SECRET>
   if (path === '/setup') {
-    if (url.searchParams.get('key') !== WEBHOOK_SECRET) return json({ error: 'forbidden' }, 403);
+    if (!WEBHOOK_SECRET || url.searchParams.get('key') !== WEBHOOK_SECRET) return json({ error: 'forbidden', secret_set: !!WEBHOOK_SECRET, token_set: !!BOT_TOKEN, admin_set: !!ADMIN_ID, url_set: !!WEBAPP_URL }, 403);
     const hook = await tg('setWebhook', { url: `${WEBAPP_URL}/api/webhook`, secret_token: WEBHOOK_SECRET, allowed_updates: ['message', 'callback_query'] });
     const menu = await tg('setChatMenuButton', { menu_button: { type: 'web_app', text: 'MAISONAX', web_app: { url: WEBAPP_URL } } });
     return json({ webhook: hook, menu });

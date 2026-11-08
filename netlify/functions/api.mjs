@@ -18,11 +18,26 @@ const tg = (method, body) =>
   }).then(r => r.json()).catch(e => ({ ok: false, error: e.message }));
 
 const send = (chat_id, text, reply_markup) => tg('sendMessage', { chat_id, text, parse_mode: 'HTML', reply_markup });
-const chatBtn = id => ({ text: '💬 Открыть чат', web_app: { url: `${WEBAPP_URL}/#order=${id}` } });
+const chatBtn = id => ({ text: '💬 Открыть чат', web_app: { url: `${WEBAPP_URL}/#order=${id}` }, style: 'primary' });
 const adminKb = o => ({ inline_keyboard: [
-  [{ text: 'В работу', callback_data: `st:${o.id}:IN_PROGRESS` }, { text: 'Завершить', callback_data: `st:${o.id}:COMPLETED` }],
-  [{ text: 'Отклонить', callback_data: `st:${o.id}:REJECTED` }, chatBtn(o.id)],
+  [{ text: 'В работу', callback_data: `st:${o.id}:IN_PROGRESS`, style: 'primary' }, { text: 'Завершить', callback_data: `st:${o.id}:COMPLETED`, style: 'success' }],
+  [{ text: 'Отклонить', callback_data: `st:${o.id}:REJECTED`, style: 'danger' }, chatBtn(o.id)],
 ] });
+async function sendFile(chat_id, buf, type, name, caption, reply_markup) {
+  const kind = type.startsWith('image/') && type !== 'image/gif' ? ['sendPhoto', 'photo'] : type.startsWith('video/') ? ['sendVideo', 'video'] : ['sendDocument', 'document'];
+  const go = ([method, field]) => {
+    const fd = new FormData();
+    fd.append('chat_id', String(chat_id));
+    fd.append(field, new Blob([buf], { type }), name);
+    fd.append('caption', caption.slice(0, 1000));
+    fd.append('parse_mode', 'HTML');
+    if (reply_markup) fd.append('reply_markup', JSON.stringify(reply_markup));
+    return fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, { method: 'POST', body: fd }).then(r => r.json()).catch(() => ({ ok: false }));
+  };
+  const r = await go(kind);
+  if (!r.ok && kind[0] !== 'sendDocument') await go(['sendDocument', 'document']);
+}
+const SAFE = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime', 'audio/mpeg', 'audio/ogg', 'audio/mp4', 'audio/webm']);
 const chatKb = id => ({ inline_keyboard: [[chatBtn(id)]] });
 
 /* ---------- Авторизация (подпись initData) ---------- */
@@ -64,13 +79,28 @@ async function setStatus(s, o, status) {
   await send(o.user_id, `Статус вашего заказа <b>#${o.id}</b> изменён:\n${LABEL[status]}`, chatKb(o.id));
 }
 
+async function addMsg(s, o, isAdmin, text, file, buf) {
+  const key = `msgs:${o.id}`;
+  const msgs = (await s.get(key, { type: 'json' })) ?? [];
+  const msg = { id: (msgs.at(-1)?.id ?? 0) + 1, order_id: o.id, sender_type: isAdmin ? 'ADMIN' : 'CLIENT', text, created_at: Date.now() };
+  if (file) msg.file = file;
+  msgs.push(msg);
+  await s.set(key, JSON.stringify(msgs));
+  const to = isAdmin ? o.user_id : ADMIN_ID;
+  const head = isAdmin ? `💬 <b>Заказ #${o.id}</b>` : `💬 <b>Заказ #${o.id}</b> · ${esc(o.name)}`;
+  const body = `${head}${text ? '\n' + esc(text) : ''}`;
+  if (file) await sendFile(to, buf, file.origType || file.type, file.name, body, chatKb(o.id));
+  else await send(to, body, chatKb(o.id));
+  return msg;
+}
+
 /* ---------- Webhook бота ---------- */
 async function webhook(req) {
   if (req.headers.get('x-telegram-bot-api-secret-token') !== WEBHOOK_SECRET) return json({ error: 'forbidden' }, 403);
   const u = await req.json().catch(() => ({}));
   if (u.message?.text?.startsWith('/start')) {
-    await send(u.message.chat.id, 'Добро пожаловать в MAISONAX. Оставьте заявку или откройте свои заказы:',
-      { inline_keyboard: [[{ text: 'Открыть MAISONAX', web_app: { url: WEBAPP_URL } }]] });
+    await send(u.message.chat.id, 'Добро пожаловать в MAISONAX! Кнопка «Открыть MAISONAX» внизу всегда под рукой.',
+      { keyboard: [[{ text: 'Открыть MAISONAX', web_app: { url: WEBAPP_URL }, style: 'primary' }]], resize_keyboard: true, is_persistent: true });
   }
   const cb = u.callback_query;
   const m = cb?.data?.match(/^st:(\d+):(\w+)$/);
@@ -89,7 +119,7 @@ async function webhook(req) {
 
 /* ---------- Роутер ---------- */
 export default async (req) => { try { return await handle(req); } catch (e) { await send(ADMIN_ID, '⚠️ Ошибка сервера: ' + esc(e.message)); return json({ error: 'server' }, 500); } };
-  const handle = async (req) => {
+const handle = async (req) => {
   const url = new URL(req.url);
   const path = url.pathname.replace(/^\/api/, '').replace(/\/$/, '') || '/';
 
@@ -107,7 +137,8 @@ export default async (req) => { try { return await handle(req); } catch (e) { aw
   if (!user) return json({ error: 'unauthorized' }, 401);
   const isAdmin = user.id === ADMIN_ID;
   const s = store();
-  const body = ['POST', 'PATCH'].includes(req.method) ? await req.json().catch(() => ({})) : {};
+  const isJson = (req.headers.get('content-type') || '').includes('json');
+  const body = ['POST', 'PATCH'].includes(req.method) && isJson ? await req.json().catch(() => ({})) : {};
 
   if (path === '/me') return json({ id: user.id, name: user.first_name, admin: isAdmin });
 
@@ -124,7 +155,16 @@ export default async (req) => { try { return await handle(req); } catch (e) { aw
   if (path === '/orders/my') return json((await listOrders(s)).filter(o => o.user_id === user.id));
   if (path === '/orders/admin') return isAdmin ? json(await listOrders(s)) : json({ error: 'forbidden' }, 403);
 
-  const m = path.match(/^\/orders\/(\d+)(?:\/(status|messages))?$/);
+  const fm = path.match(/^\/files\/([0-9a-f]{24})$/);
+  if (fm) {
+    const f = await s.getWithMetadata(`file:${fm[1]}`, { type: 'arrayBuffer' });
+    if (!f) return json({ error: 'not_found' }, 404);
+    const fo = await getOrder(s, f.metadata.order_id);
+    if (!fo || (!isAdmin && fo.user_id !== user.id)) return json({ error: 'forbidden' }, 403);
+    return new Response(f.data, { headers: { 'Content-Type': f.metadata.type, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, max-age=3600' } });
+  }
+
+  const m = path.match(/^\/orders\/(\d+)(?:\/(status|messages|upload))?$/);
   if (!m) return json({ error: 'not_found' }, 404);
   const o = await getOrder(s, m[1]);
   if (!o) return json({ error: 'not_found' }, 404);
@@ -139,6 +179,20 @@ export default async (req) => { try { return await handle(req); } catch (e) { aw
     return json(o);
   }
 
+  if (m[2] === 'upload' && req.method === 'POST') {
+    const buf = await req.arrayBuffer();
+    if (!buf.byteLength || buf.byteLength > 5 * 1024 * 1024) return json({ error: 'size' }, 413);
+    const dec = h => { try { return decodeURIComponent(req.headers.get(h) || ''); } catch { return ''; } };
+    const name = clip(dec('x-file-name') || 'file', 100).replace(/[\r\n"]/g, '');
+    const origType = clip(req.headers.get('x-file-type'), 100).toLowerCase() || 'application/octet-stream';
+    const type = SAFE.has(origType) ? origType : 'application/octet-stream';
+    const fid = crypto.randomBytes(12).toString('hex');
+    await s.set(`file:${fid}`, buf, { metadata: { type, name, order_id: o.id } });
+    const msg = await addMsg(s, o, isAdmin, clip(dec('x-caption'), 1000), { id: fid, name, type, size: buf.byteLength, origType }, buf);
+    delete msg.file.origType;
+    return json(msg);
+  }
+
   if (m[2] === 'messages') {
     const key = `msgs:${o.id}`;
     const msgs = (await s.get(key, { type: 'json' })) ?? [];
@@ -149,12 +203,7 @@ export default async (req) => { try { return await handle(req); } catch (e) { aw
     if (req.method === 'POST') {
       const text = clip(body.text, 2000);
       if (!text) return json({ error: 'empty' }, 400);
-      const msg = { id: (msgs.at(-1)?.id ?? 0) + 1, order_id: o.id, sender_type: isAdmin ? 'ADMIN' : 'CLIENT', text, created_at: Date.now() };
-      msgs.push(msg);
-      await s.set(key, JSON.stringify(msgs));
-      if (isAdmin) await send(o.user_id, `💬 <b>Заказ #${o.id}</b>\n${esc(text)}`, chatKb(o.id));
-      else await send(ADMIN_ID, `💬 <b>Заказ #${o.id}</b> · ${esc(o.name)}\n${esc(text)}`, chatKb(o.id));
-      return json(msg);
+      return json(await addMsg(s, o, isAdmin, text));
     }
   }
   return json({ error: 'not_found' }, 404);

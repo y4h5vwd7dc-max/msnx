@@ -41,7 +41,7 @@ const STATUS_TEXT = {
   NEW: id => `🟡 Заказ <b>#${id}</b> снова в ожидании.`,
   IN_PROGRESS: id => `🔵 Заказ <b>#${id}</b> принят в работу. Мы на связи в чате.`,
   COMPLETED: id => `🟢 Заказ <b>#${id}</b> исполнен. Спасибо, что выбрали MAISONAX!`,
-  REJECTED: id => `🔴 Заказ <b>#${id}</b> отклонён. Подробности — в чате.`,
+  REJECTED: (id, reason) => `🔴 Заказ <b>#${id}</b> отклонён.${reason ? `\n\n<b>Причина:</b> ${esc(reason)}` : ''}`,
 };
 
 /* ---------- Авторизация ---------- */
@@ -61,6 +61,7 @@ function verifyInitData(raw) {
 
 /* ---------- Хранилище ---------- */
 const getOrder = (s, id) => getJ(s, `order:${id}`);
+const pub = (o, isAdmin) => { if (isAdmin || !o) return o; const { note, notif, ...rest } = o; return rest; }; // заметка админа — только админу
 async function patchOrder(s, id, fn) {
   const o = await getOrder(s, id);
   if (!o) return null;
@@ -78,17 +79,23 @@ async function createOrder(s, data) {
   for (;;) {
     seq++;
     if (await s.get(`order:${seq}`)) continue;
-    const o = { ...data, id: seq };
+    const o = { ...data, id: seq, history: [{ s: 'NEW', at: data.created_at }] };
     const r = await s.set(`order:${seq}`, JSON.stringify(o), { onlyIfNew: true });
     if (r?.modified === false) continue;
     await putJ(s, 'seq', seq);
     return o;
   }
 }
-async function setStatus(s, id, status) {
+async function setStatus(s, id, status, reason = '') {
   let changed = false;
-  const o = await patchOrder(s, id, x => { changed = x.status !== status; x.status = status; });
-  if (o && changed) await send(o.user_id, STATUS_TEXT[status](o.id), chatKb(o.id));
+  const o = await patchOrder(s, id, x => {
+    changed = x.status !== status || (status === 'REJECTED' && x.reject_reason !== reason);
+    if (changed) (x.history ||= []).push({ s: status, at: Date.now(), ...(status === 'REJECTED' ? { r: reason } : {}) });
+    x.status = status;
+    if (status === 'REJECTED') { x.reject_reason = reason; x.rejected_at = Date.now(); }
+    else { delete x.reject_reason; delete x.rejected_at; }
+  });
+  if (o && changed) await send(o.user_id, STATUS_TEXT[status](o.id, o.reject_reason), chatKb(o.id));
   return o;
 }
 
@@ -151,11 +158,30 @@ async function onMessage(s, m) {
   if (m.chat.type !== 'private') return;
   const isAdmin = m.from.id === ADMIN_ID;
   const t = (m.text || '').trim();
-  const cmd = t.startsWith('/') ? t.split(/[\s@]/)[0].toLowerCase() : t;
+  const cmd = m.web_app_data ? '/start' : t.startsWith('/') ? t.split(/[\s@]/)[0].toLowerCase() : t;
   const id = m.chat.id;
 
+  // админ нажал «Отклонить» в боте → следующее его сообщение считается причиной отказа
+  if (isAdmin) {
+    const pend = await getJ(s, 'pend');
+    if (pend) {
+      if (cmd === '/cancel') { await s.delete('pend'); return send(id, 'Отменено. Статус заказа не изменён.'); }
+      const isMenu = t.startsWith('/') || ['📋 Все заказы', '📊 Статистика', '❓ Помощь'].includes(t);
+      if (t && !isMenu) {
+        await s.delete('pend');
+        if (Date.now() - pend.at > 15 * 60 * 1000) return send(id, 'Время ожидания причины истекло. Нажмите «Отклонить» в уведомлении ещё раз.');
+        const reason = clip(t, 500);
+        const o = await setStatus(s, pend.orderId, 'REJECTED', reason);
+        if (!o) return send(id, 'Заказ не найден.');
+        if (pend.mid) await tg('editMessageText', { chat_id: id, message_id: pend.mid, parse_mode: 'HTML',
+          text: `${esc(pend.base || '')}\n\n<b>Статус: ${LABEL.REJECTED}</b>\nПричина: ${esc(reason)}`, reply_markup: adminKb(o) });
+        return send(id, `🔴 Заказ <b>#${o.id}</b> отклонён. Причина отправлена клиенту.`);
+      }
+    }
+  }
+
   if (cmd === '/start') {
-    await send(id, `Добро пожаловать в <b>MAISONAX</b>! 👋\n\nОставляйте заявки и общайтесь с командой прямо в Telegram. Нажмите кнопку ниже:`,
+    await send(id, m.web_app_data ? 'Приложение открывается кнопкой под сообщением 👇 Старая кнопка в клавиатуре заменена.' : `Добро пожаловать в <b>MAISONAX</b>! 👋\n\nОставляйте заявки и общайтесь с командой прямо в Telegram. Нажмите кнопку ниже:`,
       { inline_keyboard: [[appBtn(isAdmin ? '🚀 Открыть панель' : '🚀 Открыть MAISONAX')], ...(isAdmin ? [] : [[appBtn('📝 Новая заявка', 'new', 'success'), appBtn('📋 Мои заказы', 'orders', 'primary')]])] });
     return send(id, 'Быстрое меню включено 👇', isAdmin ? adminMenu : clientMenu);
   }
@@ -191,12 +217,18 @@ async function webhook(req) {
       if (u.update_id <= seen) return json({ ok: true });
       await putJ(s, 'lastupd', u.update_id);
     }
-    if (u.message) await onMessage(s, u.message);
+    if (u.message) await onMessage(s, u.message); // только личный чат с ботом; business_message и чужие чаты не обрабатываются
     const cb = u.callback_query;
     const c = cb?.data?.match(/^st:(\d+):(\w+)$/);
     if (c) {
       if (cb.from.id !== ADMIN_ID || !STATUSES.includes(c[2])) await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Нет доступа' });
-      else {
+      else if (c[2] === 'REJECTED') {
+        const base = (cb.message?.text || '').split('\n\nСтатус:')[0];
+        await putJ(s, 'pend', { orderId: Number(c[1]), mid: cb.message?.message_id, base: base.slice(0, 3000), at: Date.now() });
+        await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Напишите причину отклонения' });
+        await send(cb.message.chat.id, `✍️ Напишите причину отклонения заказа <b>#${c[1]}</b> одним сообщением — она будет видна клиенту.\n/cancel — отмена`,
+          { force_reply: true, input_field_placeholder: 'Причина отклонения', selective: true });
+      } else {
         const o = await setStatus(s, c[1], c[2]);
         await tg('answerCallbackQuery', { callback_query_id: cb.id, text: o ? LABEL[c[2]] : 'Заказ не найден' });
         if (o) {
@@ -252,9 +284,9 @@ const handle = async (req) => {
     await send(ADMIN_ID,
       `🔔 <b>Новый заказ #${o.id}</b>\n\n👤 ${esc(name)}\n📞 ${esc(phone)}\n✈️ ${o.username ? '@' + esc(o.username) : 'без username'}\n💼 ${esc(service_type)}\n\n📝 ${esc(description)}`, adminKb(o));
     await send(o.user_id, `✅ Заявка <b>#${o.id}</b> принята!\nМы свяжемся с вами в ближайшее время. Статус и переписка — в чате заказа 👇`, chatKb(o.id));
-    return json(o);
+    return json(pub(o, isAdmin));
   }
-  if (path === '/orders/my') return json((await listOrders(s)).filter(o => o.user_id === user.id));
+  if (path === '/orders/my') return json((await listOrders(s)).filter(o => o.user_id === user.id).map(o => pub(o, false)));
   if (path === '/orders/admin') return isAdmin ? json(await listOrders(s)) : json({ error: 'forbidden' }, 403);
 
   const fm = path.match(/^\/files\/([0-9a-f]{24})$/);
@@ -266,18 +298,27 @@ const handle = async (req) => {
     return new Response(f.data, { headers: { 'Content-Type': f.metadata.type, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, max-age=86400' } });
   }
 
-  const m = path.match(/^\/orders\/(\d+)(?:\/(status|messages|upload))?$/);
+  const m = path.match(/^\/orders\/(\d+)(?:\/(status|messages|upload|note))?$/);
   if (!m) return json({ error: 'not_found' }, 404);
   const o = await getOrder(s, m[1]);
   if (!o) return json({ error: 'not_found' }, 404);
   if (!isAdmin && o.user_id !== user.id) return json({ error: 'forbidden' }, 403);
 
-  if (!m[2]) return json(o);
+  if (!m[2]) return json(pub(o, isAdmin));
 
   if (m[2] === 'status' && req.method === 'PATCH') {
     if (!isAdmin) return json({ error: 'forbidden' }, 403);
     if (!STATUSES.includes(body.status)) return json({ error: 'bad_status' }, 400);
-    return json(await setStatus(s, o.id, body.status));
+    const reason = clip(body.reason, 500);
+    if (body.status === 'REJECTED' && !reason) return json({ error: 'reason_required' }, 400);
+    return json(pub(await setStatus(s, o.id, body.status, reason), isAdmin));
+  }
+
+  if (m[2] === 'note' && req.method === 'PATCH') {
+    if (!isAdmin) return json({ error: 'forbidden' }, 403);
+    const note = clip(body.note, 1000);
+    await patchOrder(s, o.id, x => { if (note) x.note = note; else delete x.note; });
+    return json({ ok: true });
   }
 
   if (m[2] === 'upload' && req.method === 'POST') {

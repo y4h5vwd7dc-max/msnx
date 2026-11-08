@@ -86,7 +86,8 @@ async function webhook(req) {
 }
 
 /* ---------- Роутер ---------- */
-export default async (req) => {
+export default async (req) => { try { return await handle(req); } catch (e) { await send(ADMIN_ID, '⚠️ Ошибка сервера: ' + esc(e.message)); return json({ error: 'server' }, 500); } };
+  const handle = async (req) => {
   const url = new URL(req.url);
   const path = url.pathname.replace(/^\/api/, '').replace(/\/$/, '') || '/';
 

@@ -4,7 +4,8 @@ import { getStore } from '@netlify/blobs';
 const { BOT_TOKEN, WEBAPP_URL, WEBHOOK_SECRET } = process.env;
 const ADMIN_ID = Number(process.env.ADMIN_ID);
 const MAX_FILE = 5 * 1024 * 1024;
-const SESSION_TTL = 3 * 86400; // initData живёт 3 суток
+const SESSION_TTL = 3 * 86400;      // initData живёт 3 суток
+const RENOTIFY_MS = 30 * 60 * 1000; // повторное уведомление о непрочитанном — не чаще раза в 30 минут
 const STATUSES = ['NEW', 'IN_PROGRESS', 'COMPLETED', 'REJECTED'];
 const LABEL = { NEW: '🟡 В ожидании', IN_PROGRESS: '🔵 В работе', COMPLETED: '🟢 Исполнен', REJECTED: '🔴 Отклонён' };
 const SAFE = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime', 'audio/mpeg', 'audio/ogg', 'audio/mp4', 'audio/webm']);
@@ -21,42 +22,27 @@ const tg = (method, body) =>
   fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   }).then(r => r.json()).catch(e => ({ ok: false, error: e.message }));
-const send = (chat_id, text, reply_markup) => tg('sendMessage', { chat_id, text, parse_mode: 'HTML', reply_markup });
+const send = (chat_id, text, reply_markup) => tg('sendMessage', { chat_id, text, parse_mode: 'HTML', reply_markup, link_preview_options: { is_disabled: true } });
 
-async function sendFile(chat_id, buf, type, name, caption, reply_markup) {
-  const kind = type.startsWith('image/') && type !== 'image/gif' ? ['sendPhoto', 'photo'] : type.startsWith('video/') ? ['sendVideo', 'video'] : ['sendDocument', 'document'];
-  const go = ([method, field]) => {
-    const fd = new FormData();
-    fd.append('chat_id', String(chat_id));
-    fd.append(field, new Blob([buf], { type }), name);
-    fd.append('caption', caption.slice(0, 1000));
-    fd.append('parse_mode', 'HTML');
-    if (reply_markup) fd.append('reply_markup', JSON.stringify(reply_markup));
-    return fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, { method: 'POST', body: fd }).then(r => r.json()).catch(() => ({ ok: false }));
-  };
-  const r = await go(kind);
-  return !r.ok && kind[0] !== 'sendDocument' ? go(['sendDocument', 'document']) : r;
-}
-
-async function tgDownload(file_id) {
-  const f = await tg('getFile', { file_id });
-  if (!f.ok || (f.result.file_size ?? 0) > MAX_FILE) return null;
-  const r = await fetch(`https://api.telegram.org/file/bot${BOT_TOKEN}/${f.result.file_path}`);
-  return r.ok ? r.arrayBuffer() : null;
-}
-
-const chatBtn = id => ({ text: '💬 Открыть чат', web_app: { url: `${WEBAPP_URL}/#order=${id}` }, style: 'primary' });
+// ВАЖНО: web_app через inline-кнопку (или кнопку меню) передаёт initData. Кнопка обычной клавиатуры — нет.
+const appBtn = (text, hash = '', style = 'primary') => ({ text, web_app: { url: WEBAPP_URL + (hash ? '/#' + hash : '') }, style });
+const chatBtn = id => appBtn('💬 Открыть чат', `order=${id}`);
+const chatKb = id => ({ inline_keyboard: [[chatBtn(id)]] });
+const profileBtn = o => ({ text: '✈️ Профиль клиента', url: o.username ? `https://t.me/${o.username}` : `tg://user?id=${o.user_id}` });
 const adminKb = o => ({ inline_keyboard: [
   [{ text: 'В работу', callback_data: `st:${o.id}:IN_PROGRESS`, style: 'primary' }, { text: 'Завершить', callback_data: `st:${o.id}:COMPLETED`, style: 'success' }],
   [{ text: 'Отклонить', callback_data: `st:${o.id}:REJECTED`, style: 'danger' }, chatBtn(o.id)],
+  [profileBtn(o)],
 ] });
-const chatKb = id => ({ inline_keyboard: [[chatBtn(id)]] });
+const clientMenu = { keyboard: [[{ text: '📝 Новая заявка' }, { text: '📋 Мои заказы' }], [{ text: '❓ Помощь' }]], resize_keyboard: true, is_persistent: true, input_field_placeholder: 'Выберите действие' };
+const adminMenu = { keyboard: [[{ text: '📋 Все заказы' }, { text: '📊 Статистика' }], [{ text: '❓ Помощь' }]], resize_keyboard: true, is_persistent: true, input_field_placeholder: 'Выберите действие' };
 
-// сообщение админу + запоминаем его id: ответ (reply) на него в боте уйдёт клиенту в чат
-async function toAdmin(s, orderId, r) {
-  const mid = r?.result?.message_id;
-  if (mid) await putJ(s, `tg:${mid}`, orderId);
-}
+const STATUS_TEXT = {
+  NEW: id => `🟡 Заказ <b>#${id}</b> снова в ожидании.`,
+  IN_PROGRESS: id => `🔵 Заказ <b>#${id}</b> принят в работу. Мы на связи в чате.`,
+  COMPLETED: id => `🟢 Заказ <b>#${id}</b> исполнен. Спасибо, что выбрали MAISONAX!`,
+  REJECTED: id => `🔴 Заказ <b>#${id}</b> отклонён. Подробности — в чате.`,
+};
 
 /* ---------- Авторизация ---------- */
 function verifyInitData(raw) {
@@ -75,7 +61,7 @@ function verifyInitData(raw) {
 
 /* ---------- Хранилище ---------- */
 const getOrder = (s, id) => getJ(s, `order:${id}`);
-async function patchOrder(s, id, fn) {          // чтение → правка → запись как можно короче
+async function patchOrder(s, id, fn) {
   const o = await getOrder(s, id);
   if (!o) return null;
   fn(o);
@@ -102,64 +88,114 @@ async function createOrder(s, data) {
 async function setStatus(s, id, status) {
   let changed = false;
   const o = await patchOrder(s, id, x => { changed = x.status !== status; x.status = status; });
-  if (o && changed) await send(o.user_id, `Статус вашего заказа <b>#${o.id}</b> изменён:\n${LABEL[status]}`, chatKb(o.id));
+  if (o && changed) await send(o.user_id, STATUS_TEXT[status](o.id), chatKb(o.id));
   return o;
 }
 
-// каждое сообщение — отдельный ключ: параллельные записи не затирают друг друга
+// Каждое сообщение — отдельный ключ. В Telegram текст переписки НЕ дублируется:
+// получатель видит только уведомление «непрочитанное сообщение» (не чаще раза в 30 минут, пока не прочитает).
 const mkey = (oid, id) => `msg:${oid}:${String(id).padStart(16, '0')}`;
-async function addMsg(s, o, isAdmin, text, file, buf, origType) {
+async function addMsg(s, o, isAdmin, text, file) {
   const id = Date.now() * 10 + crypto.randomInt(10);
   const msg = { id, order_id: o.id, sender_type: isAdmin ? 'ADMIN' : 'CLIENT', text, created_at: Date.now() };
   if (file) msg.file = file;
   await putJ(s, mkey(o.id, id), msg);
-  await patchOrder(s, o.id, x => {
+  const side = isAdmin ? 'client' : 'admin', flag = 'unread_' + side;
+  let notify = false;
+  const fresh = await patchOrder(s, o.id, x => {
+    const now = Date.now();
+    x.notif ||= {};
+    notify = !x[flag] || now - (x.notif[side] || 0) > RENOTIFY_MS;
+    x[flag] = true;
+    if (notify) x.notif[side] = now;
     x.last = { at: msg.created_at, from: msg.sender_type, text: text ? text.slice(0, 80) : '📎 ' + (file?.name || 'файл') };
-    x[isAdmin ? 'unread_client' : 'unread_admin'] = true;
   });
-  const to = isAdmin ? o.user_id : ADMIN_ID;
-  const head = isAdmin ? `💬 <b>Заказ #${o.id}</b>` : `💬 <b>Заказ #${o.id}</b> · ${esc(o.name)}`;
-  const body = `${head}${text ? '\n' + esc(text) : ''}`;
-  const r = file ? await sendFile(to, buf, origType || file.type, file.name, body, chatKb(o.id)) : await send(to, body, chatKb(o.id));
-  if (!isAdmin) await toAdmin(s, o.id, r);
+  if (notify && fresh) {
+    if (isAdmin) await send(fresh.user_id, `💬 У Вас непрочитанное сообщение (Заказ #${fresh.id})`, chatKb(fresh.id));
+    else await send(ADMIN_ID, `💬 У Вас непрочитанное сообщение (Заказ #${fresh.id} · ${esc(fresh.name)})`, chatKb(fresh.id));
+  }
   return msg;
 }
 async function attach(s, o, isAdmin, buf, origType, name, caption) {
   const type = SAFE.has(origType) ? origType : 'application/octet-stream';
   const fid = crypto.randomBytes(12).toString('hex');
   await s.set(`file:${fid}`, buf, { metadata: { type, name, order_id: o.id } });
-  return addMsg(s, o, isAdmin, caption, { id: fid, name, type, size: buf.byteLength }, buf, origType);
+  return addMsg(s, o, isAdmin, caption, { id: fid, name, type, size: buf.byteLength });
 }
 
-/* ---------- Webhook бота ---------- */
+/* ---------- Бот ---------- */
+const HELP_CLIENT = `<b>MAISONAX</b> — сайты, чат-боты и автоматизация для бизнеса.
+
+📝 <b>Новая заявка</b> — опишите задачу, мы свяжемся с вами
+📋 <b>Мои заказы</b> — статусы и чат с командой
+💬 Переписка идёт в приложении, а сюда приходят уведомления
+
+Команды: /new · /orders · /help`;
+const HELP_ADMIN = `<b>Панель администратора</b>
+
+📋 <b>Все заказы</b> — список и чаты в приложении
+📊 <b>Статистика</b> — сводка по статусам
+Статус заказа можно менять кнопками в уведомлении или в приложении.
+
+Команды: /orders · /stats · /help`;
+
+async function stats(s) {
+  const all = await listOrders(s);
+  const by = k => all.filter(o => o.status === k).length;
+  const today = all.filter(o => Date.now() - o.created_at < 86400000).length;
+  const unread = all.filter(o => o.unread_admin).length;
+  return `📊 <b>Статистика</b>\n\nВсего заказов: <b>${all.length}</b>\nЗа 24 часа: <b>${today}</b>\n\n🟡 В ожидании: ${by('NEW')}\n🔵 В работе: ${by('IN_PROGRESS')}\n🟢 Исполнено: ${by('COMPLETED')}\n🔴 Отклонено: ${by('REJECTED')}\n\n💬 С непрочитанными: <b>${unread}</b>`;
+}
+
+async function onMessage(s, m) {
+  if (m.chat.type !== 'private') return;
+  const isAdmin = m.from.id === ADMIN_ID;
+  const t = (m.text || '').trim();
+  const cmd = t.startsWith('/') ? t.split(/[\s@]/)[0].toLowerCase() : t;
+  const id = m.chat.id;
+
+  if (cmd === '/start') {
+    await send(id, `Добро пожаловать в <b>MAISONAX</b>! 👋\n\nОставляйте заявки и общайтесь с командой прямо в Telegram. Нажмите кнопку ниже:`,
+      { inline_keyboard: [[appBtn(isAdmin ? '🚀 Открыть панель' : '🚀 Открыть MAISONAX')], ...(isAdmin ? [] : [[appBtn('📝 Новая заявка', 'new', 'success'), appBtn('📋 Мои заказы', 'orders', 'primary')]])] });
+    return send(id, 'Быстрое меню включено 👇', isAdmin ? adminMenu : clientMenu);
+  }
+  if (cmd === '/new' || t === '📝 Новая заявка') {
+    return send(id, 'Оформите заявку за минуту — опишите задачу, и мы свяжемся с вами 👇', { inline_keyboard: [[appBtn('📝 Оставить заявку', 'new', 'success')]] });
+  }
+  if (cmd === '/orders' || t === '📋 Мои заказы' || t === '📋 Все заказы') {
+    if (isAdmin) {
+      const all = await listOrders(s);
+      const fresh = all.filter(o => o.status === 'NEW').length, unread = all.filter(o => o.unread_admin).length;
+      return send(id, `📋 Заказов: <b>${all.length}</b>\n🟡 Новых: <b>${fresh}</b>\n💬 С непрочитанными: <b>${unread}</b>`, { inline_keyboard: [[appBtn('Открыть заказы', 'orders')]] });
+    }
+    const mine = (await listOrders(s)).filter(o => o.user_id === m.from.id).slice(0, 5);
+    if (!mine.length) return send(id, 'У вас пока нет заказов. Оставьте первую заявку 👇', { inline_keyboard: [[appBtn('📝 Оставить заявку', 'new', 'success')]] });
+    const lines = mine.map(o => `<b>#${o.id}</b> · ${esc(o.service_type)} — ${LABEL[o.status]}${o.unread_client ? ' 💬' : ''}`).join('\n');
+    return send(id, `📋 <b>Ваши заказы</b>\n\n${lines}`, { inline_keyboard: [...mine.map(o => [appBtn(`#${o.id} · ${LABEL[o.status].slice(3)}`, `order=${o.id}`, 'primary')]), [appBtn('Все заказы', 'orders')]] });
+  }
+  if (cmd === '/stats' || t === '📊 Статистика') {
+    if (!isAdmin) return;
+    return send(id, await stats(s), { inline_keyboard: [[appBtn('Открыть заказы', 'orders')]] });
+  }
+  if (cmd === '/help' || t === '❓ Помощь') return send(id, isAdmin ? HELP_ADMIN : HELP_CLIENT, { inline_keyboard: [[appBtn('🚀 Открыть MAISONAX')]] });
+  if (!isAdmin) return send(id, 'Чтобы написать команде по заказу, откройте чат в приложении 👇', { inline_keyboard: [[appBtn('📋 Мои заказы', 'orders'), appBtn('📝 Новая заявка', 'new', 'success')]] });
+}
+
 async function webhook(req) {
   if (req.headers.get('x-telegram-bot-api-secret-token') !== WEBHOOK_SECRET) return json({ error: 'forbidden' }, 403);
   const u = await req.json().catch(() => ({}));
   try {
     const s = store();
-    const m = u.message;
-    if (m?.text?.startsWith('/start')) {
-      await send(m.chat.id, 'Добро пожаловать в MAISONAX! Кнопка «Открыть MAISONAX» внизу всегда под рукой.',
-        { keyboard: [[{ text: 'Открыть MAISONAX', web_app: { url: WEBAPP_URL }, style: 'primary' }]], resize_keyboard: true, is_persistent: true });
-    } else if (m && m.from?.id === ADMIN_ID && m.reply_to_message) {
-      // админ отвечает reply'ем на уведомление → сообщение уходит клиенту в чат заказа
-      const oid = await getJ(s, `tg:${m.reply_to_message.message_id}`);
-      const o = oid && await getOrder(s, oid);
-      if (o) {
-        let ok = false;
-        const cap = clip(m.caption || m.text, 1000);
-        if (m.text) { await addMsg(s, o, true, clip(m.text, 2000)); ok = true; }
-        else if (m.photo || m.document) {
-          const buf = await tgDownload(m.photo ? m.photo.at(-1).file_id : m.document.file_id);
-          if (buf) { await attach(s, o, true, buf, m.photo ? 'image/jpeg' : (m.document.mime_type || ''), clip(m.document?.file_name || 'photo.jpg', 100), cap); ok = true; }
-        }
-        await tg('setMessageReaction', { chat_id: m.chat.id, message_id: m.message_id, reaction: [{ type: 'emoji', emoji: ok ? '👍' : '👎' }] });
-      }
+    if (u.update_id) { // Telegram иногда присылает апдейт повторно — пропускаем уже обработанные
+      const seen = (await getJ(s, 'lastupd')) ?? 0;
+      if (u.update_id <= seen) return json({ ok: true });
+      await putJ(s, 'lastupd', u.update_id);
     }
+    if (u.message) await onMessage(s, u.message);
     const cb = u.callback_query;
     const c = cb?.data?.match(/^st:(\d+):(\w+)$/);
     if (c) {
-      if (cb.from.id !== ADMIN_ID || !STATUSES.includes(c[2])) { await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Нет доступа' }); }
+      if (cb.from.id !== ADMIN_ID || !STATUSES.includes(c[2])) await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Нет доступа' });
       else {
         const o = await setStatus(s, c[1], c[2]);
         await tg('answerCallbackQuery', { callback_query_id: cb.id, text: o ? LABEL[c[2]] : 'Заказ не найден' });
@@ -171,7 +207,7 @@ async function webhook(req) {
       }
     }
   } catch (e) { console.error('webhook', e); }
-  return json({ ok: true }); // всегда 200, чтобы Telegram не повторял запрос бесконечно
+  return json({ ok: true }); // всегда 200, чтобы Telegram не повторял запрос
 }
 
 /* ---------- API ---------- */
@@ -181,12 +217,21 @@ const handle = async (req) => {
 
   if (path === '/webhook' && req.method === 'POST') return webhook(req);
 
-  if (path === '/setup') { // разово: /api/setup?key=<WEBHOOK_SECRET>
-    if (!WEBHOOK_SECRET || url.searchParams.get('key') !== WEBHOOK_SECRET) return json({ error: 'forbidden', secret_set: !!WEBHOOK_SECRET, token_set: !!BOT_TOKEN, admin_set: !!ADMIN_ID, url_set: !!WEBAPP_URL }, 403);
-    const hook = await tg('setWebhook', { url: `${WEBAPP_URL}/api/webhook`, secret_token: WEBHOOK_SECRET, allowed_updates: ['message', 'callback_query'] });
-    const menu = await tg('setChatMenuButton', { menu_button: { type: 'web_app', text: 'MAISONAX', web_app: { url: WEBAPP_URL } } });
-    const cmds = await tg('setMyCommands', { commands: [{ command: 'start', description: 'Открыть MAISONAX' }] });
-    return json({ webhook: hook, menu, cmds });
+  if (path === '/setup') { // разово после деплоя: /api/setup?key=<WEBHOOK_SECRET>
+    const plain = (o, st = 200) => new Response(JSON.stringify(o, null, 1), { status: st, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+    if (!WEBHOOK_SECRET || url.searchParams.get('key') !== WEBHOOK_SECRET) return plain({ error: 'forbidden', secret_set: !!WEBHOOK_SECRET, token_set: !!BOT_TOKEN, admin_set: !!ADMIN_ID, url_set: !!WEBAPP_URL }, 403);
+    const r = {};
+    r.webhook = (await tg('setWebhook', { url: `${WEBAPP_URL}/api/webhook`, secret_token: WEBHOOK_SECRET, allowed_updates: ['message', 'callback_query'], drop_pending_updates: false })).ok;
+    r.menu = (await tg('setChatMenuButton', { menu_button: { type: 'web_app', text: 'MAISONAX', web_app: { url: WEBAPP_URL } } })).ok;
+    r.commands = (await tg('setMyCommands', { commands: [
+      { command: 'start', description: 'Открыть MAISONAX' }, { command: 'new', description: 'Новая заявка' },
+      { command: 'orders', description: 'Мои заказы' }, { command: 'help', description: 'Помощь' }] })).ok;
+    r.admin_commands = (await tg('setMyCommands', { scope: { type: 'chat', chat_id: ADMIN_ID }, commands: [
+      { command: 'start', description: 'Панель' }, { command: 'orders', description: 'Все заказы' },
+      { command: 'stats', description: 'Статистика' }, { command: 'help', description: 'Помощь' }] })).ok;
+    r.description = (await tg('setMyDescription', { description: 'MAISONAX — сайты, чат-боты и автоматизация для бизнеса. Оставьте заявку и общайтесь с командой прямо в Telegram: статусы заказов, чат и уведомления в одном месте.' })).ok;
+    r.short = (await tg('setMyShortDescription', { short_description: 'Заявки и чат с командой MAISONAX' })).ok;
+    return plain(r);
   }
 
   const user = verifyInitData(req.headers.get('x-init-data'));
@@ -204,11 +249,9 @@ const handle = async (req) => {
     const mine = (await listOrders(s)).filter(o => o.user_id === user.id);
     if (!isAdmin && mine.filter(o => Date.now() - o.created_at < 600000).length >= 3) return json({ error: 'rate_limit' }, 429);
     const o = await createOrder(s, { user_id: user.id, username: user.username || null, name, phone, service_type, description, status: 'NEW', created_at: Date.now() });
-    const r = await send(ADMIN_ID,
-      `🔔 <b>Новый заказ #${o.id}</b>\n👤 Имя: ${esc(name)}\n📞 Тел: ${esc(phone)}\n` +
-      `✈️ TG: ${o.username ? '@' + esc(o.username) : `<a href="tg://user?id=${o.user_id}">профиль</a>`}\n` +
-      `💼 Услуга: ${esc(service_type)}\n📝 Задача: ${esc(description)}\n\n<i>Ответьте (reply) на это сообщение — текст уйдёт клиенту в чат.</i>`, adminKb(o));
-    await toAdmin(s, o.id, r);
+    await send(ADMIN_ID,
+      `🔔 <b>Новый заказ #${o.id}</b>\n\n👤 ${esc(name)}\n📞 ${esc(phone)}\n✈️ ${o.username ? '@' + esc(o.username) : 'без username'}\n💼 ${esc(service_type)}\n\n📝 ${esc(description)}`, adminKb(o));
+    await send(o.user_id, `✅ Заявка <b>#${o.id}</b> принята!\nМы свяжемся с вами в ближайшее время. Статус и переписка — в чате заказа 👇`, chatKb(o.id));
     return json(o);
   }
   if (path === '/orders/my') return json((await listOrders(s)).filter(o => o.user_id === user.id));

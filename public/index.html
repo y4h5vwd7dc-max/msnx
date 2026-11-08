@@ -111,6 +111,31 @@ textarea{resize:none;min-height:120px}
 .lb img{max-width:100%;max-height:100%;border-radius:12px}
 .quick{flex:none;display:flex;gap:6px;overflow-x:auto;padding:8px 0 0}
 .quick button{flex:none;background:rgba(0,243,255,.06);border:1px solid var(--line);color:var(--cyan);border-radius:50px;padding:.35rem .8rem;font-size:.75rem;cursor:pointer;white-space:nowrap}
+.reason{flex:none;border:1px solid rgba(255,93,108,.45);background:linear-gradient(160deg,rgba(255,93,108,.12),rgba(255,93,108,.04));border-radius:16px;padding:10px 14px;font-size:.88rem;word-break:break-word}
+.reason b{display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rej);margin-bottom:3px}
+#reason:empty{display:none}
+.prev.rej{color:var(--rej);border-top-color:rgba(255,93,108,.3);white-space:normal}
+.modal{position:fixed;inset:0;z-index:30;background:rgba(2,3,8,.82);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.modal .card{width:100%;max-width:520px}
+.modal h3{font-size:1.05rem;margin-bottom:4px}
+.modal p{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+.modal .acts{display:flex;gap:8px;margin-top:12px}
+.modal .acts .btn{flex:1}
+.btn.ghost{background:rgba(255,255,255,.06);color:var(--text);box-shadow:none;border:1px solid rgba(255,255,255,.12)}
+.btn.danger{background:linear-gradient(135deg,#ff5d6c,#ff8a5d);box-shadow:0 8px 30px rgba(255,93,108,.28)}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+main>*{animation:fade .3s ease both}
+.skel{flex:none;height:112px;border-radius:20px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.1),rgba(255,255,255,.04));background-size:200% 100%;animation:sh 1.3s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.tl{list-style:none;margin:16px 0 0 4px;border-left:1px dashed rgba(0,243,255,.3);padding-left:16px;display:flex;flex-direction:column;gap:11px}
+.tl li{position:relative;font-size:.82rem}
+.tl li::before{content:"";position:absolute;left:-21px;top:6px;width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+.tl small{display:block;color:var(--muted);font-family:var(--mono);font-size:.65rem}
+.tl em{display:block;color:var(--text);font-style:normal;opacity:.85}
+.emptyx{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:34px 14px;margin:auto;color:var(--muted);font-size:.9rem}
+.emptyx .ic{font-size:2.3rem;filter:drop-shadow(0 0 12px rgba(0,243,255,.45))}
+.emptyx .btn{max-width:260px;margin-top:6px}
+.note textarea{min-height:72px}
 .offline{flex:none;text-align:center;font-family:var(--mono);font-size:.7rem;color:var(--rej);padding:4px}
 </style>
 </head>
@@ -136,6 +161,7 @@ const hm = t => new Date(t).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2
 const dayKey = t => new Date(t).toDateString();
 const dayLabel = t => { const d = new Date(t), n = new Date(); if (d.toDateString() === n.toDateString()) return 'Сегодня';
   n.setDate(n.getDate() - 1); return d.toDateString() === n.toDateString() ? 'Вчера' : d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'}); };
+const ago = t => { const m = Math.floor((Date.now() - t) / 60000); if (m < 1) return 'только что'; if (m < 60) return m + ' мин назад'; const h = Math.floor(m / 60); return h < 24 ? h + ' ч назад' : time(t); };
 const sizeStr = n => n > 1048576 ? (n/1048576).toFixed(1) + ' МБ' : Math.ceil(n/1024) + ' КБ';
 const badge = s => `<span class="badge ${s}">${STATUS[s]}</span>`;
 
@@ -207,9 +233,33 @@ async function prepFile(file) {
   } catch { return file; }
 }
 
+const timeline = o => `<ul class="tl">${(o.history && o.history.length ? o.history : [{ s: o.status, at: o.created_at }]).map(e => `<li class="${e.s}">${STATUS[e.s]}<small>${time(e.at)}</small>${e.r ? `<em>${esc(e.r)}</em>` : ''}</li>`).join('')}</ul>`;
+function askReason(id, onOk, onCancel) {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card"><h3>Причина отклонения</h3><p>Заказ #${id}. Клиент увидит эту причину в приложении и в уведомлении.</p>
+    <textarea id="rs" maxlength="500" placeholder="Например: сейчас не берём проекты такого типа"></textarea>
+    <div class="acts"><button class="btn ghost" id="rs-no" type="button">Отмена</button><button class="btn danger" id="rs-ok" type="button">Отклонить</button></div></div>`;
+  document.body.appendChild(m);
+  const close = () => m.remove();
+  m.querySelector('#rs').focus();
+  m.querySelector('#rs-no').onclick = () => { close(); onCancel(); };
+  m.querySelector('#rs-ok').onclick = async e => {
+    const text = m.querySelector('#rs').value.trim();
+    if (!text) return toast('Напишите причину');
+    e.currentTarget.disabled = true;
+    if (await onOk(text)) close(); else e.currentTarget.disabled = false;
+  };
+}
+
 /* ---- Старт и навигация ---- */
 async function init() {
-  if (!tg?.initData) { $('#main').innerHTML = '<div class="empty">Откройте приложение через бота: кнопка «Открыть MAISONAX» в сообщении бота или синяя кнопка меню рядом с полем ввода.</div>'; return; }
+  if (!tg?.initData) {
+    $('#main').innerHTML = '<div class="emptyx"><div class="ic">🔐</div><div>Откройте приложение кнопкой «Открыть MAISONAX» под сообщением бота или синей кнопкой меню рядом с полем ввода.</div><button class="btn" id="reopen" type="button">Открыть через бота</button></div>';
+    const reopen = () => { try { tg.sendData('open'); } catch { tg?.close?.(); } };  // бот ответит правильной кнопкой
+    $('#reopen').onclick = reopen;
+    if (tg?.sendData && tg.platform && tg.platform !== 'unknown') setTimeout(reopen, 700);
+    return;
+  }
   try { me = await api('/me'); } catch { $('#main').innerHTML = '<div class="empty">Не удалось авторизоваться. Перезапустите приложение.</div>'; return; }
   $('#role').textContent = me.admin ? 'admin' : 'client';
   tg.BackButton?.onClick(() => go('orders'));   // один обработчик на всё приложение
@@ -233,19 +283,25 @@ function go(t) {
 /* ---- Форма заявки ---- */
 function renderForm() {
   const u = tg.initDataUnsafe?.user;
-  $('#main').innerHTML = `<div class="card">
-    <div class="field"><label>Имя</label><input id="f-name" maxlength="80" value="${esc(u?.first_name||'')}"></div>
-    <div class="field"><label>Телефон</label><input id="f-phone" type="tel" inputmode="tel" placeholder="+7 999 000 00 00"></div>
-    <div class="field"><label>Услуга</label><select id="f-svc">${SERVICES.map(s=>`<option>${s}</option>`).join('')}</select></div>
-    <div class="field"><label>Описание задачи</label><textarea id="f-desc" maxlength="2000" placeholder="Что нужно сделать и в какой нише работает ваш бизнес"></textarea></div>
+  let d = {}; try { d = JSON.parse(localStorage.getItem('draft') || '{}'); } catch {}
+  let svc = SERVICES.includes(d.svc) ? d.svc : SERVICES[0];
+  const main = $('#main');
+  main.innerHTML = `<div class="card">
+    <div class="field"><label>Имя</label><input id="f-name" maxlength="80" value="${esc(d.name ?? u?.first_name ?? '')}"></div>
+    <div class="field"><label>Телефон</label><input id="f-phone" type="tel" inputmode="tel" placeholder="+7 999 000 00 00" value="${esc(d.phone || '')}"></div>
+    <div class="field"><label>Что нужно сделать</label><select id="f-svc">${SERVICES.map(s => `<option ${s === svc ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></div>
+    <div class="field"><label>Описание задачи</label><textarea id="f-desc" maxlength="2000" placeholder="Что нужно сделать и в какой нише работает ваш бизнес">${esc(d.desc || '')}</textarea></div>
     <button class="btn" id="f-send">Отправить заявку</button></div>`;
+  const save = () => { try { localStorage.setItem('draft', JSON.stringify({ name: $('#f-name').value, phone: $('#f-phone').value, desc: $('#f-desc').value, svc })); } catch {} };
+  $('#f-svc').addEventListener('change', e => { svc = e.target.value; save(); });
+  ['#f-name', '#f-phone', '#f-desc'].forEach(q => $(q).addEventListener('input', save));
   $('#f-send').onclick = async e => {
     const btn = e.currentTarget;
-    const body = {name:$('#f-name').value,phone:$('#f-phone').value,service_type:$('#f-svc').value,description:$('#f-desc').value};
+    const body = { name: $('#f-name').value, phone: $('#f-phone').value, service_type: svc, description: $('#f-desc').value };
     if (!body.name.trim() || !body.description.trim()) return toast('Заполните имя и описание');
     if (!/^\+?[\d\s()\-]{6,20}$/.test(body.phone.trim())) return toast('Проверьте номер телефона');
     btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Отправляем';
-    try { const o = await api('/orders',{method:'POST',body}); tg.HapticFeedback?.notificationOccurred('success'); toast(`Заявка #${o.id} отправлена`); go('orders'); }
+    try { const o = await api('/orders', { method: 'POST', body }); try { localStorage.removeItem('draft'); } catch {} tg.HapticFeedback?.notificationOccurred('success'); toast(`Заявка #${o.id} отправлена`); go('orders'); }
     catch (err) { toast(err.message === 'rate_limit' ? 'Слишком много заявок. Подождите несколько минут' : 'Не удалось отправить. Попробуйте ещё раз'); btn.disabled = false; btn.textContent = 'Отправить заявку'; }
   };
 }
@@ -253,26 +309,30 @@ function renderForm() {
 /* ---- Список заказов ---- */
 async function renderList() {
   const main = $('#main');
-  main.innerHTML = `<div id="ctl" class="filters"></div>${me.admin ? '<input class="search" id="q" type="search" placeholder="Поиск: номер, имя, телефон" autocomplete="off">' : ''}<div id="lst" style="display:flex;flex-direction:column;gap:12px"><div class="empty">Загрузка…</div></div>`;
+  main.innerHTML = `<div id="ctl" class="filters"></div>${me.admin ? '<input class="search" id="q" type="search" placeholder="Поиск: номер, имя, телефон" autocomplete="off">' : ''}<div id="lst" style="display:flex;flex-direction:column;gap:12px"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>`;
   let list = [], sig = '';
   const unread = o => me.admin ? o.unread_admin : o.unread_client;
+  const done = o => ['COMPLETED', 'REJECTED'].includes(o.status);
   const match = o => !query || [o.id, o.name, o.phone, o.username, o.service_type].join(' ').toLowerCase().includes(query);
-  const inFilter = o => filter === 'ALL' ? true : filter === 'DONE' ? ['COMPLETED','REJECTED'].includes(o.status) : o.status === filter;
+  const inFilter = o => filter === 'ALL' ? true : filter === 'DONE' ? done(o) : filter === 'UNREAD' ? !!unread(o) : o.status === filter;
   const paint = () => {
     if (me.admin) {
-      const cnt = k => list.filter(o => k === 'ALL' ? true : k === 'DONE' ? ['COMPLETED','REJECTED'].includes(o.status) : o.status === k).length;
-      $('#ctl').innerHTML = [['ALL','Все'],['NEW','Новые'],['IN_PROGRESS','В работе'],['DONE','Завершённые']]
-        .map(([k,l]) => `<button class="chip ${filter===k?'on':''}" data-f="${k}">${l} · ${cnt(k)}</button>`).join('');
+      const cnt = k => list.filter(o => k === 'ALL' ? true : k === 'DONE' ? done(o) : k === 'UNREAD' ? o.unread_admin : o.status === k).length;
+      $('#ctl').innerHTML = [['ALL', 'Все'], ['NEW', 'Новые'], ['IN_PROGRESS', 'В работе'], ['DONE', 'Завершённые']]
+        .map(([k, l]) => `<button class="chip ${filter === k ? 'on' : ''}" data-f="${k}">${l} · ${cnt(k)}</button>`).join('');
       $('#ctl').querySelectorAll('.chip').forEach(b => b.onclick = () => { filter = b.dataset.f; paint(); });
     } else $('#ctl').remove();
     const shown = list.filter(o => inFilter(o) && match(o));
     const keep = main.scrollTop;
     $('#lst').innerHTML = shown.length ? shown.map(o => `<button class="card order" data-id="${o.id}">
       <div class="row"><span class="num">#${o.id}${unread(o) ? '<i class="dot"></i>' : ''}</span>${badge(o.status)}</div>
-      <div class="row"><b>${esc(me.admin ? o.name : o.service_type)}</b><span class="sub">${time(o.created_at)}</span></div>
+      <div class="row"><b>${esc(me.admin ? o.name : o.service_type)}</b><span class="sub">${ago(o.created_at)}</span></div>
       <div class="sub">${esc(me.admin ? o.service_type + ' · ' + o.description : o.description)}</div>
+      ${o.status === 'REJECTED' && o.reject_reason ? `<div class="prev rej">Причина: ${esc(o.reject_reason)}</div>` : ''}
       ${o.last ? `<div class="prev ${unread(o) ? 'new' : ''}">${o.last.from === 'ADMIN' ? (me.admin ? 'Вы' : 'MAISONAX') : esc(me.admin ? o.name : 'Вы')}: ${esc(o.last.text)}</div>` : ''}</button>`).join('')
-      : `<div class="empty">${me.admin ? 'Ничего не найдено' : 'Заказов пока нет. Оставьте первую заявку во вкладке «Новая заявка».'}</div>`;
+      : (me.admin ? '<div class="emptyx"><div class="ic">🗂</div><div>Ничего не найдено</div></div>'
+        : '<div class="emptyx"><div class="ic">📋</div><div>Заказов пока нет.<br>Опишите задачу — ответим в ближайшее время.</div><button class="btn" id="goNew">Оставить заявку</button></div>');
+    $('#goNew')?.addEventListener('click', () => go('new'));
     $('#lst').querySelectorAll('.order').forEach(b => b.onclick = () => openOrder(Number(b.dataset.id)));
     main.scrollTop = keep;
   };
@@ -280,7 +340,7 @@ async function renderList() {
     if (openId || tab !== 'orders') return;
     let l; try { l = await api(me.admin ? '/orders/admin' : '/orders/my'); } catch { return; }
     const ns = JSON.stringify(l);
-    if (ns === sig) return;           // ничего не изменилось — не перерисовываем (не сбиваем прокрутку)
+    if (ns === sig) return;
     sig = ns; list = l; paint();
   };
   $('#q')?.addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); paint(); });
@@ -307,8 +367,11 @@ async function openOrder(id) {
         <dt>Telegram</dt><dd>${o.username ? `<a href="https://t.me/${esc(o.username)}" id="tgl">@${esc(o.username)}</a>` : `<a href="tg://user?id=${o.user_id}">открыть профиль</a>`}</dd>` : ''}
         <dt>Задача</dt><dd>${esc(o.description)}</dd>
       </dl>
+      <div id="tlw">${timeline(o)}</div>
+      ${admin ? `<div class="field note" style="margin:14px 0 0"><label>Заметка (видна только вам)</label><textarea id="note" maxlength="1000" placeholder="Бюджет, договорённости, напоминания…">${esc(o.note || '')}</textarea></div>` : ''}
       ${admin ? `<div class="field" style="margin:14px 0 0"><label>Статус</label><select id="status">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${k===o.status?'selected':''}>${v}</option>`).join('')}</select></div>` : ''}</div>
     </details>
+    <div id="reason"></div>
     <div class="card chatcard"><div class="chat" id="chat" data-stick="1"><div class="empty">Сообщений пока нет</div></div>
       ${admin ? '<div class="quick" id="quick"><button data-t="Здравствуйте! Принял заявку, изучаю детали.">Принял заявку</button><button data-t="Уточните, пожалуйста, детали задачи.">Уточнить детали</button><button data-t="Когда вам удобно созвониться?">Созвон</button><button data-t="Готово ✅ Посмотрите, пожалуйста.">Готово ✅</button></div>' : ''}
       <div class="send"><button class="btn clip" id="clip" type="button" aria-label="Прикрепить файл">📎</button><input type="file" id="file" hidden>
@@ -316,9 +379,19 @@ async function openOrder(id) {
   $('#back').onclick = () => go('orders');
   $('#copy')?.addEventListener('click', () => { navigator.clipboard?.writeText(o.phone); toast('Номер скопирован'); });
   $('#tgl')?.addEventListener('click', e => { if (tg?.openTelegramLink) { e.preventDefault(); tg.openTelegramLink(e.currentTarget.href); } });
+  const paintReason = r => { $('#reason').innerHTML = r.status === 'REJECTED' && r.reject_reason ? `<div class="reason"><b>Причина отклонения</b>${esc(r.reject_reason)}</div>` : ''; };
+  const paintAll = r => { paintReason(r); const t = $('#tlw'); if (t) t.innerHTML = timeline(r); };
+  paintAll(o);
+  $('#note')?.addEventListener('change', async e => { try { await api(`/orders/${id}/note`, { method: 'PATCH', body: { note: e.target.value } }); toast('Заметка сохранена'); } catch { toast('Не удалось сохранить заметку'); } });
+  let curStatus = o.status;
   $('#status')?.addEventListener('change', async e => {
-    try { const r = await api(`/orders/${id}/status`,{method:'PATCH',body:{status:e.target.value}}); $('#st').innerHTML = badge(r.status); toast('Статус обновлён, клиент уведомлён'); }
-    catch { toast('Не удалось сменить статус'); }
+    const sel = e.target, v = sel.value;
+    const apply = async reason => {
+      try { const r = await api(`/orders/${id}/status`, { method: 'PATCH', body: { status: v, reason } }); curStatus = r.status; $('#st').innerHTML = badge(r.status); paintAll(r); toast('Статус обновлён, клиент уведомлён'); return true; }
+      catch (err) { toast(err.message === 'reason_required' ? 'Укажите причину' : 'Не удалось сменить статус'); return false; }
+    };
+    if (v === 'REJECTED') askReason(id, apply, () => { sel.value = curStatus; });
+    else if (!(await apply(''))) sel.value = curStatus;
   });
 
   const chat = $('#chat'), ta = $('#txt');
@@ -343,7 +416,7 @@ async function openOrder(id) {
     } catch {}
   };
   const refreshStatus = async () => {
-    try { const r = await api('/orders/' + id); $('#st').innerHTML = badge(r.status); const sel = $('#status'); if (sel && document.activeElement !== sel) sel.value = r.status; } catch {}
+    try { const r = await api('/orders/' + id); $('#st').innerHTML = badge(r.status); paintAll(r); curStatus = r.status; const sel = $('#status'); if (sel && document.activeElement !== sel) sel.value = r.status; } catch {}
   };
   const send = async () => {
     const t = ta.value.trim(); if (!t || sending) return;

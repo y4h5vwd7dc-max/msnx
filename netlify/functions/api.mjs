@@ -185,12 +185,12 @@ const rndCode = (p = 'MX') => p + Array.from({ length: 6 }, () => CODECH[crypto.
 async function mkPromo(s, p) {
   let code = String(p.code || '').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 20) || rndCode(String(p.kind || '').startsWith('ref') ? 'R' : 'MX');
   if (await getJ(s, `promo:${code}`)) code = rndCode();
-  const pr = { code, percent: p.percent, title: p.title || '', kind: p.kind || 'public', owner_uid: p.owner_uid || null, expires_at: p.expires_at || null, max_uses: p.max_uses || null, uses: 0, active: true, banner: !!p.banner, created_at: Date.now() };
+  const pr = { code, percent: p.percent, title: p.title || '', kind: p.kind || 'public', owner_uid: p.owner_uid || null, expires_at: p.expires_at || null, max_uses: p.max_uses || null, uses: 0, active: true, banner: !!p.banner, mode: p.mode || 'multi', per_user: !!p.per_user, used_by: [], created_at: Date.now() };
   await putJ(s, `promo:${code}`, pr);
   const idx = pr.owner_uid ? `pmy:${pr.owner_uid}` : 'pubidx', a = (await getJ(s, idx)) || []; a.push(code); await putJ(s, idx, a.slice(-100));
   return code;
 }
-const promoState = (pr, uid) => !pr || !pr.active ? 'invalid' : (pr.expires_at && pr.expires_at < Date.now()) ? 'expired' : (pr.max_uses && pr.uses >= pr.max_uses) ? 'used_up' : (pr.owner_uid && pr.owner_uid !== uid) ? 'invalid' : 'ok';
+const promoState = (pr, uid) => !pr || !pr.active ? 'invalid' : (pr.expires_at && pr.expires_at < Date.now()) ? 'expired' : (pr.max_uses && pr.uses >= pr.max_uses) ? 'used_up' : (pr.owner_uid && pr.owner_uid !== uid) ? 'invalid' : (pr.per_user && (pr.used_by || []).includes(uid)) ? 'used_by_you' : 'ok';
 async function roster(s) {
   const team = await getTeam(s);
   return [{ id: ADMIN_ID, name: (await getUser(s, ADMIN_ID))?.name || 'Владелец', role: 'owner' }, ...Object.entries(team).map(([id, v]) => ({ id: Number(id), name: v.name, role: v.role }))];
@@ -272,7 +272,7 @@ async function setStatus(s, id, status, reason = '', actor = null) {
   }
   if (status === 'REJECTED' && o.promo && !o.promo_released) { // отклонённый заказ возвращает промокод
     await patchOrder(s, o.id, x => { x.promo_released = true; });
-    const pr = await getJ(s, `promo:${o.promo.code}`); if (pr) { pr.uses = Math.max(0, pr.uses - 1); if (pr.owner_uid) pr.active = true; await putJ(s, `promo:${pr.code}`, pr); }
+    const pr = await getJ(s, `promo:${o.promo.code}`); if (pr) { pr.uses = Math.max(0, pr.uses - 1); if (pr.owner_uid) pr.active = true; if (pr.per_user && pr.used_by) pr.used_by = pr.used_by.filter(x => x !== o.user_id); await putJ(s, `promo:${pr.code}`, pr); }
   }
   await bump(s, `ver:${o.id}`);
   return o;
@@ -590,7 +590,9 @@ const handle = async (req) => {
       const code = String(body.code || '').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 20);
       if (code && await getJ(s, `promo:${code}`)) return json({ error: 'exists' }, 409);
       const exp = /^\d{4}-\d{2}-\d{2}$/.test(body.expires || '') ? Date.parse(body.expires + 'T23:59:59Z') - TZ * 3600000 : null;
-      const c = await mkPromo(s, { code, percent, title: clip(body.title, 40), expires_at: exp, max_uses: Math.round(Number(body.max_uses)) > 0 ? Math.round(Number(body.max_uses)) : null, banner: !!body.banner });
+      const mode = ['single', 'per_user', 'multi'].includes(body.mode) ? body.mode : 'multi'; // разовый / один раз на клиента / многоразовый
+      const lim = Math.round(Number(body.max_uses)) > 0 ? Math.round(Number(body.max_uses)) : null;
+      const c = await mkPromo(s, { code, percent, title: clip(body.title, 40), expires_at: exp, max_uses: mode === 'single' ? 1 : lim, mode, per_user: mode === 'per_user', banner: !!body.banner });
       await audit(s, actor, 'promo', null, `${c} −${percent}%`);
     }
     return json((await Promise.all(((await getJ(s, 'pubidx')) || []).map(c => getJ(s, `promo:${c}`)))).filter(Boolean).reverse());
@@ -651,7 +653,7 @@ const handle = async (req) => {
     if (pcode) { const pr = await getJ(s, `promo:${pcode}`), st = promoState(pr, tu.id); if (st !== 'ok') return json({ error: 'bad_promo', reason: st }, 400); promo = { code: pr.code, percent: pr.percent }; }
     const o = await createOrder(s, { user_id: tu.id, username: tu.username || null, name, phone, service_type, description, contact: { via, time }, source: u.src || null, ref_by: u.ref || null,
       status: 'NEW', priority: 'normal', tags: [], assignee: null, promo, created_at: Date.now() });
-    if (promo) { const pr = await getJ(s, `promo:${promo.code}`); pr.uses++; if (pr.owner_uid) pr.active = false; await putJ(s, `promo:${pr.code}`, pr); }
+    if (promo) { const pr = await getJ(s, `promo:${promo.code}`); pr.uses++; if (pr.owner_uid) pr.active = false; if (pr.per_user) (pr.used_by ||= []).push(tu.id); await putJ(s, `promo:${pr.code}`, pr); }
     await track(s, tu.id, 'submit');
     const txt = `🔔 <b>Новый заказ #${o.id}</b>\n\n👤 ${esc(name)}\n📞 ${esc(phone)}\n✈️ ${o.username ? '@' + esc(o.username) : 'без username'}\n💼 ${esc(service_type)}\n📲 Связь: ${VIA_RU[via]}, ${TIME_RU[time]}${o.source ? `\n🏷 Источник: ${esc(o.source)}` : ''}${o.ref_by ? '\n🎁 По приглашению клиента' : ''}${promo ? `\n🏷 Промокод ${promo.code} (−${promo.percent}%)` : ''}\n\n📝 ${esc(description)}`;
     for (const uid of writers(team)) { await send(uid, txt, adminKb(o)); await pushNt(s, uid, { type: 'order', order: o.id, text: `Новый заказ #${o.id} · ${name}` }); }

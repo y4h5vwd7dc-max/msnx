@@ -95,7 +95,7 @@ textarea{resize:none;min-height:120px}
 .fbtn small{display:inline;margin:0}
 .send .clip{background:rgba(0,243,255,.08);border:1px solid var(--line);color:var(--cyan);font-size:1.1rem;padding:0 13px;box-shadow:none}
 .empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:.9rem;margin:auto}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(11,13,22,.95);border:1px solid var(--cyan);box-shadow:0 0 24px rgba(0,243,255,.25);padding:.65rem 1.1rem;border-radius:12px;font-size:.88rem;z-index:9}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 10px);transform:translateX(-50%);pointer-events:none;max-width:92vw;text-align:center;background:rgba(11,13,22,.95);border:1px solid var(--cyan);box-shadow:0 0 24px rgba(0,243,255,.25);padding:.65rem 1.1rem;border-radius:12px;font-size:.88rem;z-index:9}
 @media (prefers-reduced-motion:reduce){.spin{animation-duration:2s}.lg-orb,.lg-node,.role::before{animation:none}}
 
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);margin-left:8px;vertical-align:middle}
@@ -244,6 +244,12 @@ main>*{animation:fade .3s ease both}
 .promo-b{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;margin-bottom:12px;border-radius:16px;border:1px solid rgba(255,216,77,.45);background:linear-gradient(135deg,rgba(255,216,77,.14),rgba(255,93,108,.08));flex:none}
 .promo-b b{display:block;font-size:.92rem}
 .promo-b small{color:var(--new);font-family:var(--mono);font-size:.72rem}
+body{position:fixed;inset:0;width:100%}
+body.kbc header,body.kbc nav,body.kbc .crow,body.kbc .det,body.kbc .quick,body.kbc .pin{display:none!important}
+body.kbc #bn{display:none!important}
+body.kbc main.chatmode{padding:6px 10px}
+.chatcard{min-height:140px}
+.att .ph{min-height:90px}
 </style>
 </head>
 <body>
@@ -260,6 +266,29 @@ tg?.setHeaderColor?.('#04050b'); tg?.setBackgroundColor?.('#04050b');
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ls = { get: k => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} }, del: k => { try { localStorage.removeItem(k); } catch {} } };
+/* ---------- Клавиатура и размер окна: поле ввода всегда видно ---------- */
+(function () {
+  let full = Math.max(window.innerHeight, tg?.viewportStableHeight || 0), kbFocus = false;
+  const fit = () => {
+    const a = $('#app'); if (!a) return;
+    const vv = window.visualViewport, h = Math.round(vv ? vv.height : window.innerHeight), top = Math.round(vv ? vv.offsetTop : 0);
+    const cs = getComputedStyle(document.body), pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    if (h > full) full = h;
+    a.style.height = Math.max(200, h - pad) + 'px'; a.style.transform = top ? `translateY(${top}px)` : '';
+    const shrunk = h < full * 0.8, kb = shrunk || (kbFocus && h < full * 0.92); // клавиатура = окно заметно уменьшилось
+    document.body.classList.toggle('kb', kb);
+    document.body.classList.toggle('kbc', shrunk && !!document.querySelector('main.chatmode') && !!document.activeElement?.closest?.('.chatcard')); // прячем лишнее только когда пишут в чате (не в параметрах заказа)
+    window.__onVp?.();
+  };
+  window.__fit = fit;
+  window.visualViewport?.addEventListener('resize', fit); window.visualViewport?.addEventListener('scroll', fit);
+  window.addEventListener('resize', fit); tg?.onEvent?.('viewportChanged', fit);
+  const isField = e => e.target.matches?.('input:not([type=file]):not([type=checkbox]),textarea');
+  document.addEventListener('focusin', e => { if (isField(e)) { kbFocus = true; fit(); setTimeout(fit, 250); setTimeout(() => window.scrollTo(0, 0), 60); } });
+  document.addEventListener('focusout', e => { if (isField(e)) setTimeout(() => { kbFocus = !!document.activeElement?.matches?.('input:not([type=file]):not([type=checkbox]),textarea'); fit(); }, 120); });
+  window.addEventListener('orientationchange', () => setTimeout(() => { full = 0; fit(); }, 300));
+  fit();
+})();
 
 /* ---------- Переводы (интерфейс клиента: RU / EN / HY; экраны команды — на русском) ---------- */
 const D = {
@@ -292,9 +321,9 @@ hy: { tab_new:'Նոր հայտ', tab_orders:'Իմ պատվերները', back:'�
  bell:'Ծանուցումներ', bell_empty:'Ծանուցումներ դեռ չկան', menu:'Ընտրացանկ', m_lang:'Լեզու', m_news:'Նորություններ և ակցիաներ', m_ref:'🎁 Հրավիրել ընկերոջը', ref_title:'Հրավիրեք ընկերոջը', ref_text:'Ուղարկեք հղումը ընկերոջը։ Երբ նա ավարտի պատվերը, դուք բոնուս կստանաք. պայմանները կճշտի թիմը։', ref_copy:'Պատճենել հղումը', ref_share:'Կիսվել', ref_stats:'Հրավիրված՝ {i} · Ավարտել են պատվերը՝ {c}', ref_copied:'Հղումը պատճենված է', ref_nolink:'Հղումը դեռ հասանելի չէ' },
 };
 const D2 = {
-ru: { promo_label:'Промокод', promo_ph:'Введите код', promo_apply:'Применить', promo_ok:'Скидка {p}% применится к заказу', promo_bad:'Код недействителен', promo_exp:'Срок действия кода истёк', promo_used_up:'Лимит использований исчерпан', promo_use:'Применить', promo_left:'осталось {x}', m_bonus:'🏷 Мои бонусы', bonus_title:'Мои бонусы', bonus_empty:'Бонусов пока нет — приглашайте друзей!', bonus_active:'доступен', bonus_used:'использован', bonus_tap:'Нажмите, чтобы скопировать код', top_title:'Топ приглашающих', top_me:'Ваше место: {n}', q_wait:'Нет сети — сообщение отправится позже', d_promo:'Промокод', t_d:'д' },
-en: { promo_label:'Promo code', promo_ph:'Enter code', promo_apply:'Apply', promo_ok:'{p}% off will be applied to your order', promo_bad:'Invalid code', promo_exp:'This code has expired', promo_used_up:'Usage limit reached', promo_use:'Apply', promo_left:'{x} left', m_bonus:'🏷 My bonuses', bonus_title:'My bonuses', bonus_empty:'No bonuses yet — invite friends!', bonus_active:'available', bonus_used:'used', bonus_tap:'Tap a code to copy it', top_title:'Top inviters', top_me:'Your place: {n}', q_wait:'No connection — the message will be sent later', d_promo:'Promo code', t_d:'d' },
-hy: { promo_label:'Պրոմոկոդ', promo_ph:'Մուտքագրեք կոդը', promo_apply:'Կիրառել', promo_ok:'{p}% զեղչը կկիրառվի պատվերի վրա', promo_bad:'Կոդը անվավեր է', promo_exp:'Կոդի ժամկետը լրացել է', promo_used_up:'Օգտագործման սահմանաչափը սպառված է', promo_use:'Կիրառել', promo_left:'մնաց {x}', m_bonus:'🏷 Իմ բոնուսները', bonus_title:'Իմ բոնուսները', bonus_empty:'Բոնուսներ դեռ չկան՝ հրավիրեք ընկերներին։', bonus_active:'հասանելի է', bonus_used:'օգտագործված է', bonus_tap:'Սեղմեք կոդի վրա՝ պատճենելու համար', top_title:'Լավագույն հրավիրողները', top_me:'Ձեր տեղը՝ {n}', q_wait:'Կապ չկա՝ հաղորդագրությունը կուղարկվի ավելի ուշ', d_promo:'Պրոմոկոդ', t_d:'օր' },
+ru: { promo_label:'Промокод', promo_ph:'Введите код', promo_apply:'Применить', promo_ok:'Скидка {p}% применится к заказу', promo_bad:'Код недействителен', promo_exp:'Срок действия кода истёк', promo_used_up:'Лимит использований исчерпан', promo_used_you:'Вы уже использовали этот код', promo_use:'Применить', promo_left:'осталось {x}', m_bonus:'🏷 Мои бонусы', bonus_title:'Мои бонусы', bonus_empty:'Бонусов пока нет — приглашайте друзей!', bonus_active:'доступен', bonus_used:'использован', bonus_tap:'Нажмите, чтобы скопировать код', top_title:'Топ приглашающих', top_me:'Ваше место: {n}', q_wait:'Нет сети — сообщение отправится позже', d_promo:'Промокод', t_d:'д' },
+en: { promo_label:'Promo code', promo_ph:'Enter code', promo_apply:'Apply', promo_ok:'{p}% off will be applied to your order', promo_bad:'Invalid code', promo_exp:'This code has expired', promo_used_up:'Usage limit reached', promo_used_you:'You have already used this code', promo_use:'Apply', promo_left:'{x} left', m_bonus:'🏷 My bonuses', bonus_title:'My bonuses', bonus_empty:'No bonuses yet — invite friends!', bonus_active:'available', bonus_used:'used', bonus_tap:'Tap a code to copy it', top_title:'Top inviters', top_me:'Your place: {n}', q_wait:'No connection — the message will be sent later', d_promo:'Promo code', t_d:'d' },
+hy: { promo_label:'Պրոմոկոդ', promo_ph:'Մուտքագրեք կոդը', promo_apply:'Կիրառել', promo_ok:'{p}% զեղչը կկիրառվի պատվերի վրա', promo_bad:'Կոդը անվավեր է', promo_exp:'Կոդի ժամկետը լրացել է', promo_used_up:'Օգտագործման սահմանաչափը սպառված է', promo_used_you:'Դուք արդեն օգտագործել եք այս կոդը', promo_use:'Կիրառել', promo_left:'մնաց {x}', m_bonus:'🏷 Իմ բոնուսները', bonus_title:'Իմ բոնուսները', bonus_empty:'Բոնուսներ դեռ չկան՝ հրավիրեք ընկերներին։', bonus_active:'հասանելի է', bonus_used:'օգտագործված է', bonus_tap:'Սեղմեք կոդի վրա՝ պատճենելու համար', top_title:'Լավագույն հրավիրողները', top_me:'Ձեր տեղը՝ {n}', q_wait:'Կապ չկա՝ հաղորդագրությունը կուղարկվի ավելի ուշ', d_promo:'Պրոմոկոդ', t_d:'օր' },
 };
 for (const l of ['ru', 'en', 'hy']) Object.assign(D[l], D2[l]);
 let L = ls.get('lang') || 'ru';
@@ -509,11 +538,11 @@ function renderNav() {
   $$('#nav .tab').forEach(b => b.onclick = () => go(b.dataset.t));
 }
 function go(x) {
-  tab = x; openId = null; clearTimers(); window.__tick = null; window.__obSent = null;
+  tab = x; openId = null; clearTimers(); window.__tick = null; window.__obSent = null; window.__onVp = null;
   $('#main').className = ''; SUB.includes(x) ? tg?.BackButton?.show() : tg?.BackButton?.hide(); renderNav();
   history.replaceState(null, '', location.pathname);
   if (SUB.includes(x)) { $('#nav').innerHTML = '<button class="back" id="subback">← К ЗАКАЗАМ</button>'; $('#subback').onclick = () => go('orders'); }
-  ({ new: renderForm, orders: renderList, stats: renderStats, team: renderTeam, bcast: renderBcast, audit: renderAudit, promos: renderPromos, auto: renderAuto, tchat: renderTchat })[x]();
+  ({ new: renderForm, orders: renderList, stats: renderStats, team: renderTeam, bcast: renderBcast, audit: renderAudit, promos: renderPromos, auto: renderAuto, tchat: renderTchat })[x](); window.__fit?.();
 }
 
 /* ---------- Форма заявки ---------- */
@@ -525,7 +554,7 @@ function renderForm() {
   const main = $('#main');
   main.innerHTML = `<div id="pb"></div><div class="card">
     <div class="field"><label>${t('f_name')}</label><input id="f-name" maxlength="80" value="${esc(d.name ?? u?.first_name ?? '')}"></div>
-    <div class="field"><label>${t('f_phone')}</label><input id="f-phone" type="tel" inputmode="tel" placeholder="+374 00 000 000" value="${esc(d.phone || me.phone || '')}">
+    <div class="field"><label>${t('f_phone')}</label><input id="f-phone" type="tel" inputmode="tel" placeholder="+7 999 000 00 00" value="${esc(d.phone || me.phone || '+7 ')}">
       ${tg?.requestContact || me.phone ? `<button type="button" class="btn small line" id="f-tgph" style="margin-top:8px">${t('f_tgphone')}</button>` : ''}</div>
     <div class="field"><label>${t('f_service')}</label><select id="f-svc">${SERVICES.map((s, i) => `<option value="${esc(s)}" ${s === svc ? 'selected' : ''}>${t('svc' + i)}</option>`).join('')}</select></div>
     <div class="field"><label>${t('f_contact')}</label><div class="seg seg3" id="f-via">${VIA.map(v => `<button type="button" data-v="${v}" class="${v === via ? 'on' : ''}">${t('f_via_' + v)}</button>`).join('')}</div>
@@ -541,6 +570,7 @@ function renderForm() {
   $('#f-time').onchange = e => { ctime = e.target.value; save(); };
   $$('#f-via button').forEach(b => b.onclick = () => { via = b.dataset.v; $$('#f-via button').forEach(x => x.classList.toggle('on', x === b)); save(); });
   ['#f-name', '#f-phone', '#f-desc'].forEach(q => $(q).addEventListener('input', save));
+  $('#f-phone').addEventListener('focus', e => { if (!e.target.value.trim()) e.target.value = '+7 '; });
   const chips = () => { $('#f-chips').innerHTML = files.map((f, i) => `<span>${esc(f.name.slice(0, 22))} <b data-i="${i}">✕</b></span>`).join(''); $$('#f-chips b').forEach(b => b.onclick = () => { files.splice(+b.dataset.i, 1); chips(); }); };
   $('#f-att').onclick = () => $('#f-file').click();
   $('#f-file').onchange = e => { for (const f of e.target.files) { if (files.length >= 3) break; if (f.size > MAX_FILE * 1.6 && !f.type.startsWith('image/')) { toast(t('f_big')); continue; } files.push(f); } e.target.value = ''; chips(); };
@@ -555,7 +585,7 @@ function renderForm() {
   const pmsg = (txt, good) => { const e = $('#f-pmsg'); e.textContent = txt; e.style.color = good ? 'var(--done)' : 'var(--rej)'; };
   const applyPromo = async code => {
     code = (code || $('#f-promo').value).trim().toUpperCase(); $('#f-promo').value = code; if (!code) return pmsg('');
-    try { const r = await api('/promo/check', { method: 'POST', body: { code } }); r.ok ? pmsg(t('promo_ok', { p: r.percent }), true) : pmsg(t(r.reason === 'expired' ? 'promo_exp' : r.reason === 'used_up' ? 'promo_used_up' : 'promo_bad')); } catch { pmsg(t('promo_bad')); }
+    try { const r = await api('/promo/check', { method: 'POST', body: { code } }); r.ok ? pmsg(t('promo_ok', { p: r.percent }), true) : pmsg(t(r.reason === 'expired' ? 'promo_exp' : r.reason === 'used_up' ? 'promo_used_up' : r.reason === 'used_by_you' ? 'promo_used_you' : 'promo_bad')); } catch { pmsg(t('promo_bad')); }
   };
   $('#f-papply').onclick = () => applyPromo();
   api('/promo/banners').then(bs => {
@@ -668,7 +698,7 @@ async function openOrder(id) {
       <div class="field note" style="margin:14px 0 0"><label>Заметка (видна только команде)</label><textarea id="note" maxlength="1000" placeholder="Договорённости, напоминания…">${esc(o.note || '')}</textarea></div>`
     : `<dl class="info" style="margin-top:12px"><dt>Приоритет</dt><dd>${PR[o.priority || 'normal']}</dd><dt>Бюджет</dt><dd>${o.budget ?? '—'}</dd><dt>Оплачено</dt><dd>${o.paid ?? '—'}</dd><dt>Срок</dt><dd>${o.deadline || '—'}</dd>${o.note ? `<dt>Заметка</dt><dd>${esc(o.note)}</dd>` : ''}</dl>`;
   main.className = 'chatmode';
-  main.innerHTML = `<div class="row" style="flex:none"><button class="back" id="back">${t('back')}</button><button class="back" id="sbtn" aria-label="${t('c_search')}">🔍</button></div>
+  main.innerHTML = `<div class="row crow" style="flex:none"><button class="back" id="back">${t('back')}</button><button class="back" id="sbtn" aria-label="${t('c_search')}">🔍</button></div>
     <details class="card det"><summary><span class="num">${t('d_order', { id: o.id })}</span><span id="st">${badge(o.status)}</span></summary><div class="body">${info}${metaForm}${staff ? tasksBox : ''}<div id="tlw">${timeline(o)}</div></div></details>
     <div id="bn" style="display:contents"></div>
     <div class="card chatcard"><div class="csearch" id="cs" hidden><input id="cs-i" placeholder="${esc(t('c_search'))}"><small id="cs-n"></small><button id="cs-p">↑</button><button id="cs-x">↓</button></div>
@@ -678,6 +708,7 @@ async function openOrder(id) {
       ${staff && !write ? '<div class="empty" style="padding:10px;margin:0">Режим просмотра</div>' : `<div class="send" id="sd"><button class="btn clip" id="clip" type="button" aria-label="${t('c_attach')}">📎</button><input type="file" id="file" hidden>${write ? '<button class="btn lock" id="lock" type="button" title="Заметка для команды (клиент не увидит)">🔒</button>' : ''}<textarea id="txt" rows="1" maxlength="2000" placeholder="${esc(t('c_ph'))}"></textarea><button class="btn" id="go" aria-label="send">➤</button></div>`}</div>`;
 
   const chat = $('#chat'), ta = $('#txt');
+  window.__onVp = () => { if (chat.dataset.stick === '1') chat.scrollTop = chat.scrollHeight; }; window.__fit?.();
   const paintAll = r => { Object.assign(o, r); $('#st').innerHTML = badge(r.status); $('#tlw').innerHTML = timeline(r); paintBanners(r); };
   function paintBanners(r) {
     const rv = !staff && r.status === 'COMPLETED', sg = JSON.stringify([r.status, r.reject_reason, r.review, r.pinned, rv]); if (sg === bsig) return; bsig = sg;
@@ -811,14 +842,14 @@ async function openOrder(id) {
   const refresh = async () => { try { paintAll(await api('/orders/' + id)); if (write) { const s = $('#status'); if (s && document.activeElement !== s) s.value = o.status; } } catch {} };
   if (ta) {
     const send = async () => {
-      const text = ta.value.trim(); if (!text || sending) return; sending = true; ta.value = ''; ta.style.height = '';
+      const text = ta.value.trim(); if (!text || sending) return; const keep = document.activeElement === ta; sending = true; ta.value = ''; ta.style.height = '';
       const body = { text, reply_to: replyTo?.id, internal }; setReply(null);
       const cid = newCid();
       try { add(await api(`/orders/${id}/messages`, { method: 'POST', body: { ...body, cid } })); toBottom(); tg?.HapticFeedback?.impactOccurred?.('light'); }
       catch (e) { if (isNet(e)) { const it = { path: `/orders/${id}/messages`, cid, body, oid: id }; obSet([...obGet(), it]); addPending(it); toast(t('q_wait')); } else { ta.value = text; toast(t('c_fail')); } }
-      sending = false;
+      sending = false; if (keep) ta.focus();
     };
-    $('#go').onclick = send;
+    $('#go').addEventListener('pointerdown', e => e.preventDefault()); $('#go').onclick = send; // кнопка не забирает фокус — клавиатура не закрывается
     ta.addEventListener('input', () => { lastAct = Date.now(); ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 110) + 'px'; if (!internal && ta.value && Date.now() - lastTyp > 4000) { lastTyp = Date.now(); api(`/orders/${id}/typing`, { method: 'POST' }).catch(() => {}); } });
     ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) { e.preventDefault(); send(); } });
     ta.addEventListener('focus', () => setTimeout(toBottom, 300));
@@ -893,15 +924,17 @@ async function renderAudit() {
 async function renderPromos() {
   const main = $('#main'); let list; try { list = await api('/promos'); } catch { main.innerHTML = '<div class="empty">Ошибка загрузки</div>'; return; }
   const top = await api('/ref/top').catch(() => ({ top: [] }));
-  main.innerHTML = `<div class="card"><p class="h2">Промокоды и акции</p>${list.length ? list.map(p => `<div class="li"><span><b>${esc(p.code)}</b> −${p.percent}% ${p.banner ? '📣' : ''}<br><small>${esc(p.title || '')} · использовано ${p.uses}${p.max_uses ? '/' + p.max_uses : ''}${p.expires_at ? ' · до ' + new Date(p.expires_at).toLocaleDateString('ru-RU') : ''}${p.active ? '' : ' · выключен'}</small></span><span><button type="button" data-t="${esc(p.code)}" style="background:none;border:0;color:var(--cyan)">${p.active ? 'выкл' : 'вкл'}</button> <button type="button" data-x="${esc(p.code)}" style="background:none;border:0;color:var(--rej)">✕</button></span></div>`).join('') : '<p style="color:var(--muted)">Пока нет</p>'}</div>
+  main.innerHTML = `<div class="card"><p class="h2">Промокоды и акции</p>${list.length ? list.map(p => `<div class="li"><span><b>${esc(p.code)}</b> −${p.percent}% ${p.banner ? '📣' : ''}<br><small>${p.mode === 'single' ? 'разовый' : p.mode === 'per_user' ? '1 раз на клиента' : 'многоразовый'} · ${esc(p.title || '')} · использовано ${p.uses}${p.max_uses ? '/' + p.max_uses : ''}${p.expires_at ? ' · до ' + new Date(p.expires_at).toLocaleDateString('ru-RU') : ''}${p.active ? '' : ' · выключен'}</small></span><span><button type="button" data-t="${esc(p.code)}" style="background:none;border:0;color:var(--cyan)">${p.active ? 'выкл' : 'вкл'}</button> <button type="button" data-x="${esc(p.code)}" style="background:none;border:0;color:var(--rej)">✕</button></span></div>`).join('') : '<p style="color:var(--muted)">Пока нет</p>'}</div>
     <div class="card"><p class="h2">Новый промокод</p><label>Код (пусто — создать автоматически)</label><input id="p-c" maxlength="20" style="text-transform:uppercase">
+      <label style="margin-top:10px">Тип промокода</label><select id="p-mode"><option value="multi">Многоразовый — любое число клиентов (лимит по желанию)</option><option value="per_user">Один раз на каждого клиента</option><option value="single">Разовый — один заказ, потом код недействителен</option></select>
       <div class="two" style="margin-top:10px"><div><label>Скидка, %</label><input id="p-p" type="number" min="1" max="90" value="10"></div><div><label>Лимит</label><input id="p-m" type="number" min="0" placeholder="без лимита"></div></div>
       <label style="margin-top:10px">Название акции</label><input id="p-t" maxlength="40" placeholder="Например: Осенняя скидка"><label style="margin-top:10px">Действует до</label><input id="p-e" type="date">
       <label class="sw" style="margin-top:12px"><span>Показывать баннер с таймером в форме заявки</span><input type="checkbox" id="p-b" checked></label><button class="btn" id="p-add" style="margin-top:12px">Создать</button></div>
     <div class="card"><p class="h2">Рейтинг приглашающих</p>${top.top.length ? top.top.map((x, i) => `<div class="li"><span>${i + 1}. ${esc(x.name)}</span><b>${x.completed} <small>из ${x.invited}</small></b></div>`).join('') : '<p style="color:var(--muted)">Пока нет приглашённых</p>'}<p style="color:var(--muted);font-size:.75rem;margin-top:8px">Размер бонуса за друга — в разделе «Автоматизация».</p></div>`;
   $$('[data-t]').forEach(b => b.onclick = async () => { try { await api('/promos/toggle', { method: 'POST', body: { code: b.dataset.t } }); renderPromos(); } catch { toast('Не удалось'); } });
   $$('[data-x]').forEach(b => b.onclick = async () => { try { await api('/promos/delete', { method: 'POST', body: { code: b.dataset.x } }); renderPromos(); } catch { toast('Не удалось'); } });
-  $('#p-add').onclick = async () => { try { await api('/promos', { method: 'POST', body: { code: $('#p-c').value, percent: $('#p-p').value, max_uses: $('#p-m').value, title: $('#p-t').value, expires: $('#p-e').value, banner: $('#p-b').checked } }); toast('Создано'); renderPromos(); } catch (e) { toast(e.message === 'exists' ? 'Такой код уже есть' : 'Проверьте поля (скидка 1–90%)'); } };
+  $('#p-mode').onchange = e => { const one = e.target.value === 'single'; $('#p-m').disabled = one; if (one) $('#p-m').value = ''; $('#p-m').placeholder = one ? 'всегда 1' : 'без лимита'; };
+  $('#p-add').onclick = async () => { try { await api('/promos', { method: 'POST', body: { code: $('#p-c').value, percent: $('#p-p').value, max_uses: $('#p-m').value, mode: $('#p-mode').value, title: $('#p-t').value, expires: $('#p-e').value, banner: $('#p-b').checked } }); toast('Создано'); renderPromos(); } catch (e) { toast(e.message === 'exists' ? 'Такой код уже есть' : 'Проверьте поля (скидка 1–90%)'); } };
 }
 async function renderAuto() {
   const main = $('#main'); let c; try { c = await api('/cfg'); } catch { main.innerHTML = '<div class="empty">Ошибка загрузки</div>'; return; }
@@ -918,7 +951,7 @@ async function renderTchat() { // чат команды: упоминания @�
   const main = $('#main'); main.className = 'chatmode';
   if (!TEAM) try { TEAM = await api('/team'); } catch {}
   main.innerHTML = `<div class="card chatcard"><p class="h2" style="margin:0 0 6px 4px">Чат команды</p><div class="chat" id="chat" data-stick="1"><div class="empty">${t('c_empty')}</div></div>${me.write ? `<div class="mnbar" id="mn" hidden></div><div class="send"><textarea id="txt" rows="1" maxlength="1000" placeholder="Сообщение · @имя — упомянуть"></textarea><button class="btn" id="go" aria-label="send">➤</button></div>` : '<div class="empty" style="padding:10px;margin:0">Режим просмотра</div>'}</div>`;
-  const chat = $('#chat'), ta = $('#txt'), seen = new Set(); let last = 0, ver = 0, polling = false, lastAct = Date.now(), lastDay = '';
+  const chat = $('#chat'), ta = $('#txt'), seen = new Set(); window.__onVp = () => { if (chat.dataset.stick === '1') chat.scrollTop = chat.scrollHeight; }; window.__fit?.(); let last = 0, ver = 0, polling = false, lastAct = Date.now(), lastDay = '';
   const hl = tx => esc(tx).replace(/@([\p{L}\p{N}_-]+)/gu, '<span class="mnx">@$1</span>');
   const toBottom = () => { chat.scrollTop = chat.scrollHeight; chat.dataset.stick = '1'; };
   const add = m => {
@@ -941,7 +974,7 @@ async function renderTchat() { // чат команды: упоминания @�
       const text = ta.value.trim(); if (!text) return; ta.value = ''; ta.style.height = ''; lastAct = Date.now(); const cid = newCid();
       try { add(await api('/teamchat', { method: 'POST', body: { text, cid } })); toBottom(); } catch (e) { if (isNet(e)) { const it = { path: '/teamchat', cid, body: { text } }; obSet([...obGet(), it]); addPending(it); toast(t('q_wait')); } else { ta.value = text; toast(t('c_fail')); } }
     };
-    $('#go').onclick = send;
+    $('#go').addEventListener('pointerdown', e => e.preventDefault()); $('#go').onclick = send; // кнопка не забирает фокус — клавиатура не закрывается
     ta.addEventListener('input', () => { lastAct = Date.now(); ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 110) + 'px'; });
     ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) { e.preventDefault(); send(); } });
   }

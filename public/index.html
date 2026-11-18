@@ -532,6 +532,27 @@ nav .tab.on{background:var(--grad);color:var(--ink);box-shadow:0 4px 14px rgba(v
 .num .oi::after{content:"";position:absolute;inset:-8px}
 .num .oi svg.ic{width:13px;height:13px}
 .num .oi:active{transform:scale(.88);background:rgba(var(--a1),.18)}
+/* v7 fixes */
+input[type=date],input[type=time],input[type=datetime-local]{display:block;width:100%;max-width:100%;min-width:0;-webkit-appearance:none;appearance:none;min-height:2.7rem;line-height:1.3}
+input[type=date]::-webkit-date-and-time-value{text-align:left;min-width:0}
+.card input,.card select,.card textarea{max-width:100%;min-width:0}
+.fm{padding:16px 16px 18px}
+.fm .field{margin-bottom:16px}
+.fm label{font-size:.64rem;margin-bottom:6px}
+.fm input,.fm select,.fm textarea{padding:.7rem .85rem;border-radius:12px;line-height:1.35}
+.fm textarea{min-height:96px}
+.fm .seg{margin-bottom:12px;gap:8px}.fm .seg button{padding:.6rem .3rem;font-size:.84rem;border-radius:12px}
+.fm .fl{gap:8px}.fm .fl .btn.small{padding:.62rem 1rem;font-size:.84rem}
+.fm .attrow{gap:12px}.fm .attrow .btn{padding:.6rem 1rem}
+.fm .attrow p{font-size:.72rem;line-height:1.35}
+.fm #f-pmsg{margin-top:8px!important;font-size:.78rem!important}
+.fm .chips{margin-top:10px}
+.fm label.sw{margin:4px 0 16px;font-size:.88rem}
+.fm #f-send{padding:.9rem;font-size:.95rem;border-radius:13px}
+.promo-b{margin-bottom:16px}
+.card.order.urgent{border-color:rgba(255,122,69,.55);background:linear-gradient(135deg,rgba(255,122,69,.10),rgba(255,255,255,.02))}
+.pinhdr{font-family:var(--mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:#ff7a45;margin:2px 2px 0;display:flex;align-items:center;gap:6px}
+.li>span:last-child{flex:none;display:flex;align-items:center;gap:8px}
 </style>
 <script>
 /* ===== MAISONAX · сезонная система оформления =====
@@ -804,9 +825,9 @@ hy: { tab_new:'Նոր հայտ', tab_orders:'Իմ պատվերները', back:'�
  bell:'Ծանուցումներ', bell_empty:'Ծանուցումներ դեռ չկան', menu:'Ընտրացանկ', m_lang:'Լեզու', m_news:'Նորություններ և ակցիաներ', m_ref:'Հրավիրել ընկերոջը', ref_title:'Հրավիրեք ընկերոջը', ref_text:'Ուղարկեք հղումը ընկերոջը։ Երբ նա ավարտի պատվերը, դուք բոնուս կստանաք. պայմանները կճշտի թիմը։', ref_copy:'Պատճենել հղումը', ref_share:'Կիսվել', ref_stats:'Հրավիրված՝ {i} · Ավարտել են պատվերը՝ {c}', ref_copied:'Հղումը պատճենված է', ref_nolink:'Հղումը դեռ հասանելի չէ' },
 };
 const D2 = {
-ru: { promo_label:'Промокод', promo_ph:'Введите код', promo_apply:'Применить', promo_ok:'Скидка {p}% применится к заказу', promo_bad:'Код недействителен', promo_exp:'Срок действия кода истёк', promo_used_up:'Лимит использований исчерпан', promo_used_you:'Вы уже использовали этот код', promo_use:'Применить', promo_left:'осталось {x}', m_bonus:'Мои бонусы', bonus_title:'Мои бонусы', bonus_empty:'Бонусов пока нет — приглашайте друзей!', bonus_active:'доступен', bonus_used:'использован', bonus_tap:'Нажмите, чтобы скопировать код', top_title:'Топ приглашающих', top_me:'Ваше место: {n}', q_wait:'Нет сети — сообщение отправится позже', d_promo:'Промокод', up_prep:'Подготовка…', up_sending:'Отправка {p}%', retry:'Повторить', close_btn:'Закрыть', err_network_t:'Нет связи', err_network_d:'Проверьте интернет и повторите. Ваши данные не потеряны.', err_server_t:'Что-то пошло не так', err_server_d:'Сервер временно недоступен. Попробуйте ещё раз через минуту.', err_notfound_t:'Не найдено', err_notfound_d:'Заказ удалён или у вас нет к нему доступа.', err_session_t:'Сессия недействительна', err_session_d:'Закройте приложение и откройте его заново через бота.', t_d:'д' },
-en: { promo_label:'Promo code', promo_ph:'Enter code', promo_apply:'Apply', promo_ok:'{p}% off will be applied to your order', promo_bad:'Invalid code', promo_exp:'This code has expired', promo_used_up:'Usage limit reached', promo_used_you:'You have already used this code', promo_use:'Apply', promo_left:'{x} left', m_bonus:'My bonuses', bonus_title:'My bonuses', bonus_empty:'No bonuses yet — invite friends!', bonus_active:'available', bonus_used:'used', bonus_tap:'Tap a code to copy it', top_title:'Top inviters', top_me:'Your place: {n}', q_wait:'No connection — the message will be sent later', d_promo:'Promo code', up_prep:'Preparing…', up_sending:'Sending {p}%', retry:'Retry', close_btn:'Close', err_network_t:'No connection', err_network_d:'Check your internet and try again. Your data is safe.', err_server_t:'Something went wrong', err_server_d:'The server is temporarily unavailable. Please try again in a minute.', err_notfound_t:'Not found', err_notfound_d:'The order was removed or you do not have access.', err_session_t:'Session expired', err_session_d:'Close the app and reopen it via the bot.', t_d:'d' },
-hy: { promo_label:'Պրոմոկոդ', promo_ph:'Մուտքագրեք կոդը', promo_apply:'Կիրառել', promo_ok:'{p}% զեղչը կկիրառվի պատվերի վրա', promo_bad:'Կոդը անվավեր է', promo_exp:'Կոդի ժամկետը լրացել է', promo_used_up:'Օգտագործման սահմանաչափը սպառված է', promo_used_you:'Դուք արդեն օգտագործել եք այս կոդը', promo_use:'Կիրառել', promo_left:'մնաց {x}', m_bonus:'Իմ բոնուսները', bonus_title:'Իմ բոնուսները', bonus_empty:'Բոնուսներ դեռ չկան՝ հրավիրեք ընկերներին։', bonus_active:'հասանելի է', bonus_used:'օգտագործված է', bonus_tap:'Սեղմեք կոդի վրա՝ պատճենելու համար', top_title:'Լավագույն հրավիրողները', top_me:'Ձեր տեղը՝ {n}', q_wait:'Կապ չկա՝ հաղորդագրությունը կուղարկվի ավելի ուշ', d_promo:'Պրոմոկոդ', up_prep:'Պատրաստվում է…', up_sending:'Ուղարկվում է {p}%', retry:'Կրկնել', close_btn:'Փակել', err_network_t:'Կապ չկա', err_network_d:'Ստուգեք ինտերնետը և կրկնեք։ Ձեր տվյալները չեն կորել։', err_server_t:'Ինչ-որ բան այնպես չգնաց', err_server_d:'Սերվերը ժամանակավորապես անհասանելի է։ Փորձեք կրկին մեկ րոպեից։', err_notfound_t:'Չի գտնվել', err_notfound_d:'Պատվերը հեռացվել է կամ դուք մուտք չունեք։', err_session_t:'Սեսիան անվավեր է', err_session_d:'Փակեք հավելվածը և կրկին բացեք բոտի միջոցով։', t_d:'օր' },
+ru: { promo_label:'Промокод', promo_ph:'Введите код', promo_apply:'Применить', promo_ok:'Скидка {p}% применится к заказу', promo_bad:'Код недействителен', promo_exp:'Срок действия кода истёк', promo_used_up:'Лимит использований исчерпан', promo_used_you:'Вы уже использовали этот код', promo_use:'Применить', promo_left:'осталось {x}', m_bonus:'Мои бонусы', bonus_title:'Мои бонусы', bonus_empty:'Бонусов пока нет — приглашайте друзей!', bonus_active:'доступен', bonus_used:'использован', bonus_exp:'истёк', bonus_tap:'Нажмите, чтобы скопировать код', top_title:'Топ приглашающих', top_me:'Ваше место: {n}', q_wait:'Нет сети — сообщение отправится позже', d_promo:'Промокод', up_prep:'Подготовка…', up_sending:'Отправка {p}%', retry:'Повторить', close_btn:'Закрыть', err_network_t:'Нет связи', err_network_d:'Проверьте интернет и повторите. Ваши данные не потеряны.', err_server_t:'Что-то пошло не так', err_server_d:'Сервер временно недоступен. Попробуйте ещё раз через минуту.', err_notfound_t:'Не найдено', err_notfound_d:'Заказ удалён или у вас нет к нему доступа.', err_session_t:'Сессия недействительна', err_session_d:'Закройте приложение и откройте его заново через бота.', t_d:'д' },
+en: { promo_label:'Promo code', promo_ph:'Enter code', promo_apply:'Apply', promo_ok:'{p}% off will be applied to your order', promo_bad:'Invalid code', promo_exp:'This code has expired', promo_used_up:'Usage limit reached', promo_used_you:'You have already used this code', promo_use:'Apply', promo_left:'{x} left', m_bonus:'My bonuses', bonus_title:'My bonuses', bonus_empty:'No bonuses yet — invite friends!', bonus_active:'available', bonus_used:'used', bonus_exp:'expired', bonus_tap:'Tap a code to copy it', top_title:'Top inviters', top_me:'Your place: {n}', q_wait:'No connection — the message will be sent later', d_promo:'Promo code', up_prep:'Preparing…', up_sending:'Sending {p}%', retry:'Retry', close_btn:'Close', err_network_t:'No connection', err_network_d:'Check your internet and try again. Your data is safe.', err_server_t:'Something went wrong', err_server_d:'The server is temporarily unavailable. Please try again in a minute.', err_notfound_t:'Not found', err_notfound_d:'The order was removed or you do not have access.', err_session_t:'Session expired', err_session_d:'Close the app and reopen it via the bot.', t_d:'d' },
+hy: { promo_label:'Պրոմոկոդ', promo_ph:'Մուտքագրեք կոդը', promo_apply:'Կիրառել', promo_ok:'{p}% զեղչը կկիրառվի պատվերի վրա', promo_bad:'Կոդը անվավեր է', promo_exp:'Կոդի ժամկետը լրացել է', promo_used_up:'Օգտագործման սահմանաչափը սպառված է', promo_used_you:'Դուք արդեն օգտագործել եք այս կոդը', promo_use:'Կիրառել', promo_left:'մնաց {x}', m_bonus:'Իմ բոնուսները', bonus_title:'Իմ բոնուսները', bonus_empty:'Բոնուսներ դեռ չկան՝ հրավիրեք ընկերներին։', bonus_active:'հասանելի է', bonus_used:'օգտագործված է', bonus_exp:'ժամկետը լրացել է', bonus_tap:'Սեղմեք կոդի վրա՝ պատճենելու համար', top_title:'Լավագույն հրավիրողները', top_me:'Ձեր տեղը՝ {n}', q_wait:'Կապ չկա՝ հաղորդագրությունը կուղարկվի ավելի ուշ', d_promo:'Պրոմոկոդ', up_prep:'Պատրաստվում է…', up_sending:'Ուղարկվում է {p}%', retry:'Կրկնել', close_btn:'Փակել', err_network_t:'Կապ չկա', err_network_d:'Ստուգեք ինտերնետը և կրկնեք։ Ձեր տվյալները չեն կորել։', err_server_t:'Ինչ-որ բան այնպես չգնաց', err_server_d:'Սերվերը ժամանակավորապես անհասանելի է։ Փորձեք կրկին մեկ րոպեից։', err_notfound_t:'Չի գտնվել', err_notfound_d:'Պատվերը հեռացվել է կամ դուք մուտք չունեք։', err_session_t:'Սեսիան անվավեր է', err_session_d:'Փակեք հավելվածը և կրկին բացեք բոտի միջոցով։', t_d:'օր' },
 };
 for (const l of ['ru', 'en', 'hy']) Object.assign(D[l], D2[l]);
 let L = ls.get('lang') || 'ru';
@@ -925,7 +946,7 @@ async function api(path, opts = {}) {
       body: opts.body ? JSON.stringify(opts.body) : undefined });
     const nt = r.headers.get('X-NT'); if (nt !== null) setBell(+nt);
     if (r.status === 401 && !expiredShown) { expiredShown = true; toast(t('expired'), 'warn', { ms: 6000 }); }
-    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
+    if (!r.ok) { const j = await r.json().catch(() => ({})), er = new Error(j.error || r.status); er.reason = j.reason; throw er; }
     $('#off')?.remove();
     return await r.json();
   } catch (e) {
@@ -1002,7 +1023,7 @@ function openRef() {
 }
 async function openBonus() {
   let list = []; try { list = await api('/promo/my'); } catch {}
-  const sh = sheet(`<h3>${t('bonus_title')}</h3>${list.length ? list.map(p => `<button class="nt ${p.active ? 'new' : ''}" data-c="${esc(p.code)}"><span><b>${esc(p.code)}</b> · −${p.percent}%</span><small>${p.active ? t('bonus_active') : t('bonus_used')}</small></button>`).join('') + `<p style="color:var(--muted);font-size:.75rem;text-align:center;margin-top:4px">${t('bonus_tap')}</p>` : `<div class="empty">${t('bonus_empty')}</div>`}`, { center: true });
+  const sh = sheet(`<h3>${t('bonus_title')}</h3>${list.length ? list.map(p => `<button class="nt ${p.active ? 'new' : ''}" data-c="${esc(p.code)}"><span><b>${esc(p.code)}</b> · −${p.percent}%</span><small>${p.active ? t('bonus_active') : p.state === 'expired' ? t('bonus_exp') : t('bonus_used')}</small></button>`).join('') + `<p style="color:var(--muted);font-size:.75rem;text-align:center;margin-top:4px">${t('bonus_tap')}</p>` : `<div class="empty">${t('bonus_empty')}</div>`}`, { center: true });
   sh.el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { navigator.clipboard?.writeText(b.dataset.c); toast(t('c_copied')); });
 }
 function manageTpl(done) { // шаблоны ответов команды
@@ -1175,16 +1196,19 @@ function renderForm() {
     });
   });
   const pmsg = (txt, good) => { const e = $('#f-pmsg'); e.textContent = txt; e.style.color = good ? 'var(--done)' : 'var(--rej)'; };
+  const pReason = r => t(r === 'expired' ? 'promo_exp' : r === 'used_up' ? 'promo_used_up' : r === 'used_by_you' ? 'promo_used_you' : 'promo_bad');
   const applyPromo = async code => {
     code = (code || $('#f-promo').value).trim().toUpperCase(); $('#f-promo').value = code; if (!code) return pmsg('');
-    try { const r = await api('/promo/check', { method: 'POST', body: { code } }); r.ok ? pmsg(t('promo_ok', { p: r.percent }), true) : pmsg(t(r.reason === 'expired' ? 'promo_exp' : r.reason === 'used_up' ? 'promo_used_up' : r.reason === 'used_by_you' ? 'promo_used_you' : 'promo_bad')); } catch { pmsg(t('promo_bad')); }
+    try { const r = await api('/promo/check', { method: 'POST', body: { code } }); r.ok ? pmsg(t('promo_ok', { p: r.percent }), true) : pmsg(pReason(r.reason)); }
+    catch (err) { pmsg(err.message === 'rate_limit' ? t('f_rate') : t('f_fail')); }
   };
+  $('#f-promo').addEventListener('input', () => pmsg(''));
   $('#f-papply').onclick = () => applyPromo();
   api('/promo/banners').then(bs => {
     if (!bs.length) return;
     $('#pb').innerHTML = bs.map(x => `<div class="promo-b"><div><b>${ic('fire','s')} ${esc(x.title || '')} −${x.percent}%</b>${x.expires_at ? `<small class="cd" data-e="${x.expires_at}"></small>` : ''}</div><button type="button" class="btn small" data-c="${esc(x.code)}" style="width:auto;padding:0 14px">${t('promo_use')}</button></div>`).join('');
     $$('#pb [data-c]').forEach(z => z.onclick = () => applyPromo(z.dataset.c));
-    const tick = () => $$('#pb .cd').forEach(c => { c.textContent = ' · ' + t('promo_left', { x: fmtLeft(+c.dataset.e) }); }); tick(); addTimer(tick, 1000);
+    const tick = () => { $$('#pb .promo-b').forEach(b => { const c = b.querySelector('.cd'); if (!c) return; if (+c.dataset.e <= Date.now()) b.remove(); else c.textContent = ' · ' + t('promo_left', { x: fmtLeft(+c.dataset.e) }); }); }; tick(); addTimer(tick, 1000);
   }).catch(() => {});
   api('/promo/my').then(ps => { $('#f-pmy').innerHTML = ps.filter(p => p.active).map(p => `<span data-c="${esc(p.code)}" style="cursor:pointer">${ic('gift','s')} ${esc(p.code)} −${p.percent}%</span>`).join(''); $$('#f-pmy [data-c]').forEach(z => z.onclick = () => applyPromo(z.dataset.c)); }).catch(() => {});
   $('#f-send').onclick = async e => {
@@ -1202,7 +1226,7 @@ function renderForm() {
       }
       if (failed) toast(t('c_file_fail'), 'warn');
       ls.del('draft'); tg.HapticFeedback?.notificationOccurred('success'); toast(t('f_sent', { id: o.id })); go('orders');
-    } catch (err) { toast(err.message === 'rate_limit' ? t('f_rate') : err.message === 'bad_promo' ? t('promo_bad') : t('f_fail')); btn.disabled = false; btn.textContent = t('f_send'); }
+    } catch (err) { toast(err.message === 'rate_limit' ? t('f_rate') : err.message === 'bad_promo' ? pReason(err.reason) : t('f_fail')); btn.disabled = false; btn.textContent = t('f_send'); }
   };
 }
 
@@ -1217,7 +1241,8 @@ async function renderList() {
   const inF = (o, f) => f === 'ALL' ? true : f === 'DONE' ? done(o) : f === 'MINE' ? o.assignee?.id === me.id : f === 'URGENT' ? o.priority === 'urgent' && !done(o) : o.status === f;
   const match = o => !query || hits[o.id] || [o.id, o.name, o.phone, o.username, o.service_type, o.description, (o.tags || []).join(' '), o.assignee?.name].join(' ').toLowerCase().includes(query);
   const prio = o => o.priority === 'urgent' ? ' ' + ic('fire', 's pr-u') : o.priority === 'high' ? ' ' + ic('arrowup', 's pr-h') : '';
-  const card = o => `<button class="card order${sel.has(o.id) ? ' sel' : ''}" data-id="${o.id}">
+  const isU = o => o.priority === 'urgent' && !done(o);
+  const card = o => `<button class="card order${isU(o) ? ' urgent' : ''}${sel.has(o.id) ? ' sel' : ''}" data-id="${o.id}">
       <div class="row"><span class="num">${selMode ? `<i class="chk${sel.has(o.id) ? ' on' : ''}"></i>` : ''}#${o.id}${staff ? prio(o) : ''}${unread(o) ? '<i class="dot"></i>' : ''}<span class="oi" role="button" tabindex="0" data-info="${o.id}" aria-label="info">${ic('info')}</span></span>${badge(o.status)}</div>
       <div class="row"><b>${esc(staff ? o.name : svcName(o.service_type))}</b><span class="sub">${ago(o.created_at)}</span></div>
       <div class="sub">${esc(staff ? svcName(o.service_type) + ' · ' + o.description : o.description)}</div>
@@ -1232,8 +1257,8 @@ async function renderList() {
       $$('#ctl [data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; paint(); });
       $('#selB')?.addEventListener('click', () => { selMode = !selMode; sel.clear(); paint(); });
     }
-    const shown = list.filter(o => (!staff || inF(o, filter)) && match(o)), keep = main.scrollTop;
-    $('#lst').innerHTML = shown.length ? shown.map(card).join('') : (staff ? '<div class="emptyx"><div class="eic">' + ic('folder') + '</div><div>Ничего не найдено</div></div>' : `<div class="emptyx"><div class="eic">${ic('board')}</div><div>${t('o_none')}</div><button class="btn" id="goNew">${t('o_make')}</button></div>`);
+    const shown = list.filter(o => (!staff || inF(o, filter)) && match(o)).sort((a, b) => (isU(b) - isU(a)) || (b.id - a.id)), keep = main.scrollTop;
+    $('#lst').innerHTML = shown.length ? shown.map((o, i) => (isU(o) && !(i && isU(shown[i - 1])) ? `<div class="pinhdr">${ic('fire','s')} Закреплено · срочные</div>` : '') + card(o)).join('') : (staff ? '<div class="emptyx"><div class="eic">' + ic('folder') + '</div><div>Ничего не найдено</div></div>' : `<div class="emptyx"><div class="eic">${ic('board')}</div><div>${t('o_none')}</div><button class="btn" id="goNew">${t('o_make')}</button></div>`);
     $('#goNew')?.addEventListener('click', () => go('new'));
     $$('#lst .oi').forEach(b => b.onclick = e => { e.stopPropagation(); e.preventDefault(); openOrderInfo(+b.dataset.info); });
     $$('#lst .order').forEach(b => b.onclick = () => { const id = +b.dataset.id; if (selMode) { sel.has(id) ? sel.delete(id) : sel.add(id); paint(); } else openOrder(id); });
@@ -1567,17 +1592,23 @@ async function renderAudit() {
 async function renderPromos() {
   const main = $('#main'); let list; try { list = await api('/promos'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }
   const top = await api('/ref/top').catch(() => ({ top: [] }));
-  main.innerHTML = `<div class="card"><p class="h2">Промокоды и акции</p>${list.length ? list.map(p => `<div class="li"><span><b>${esc(p.code)}</b> −${p.percent}% ${p.banner ? ic('mega','s') : ''}<br><small>${p.mode === 'single' ? 'разовый' : p.mode === 'per_user' ? '1 раз на клиента' : 'многоразовый'} · ${esc(p.title || '')} · использовано ${p.uses}${p.max_uses ? '/' + p.max_uses : ''}${p.expires_at ? ' · до ' + new Date(p.expires_at).toLocaleDateString('ru-RU') : ''}${p.active ? '' : ' · выключен'}</small></span><span><button type="button" data-t="${esc(p.code)}" style="background:none;border:0;color:var(--cyan)">${p.active ? 'выкл' : 'вкл'}</button> <button type="button" data-x="${esc(p.code)}" aria-label="delete" style="background:none;border:0;color:var(--rej)">${ic('close','s')}</button></span></div>`).join('') : '<p style="color:var(--muted)">Пока нет</p>'}</div>
+  main.innerHTML = `<div class="card"><p class="h2">Промокоды и акции</p>${list.length ? list.map(p => `<div class="li"><span><b>${esc(p.code)}</b> −${p.percent}% ${p.banner ? ic('mega','s') : ''}<br><small>${p.mode === 'single' ? 'разовый' : p.mode === 'per_user' ? '1 раз на клиента' : 'многоразовый'} · ${esc(p.title || '')} · использовано ${p.uses}${p.max_uses ? '/' + p.max_uses : ''}${p.expires_at ? ' · до ' + new Date(p.expires_at).toLocaleDateString('ru-RU') : ''}${p.state === 'expired' ? ' · истёк' : p.state === 'used_up' ? ' · исчерпан' : p.active ? '' : ' · выключен'}</small></span><span><button type="button" data-t="${esc(p.code)}" style="background:none;border:0;color:var(--cyan)">${p.active ? 'выкл' : 'вкл'}</button> <button type="button" data-x="${esc(p.code)}" aria-label="delete" style="background:none;border:0;color:var(--rej)">${ic('close','s')}</button></span></div>`).join('') : '<p style="color:var(--muted)">Пока нет</p>'}</div>
     <div class="card"><p class="h2">Новый промокод</p><label>Код (пусто — создать автоматически)</label><input id="p-c" maxlength="20" style="text-transform:uppercase">
       <label style="margin-top:10px">Тип промокода</label><select id="p-mode"><option value="multi">Многоразовый — любое число клиентов (лимит по желанию)</option><option value="per_user">Один раз на каждого клиента</option><option value="single">Разовый — один заказ, потом код недействителен</option></select>
       <div class="two" style="margin-top:10px"><div><label>Скидка, %</label><input id="p-p" type="number" min="1" max="90" value="10"></div><div><label>Лимит</label><input id="p-m" type="number" min="0" placeholder="без лимита"></div></div>
-      <label style="margin-top:10px">Название акции</label><input id="p-t" maxlength="40" placeholder="Например: Осенняя скидка"><label style="margin-top:10px">Действует до</label><input id="p-e" type="date">
+      <label style="margin-top:10px">Название акции</label><input id="p-t" maxlength="40" placeholder="Например: Осенняя скидка"><label style="margin-top:10px">Действует до</label><input id="p-e" type="date" min="${new Date().toISOString().slice(0, 10)}">
       <label class="sw" style="margin-top:12px"><span>Показывать баннер с таймером в форме заявки</span><input type="checkbox" id="p-b" checked></label><button class="btn" id="p-add" style="margin-top:12px">Создать</button></div>
     <div class="card"><p class="h2">Рейтинг приглашающих</p>${top.top.length ? top.top.map((x, i) => `<div class="li"><span>${i + 1}. ${esc(x.name)}</span><b>${x.completed} <small>из ${x.invited}</small></b></div>`).join('') : '<p style="color:var(--muted)">Пока нет приглашённых</p>'}<p style="color:var(--muted);font-size:.75rem;margin-top:8px">Размер бонуса за друга — в разделе «Автоматизация».</p></div>`;
   $$('[data-t]').forEach(b => b.onclick = async () => { try { await api('/promos/toggle', { method: 'POST', body: { code: b.dataset.t } }); renderPromos(); } catch { toast('Не удалось'); } });
-  $$('[data-x]').forEach(b => b.onclick = async () => { try { await api('/promos/delete', { method: 'POST', body: { code: b.dataset.x } }); renderPromos(); } catch { toast('Не удалось'); } });
+  $$('[data-x]').forEach(b => b.onclick = async () => { const q = `Удалить промокод ${b.dataset.x}?`; if (!await new Promise(r => tg?.showConfirm ? tg.showConfirm(q, r) : r(confirm(q)))) return; try { await api('/promos/delete', { method: 'POST', body: { code: b.dataset.x } }); renderPromos(); } catch { toast('Не удалось'); } });
   $('#p-mode').onchange = e => { const one = e.target.value === 'single'; $('#p-m').disabled = one; if (one) $('#p-m').value = ''; $('#p-m').placeholder = one ? 'всегда 1' : 'без лимита'; };
-  $('#p-add').onclick = async () => { try { await api('/promos', { method: 'POST', body: { code: $('#p-c').value, percent: $('#p-p').value, max_uses: $('#p-m').value, mode: $('#p-mode').value, title: $('#p-t').value, expires: $('#p-e').value, banner: $('#p-b').checked } }); toast('Создано'); renderPromos(); } catch (e) { toast(e.message === 'exists' ? 'Такой код уже есть' : 'Проверьте поля (скидка 1–90%)'); } };
+  $('#p-add').onclick = async e => {
+    const btn = e.currentTarget, pct = Number($('#p-p').value);
+    if (!(pct >= 1 && pct <= 90)) return toast('Скидка: от 1 до 90%');
+    btn.disabled = true;
+    try { await api('/promos', { method: 'POST', body: { code: $('#p-c').value, percent: pct, max_uses: $('#p-m').value, mode: $('#p-mode').value, title: $('#p-t').value, expires: $('#p-e').value, banner: $('#p-b').checked } }); toast('Создано'); renderPromos(); }
+    catch (er) { btn.disabled = false; toast(({ exists: 'Такой код уже есть', bad_code: 'Код: 3–20 символов, латиница, цифры, _ и -', bad_date: 'Некорректная дата', past_date: 'Эта дата уже прошла' })[er.message] || 'Проверьте поля (скидка 1–90%)'); }
+  };
 }
 async function renderAuto() {
   const main = $('#main'); let c; try { c = await api('/cfg'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }

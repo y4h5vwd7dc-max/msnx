@@ -250,9 +250,63 @@ body.kbc #bn{display:none!important}
 body.kbc main.chatmode{padding:6px 10px}
 .chatcard{min-height:140px}
 .att .ph{min-height:90px}
+
+/* --- прогресс загрузки --- */
+.msg.upl{opacity:1;min-width:210px}
+.upl .uname{font-size:.85rem;word-break:break-all}
+.upl .uname small{color:var(--muted);font-family:var(--mono);font-size:.62rem;display:inline;margin:0}
+.upl .bar{height:6px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden;margin:7px 0 5px}
+.upl .bar i{display:block;height:100%;width:0;background:var(--grad);transition:width .15s linear;box-shadow:0 0 10px rgba(0,243,255,.5)}
+.upl .uact{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.upl .ust{font-family:var(--mono);font-size:.72rem;color:var(--cyan)}
+.upl .ust.bad{color:var(--rej);margin:4px 0}
+.upl .uact button{background:none;border:1px solid var(--line);color:var(--cyan);border-radius:50px;padding:.2rem .7rem;font-size:.75rem;cursor:pointer}
+.upl .uact button[data-a=x]{color:var(--rej);border-color:rgba(255,93,108,.4)}
+.chips span{background:linear-gradient(90deg,rgba(0,243,255,.3) var(--p,0%),rgba(0,243,255,.06) var(--p,0%));transition:background .15s}
+#f-prog{margin:10px 0 0}
+/* --- уведомления --- */
+.toasts{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;gap:8px;width:min(92vw,420px);pointer-events:none}
+.tst{pointer-events:auto;position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border-radius:14px;border:1px solid var(--line);background:rgba(11,13,22,.97);color:var(--cyan);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 18px rgba(0,243,255,.12);animation:tin .28s ease both}
+.tst.out{animation:tout .22s ease both}
+.tst .ic{flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 .8rem var(--mono);font-style:normal;background:rgba(0,243,255,.14)}
+.tst .tx{flex:1;color:var(--text);font-size:.88rem;line-height:1.35}
+.tst .act{flex:none;background:none;border:1px solid currentColor;color:inherit;border-radius:50px;padding:.2rem .7rem;font-size:.78rem;cursor:pointer}
+.tst .cl{flex:none;background:none;border:0;color:var(--muted);cursor:pointer;font-size:.9rem;padding:2px 4px}
+.tst .tm{position:absolute;left:0;bottom:0;height:2px;width:100%;background:currentColor;opacity:.7;transform-origin:left;animation:tbar linear forwards}
+.tst.success{color:var(--done);border-color:rgba(61,255,160,.5)}.tst.success .ic{background:rgba(61,255,160,.15)}
+.tst.error{color:var(--rej);border-color:rgba(255,93,108,.55)}.tst.error .ic{background:rgba(255,93,108,.15)}
+.tst.warn{color:var(--new);border-color:rgba(255,216,77,.55)}.tst.warn .ic{background:rgba(255,216,77,.15)}
+@keyframes tin{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes tout{to{opacity:0;transform:translateY(-10px) scale(.96)}}
+@keyframes tbar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+/* --- экраны ошибок --- */
+.erx{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:30px 18px;margin:auto;max-width:340px}
+.erx svg{width:96px;height:96px;overflow:visible;animation:efloat 3.2s ease-in-out infinite;filter:drop-shadow(0 0 16px rgba(0,243,255,.38))}
+.erx.server svg,.erx.session svg{filter:drop-shadow(0 0 16px rgba(255,93,108,.4))}
+.erx h3{font-size:1.1rem;margin-top:4px}
+.erx p{color:var(--muted);font-size:.88rem}
+.erx .btn{max-width:240px;margin-top:8px}
+.erx .btn.ghost{margin-top:0}
+.erx .arc{animation:eblink 1.6s ease-in-out infinite}.erx .a2{animation-delay:.25s}.erx .a3{animation-delay:.5s}
+@keyframes efloat{50%{transform:translateY(-8px)}}
+@keyframes eblink{50%{opacity:.15}}
+/* --- заставка --- */
+#splash{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .45s ease,transform .45s ease}
+#splash::before{content:"";position:absolute;inset:0;background:radial-gradient(520px 360px at 50% 42%,rgba(0,243,255,.18),transparent 70%),radial-gradient(420px 300px at 80% 90%,rgba(167,139,250,.14),transparent 70%)}
+#splash.out{opacity:0;transform:scale(1.05);pointer-events:none}
+#splash>*{position:relative}
+#splash svg{width:104px;height:104px;overflow:visible;filter:drop-shadow(0 0 24px rgba(0,243,255,.6));animation:spin-in .8s ease both}
+#splash .sw{font-weight:800;letter-spacing:.34em;font-size:1.3rem;color:#fff;animation:fade-up .7s .15s ease both}
+#splash .ld{width:132px;height:3px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;animation:fade-up .7s .3s ease both}
+#splash .ld i{display:block;height:100%;width:40%;border-radius:3px;background:var(--grad);animation:sld 1.15s ease-in-out infinite}
+@keyframes sld{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
+@keyframes spin-in{from{opacity:0;transform:scale(.7) rotate(-40deg)}to{opacity:1;transform:none}}
+@keyframes fade-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.tst,.erx svg,.erx .arc,#splash svg,#splash .sw,#splash .ld,#splash .ld i{animation:none}}
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true"><svg viewBox="0 0 48 48"><defs><linearGradient id="lgS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00f3ff"/><stop offset=".55" stop-color="#6c8cff"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs><g class="lg-orb"><circle cx="24" cy="24" r="21" fill="none" stroke="url(#lgS)" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="52 12 22 12"/><circle cx="24" cy="3" r="2.4" fill="#fff"/></g><path d="M14 33V17l10 10 10-10v16" fill="none" stroke="url(#lgS)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="lg-node" cx="24" cy="27" r="2.3" fill="#fff"/></svg><div class="sw lg-word">MAISON<span>AX</span></div><div class="ld"><i></i></div></div>
 <div id="app">
   <header><span class="logo"><svg class="lg-mark" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lgG1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00f3ff"/><stop offset=".55" stop-color="#6c8cff"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs><g class="lg-orb"><circle cx="24" cy="24" r="21" fill="none" stroke="url(#lgG1)" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="52 12 22 12"/><circle cx="24" cy="3" r="2.4" fill="#fff"/></g><path d="M14 33V17l10 10 10-10v16" fill="none" stroke="url(#lgG1)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle class="lg-node" cx="24" cy="27" r="2.3" fill="#fff"/></svg><span class="lg-word">MAISON<span>AX</span></span></span><div class="hbar" id="hbar"></div></header>
   <nav id="nav"></nav>
@@ -321,9 +375,9 @@ hy: { tab_new:'Նոր հայտ', tab_orders:'Իմ պատվերները', back:'�
  bell:'Ծանուցումներ', bell_empty:'Ծանուցումներ դեռ չկան', menu:'Ընտրացանկ', m_lang:'Լեզու', m_news:'Նորություններ և ակցիաներ', m_ref:'🎁 Հրավիրել ընկերոջը', ref_title:'Հրավիրեք ընկերոջը', ref_text:'Ուղարկեք հղումը ընկերոջը։ Երբ նա ավարտի պատվերը, դուք բոնուս կստանաք. պայմանները կճշտի թիմը։', ref_copy:'Պատճենել հղումը', ref_share:'Կիսվել', ref_stats:'Հրավիրված՝ {i} · Ավարտել են պատվերը՝ {c}', ref_copied:'Հղումը պատճենված է', ref_nolink:'Հղումը դեռ հասանելի չէ' },
 };
 const D2 = {
-ru: { promo_label:'Промокод', promo_ph:'Введите код', promo_apply:'Применить', promo_ok:'Скидка {p}% применится к заказу', promo_bad:'Код недействителен', promo_exp:'Срок действия кода истёк', promo_used_up:'Лимит использований исчерпан', promo_used_you:'Вы уже использовали этот код', promo_use:'Применить', promo_left:'осталось {x}', m_bonus:'🏷 Мои бонусы', bonus_title:'Мои бонусы', bonus_empty:'Бонусов пока нет — приглашайте друзей!', bonus_active:'доступен', bonus_used:'использован', bonus_tap:'Нажмите, чтобы скопировать код', top_title:'Топ приглашающих', top_me:'Ваше место: {n}', q_wait:'Нет сети — сообщение отправится позже', d_promo:'Промокод', t_d:'д' },
-en: { promo_label:'Promo code', promo_ph:'Enter code', promo_apply:'Apply', promo_ok:'{p}% off will be applied to your order', promo_bad:'Invalid code', promo_exp:'This code has expired', promo_used_up:'Usage limit reached', promo_used_you:'You have already used this code', promo_use:'Apply', promo_left:'{x} left', m_bonus:'🏷 My bonuses', bonus_title:'My bonuses', bonus_empty:'No bonuses yet — invite friends!', bonus_active:'available', bonus_used:'used', bonus_tap:'Tap a code to copy it', top_title:'Top inviters', top_me:'Your place: {n}', q_wait:'No connection — the message will be sent later', d_promo:'Promo code', t_d:'d' },
-hy: { promo_label:'Պրոմոկոդ', promo_ph:'Մուտքագրեք կոդը', promo_apply:'Կիրառել', promo_ok:'{p}% զեղչը կկիրառվի պատվերի վրա', promo_bad:'Կոդը անվավեր է', promo_exp:'Կոդի ժամկետը լրացել է', promo_used_up:'Օգտագործման սահմանաչափը սպառված է', promo_used_you:'Դուք արդեն օգտագործել եք այս կոդը', promo_use:'Կիրառել', promo_left:'մնաց {x}', m_bonus:'🏷 Իմ բոնուսները', bonus_title:'Իմ բոնուսները', bonus_empty:'Բոնուսներ դեռ չկան՝ հրավիրեք ընկերներին։', bonus_active:'հասանելի է', bonus_used:'օգտագործված է', bonus_tap:'Սեղմեք կոդի վրա՝ պատճենելու համար', top_title:'Լավագույն հրավիրողները', top_me:'Ձեր տեղը՝ {n}', q_wait:'Կապ չկա՝ հաղորդագրությունը կուղարկվի ավելի ուշ', d_promo:'Պրոմոկոդ', t_d:'օր' },
+ru: { promo_label:'Промокод', promo_ph:'Введите код', promo_apply:'Применить', promo_ok:'Скидка {p}% применится к заказу', promo_bad:'Код недействителен', promo_exp:'Срок действия кода истёк', promo_used_up:'Лимит использований исчерпан', promo_used_you:'Вы уже использовали этот код', promo_use:'Применить', promo_left:'осталось {x}', m_bonus:'🏷 Мои бонусы', bonus_title:'Мои бонусы', bonus_empty:'Бонусов пока нет — приглашайте друзей!', bonus_active:'доступен', bonus_used:'использован', bonus_tap:'Нажмите, чтобы скопировать код', top_title:'Топ приглашающих', top_me:'Ваше место: {n}', q_wait:'Нет сети — сообщение отправится позже', d_promo:'Промокод', up_prep:'Подготовка…', up_sending:'Отправка {p}%', retry:'Повторить', close_btn:'Закрыть', err_network_t:'Нет связи', err_network_d:'Проверьте интернет и повторите. Ваши данные не потеряны.', err_server_t:'Что-то пошло не так', err_server_d:'Сервер временно недоступен. Попробуйте ещё раз через минуту.', err_notfound_t:'Не найдено', err_notfound_d:'Заказ удалён или у вас нет к нему доступа.', err_session_t:'Сессия недействительна', err_session_d:'Закройте приложение и откройте его заново через бота.', t_d:'д' },
+en: { promo_label:'Promo code', promo_ph:'Enter code', promo_apply:'Apply', promo_ok:'{p}% off will be applied to your order', promo_bad:'Invalid code', promo_exp:'This code has expired', promo_used_up:'Usage limit reached', promo_used_you:'You have already used this code', promo_use:'Apply', promo_left:'{x} left', m_bonus:'🏷 My bonuses', bonus_title:'My bonuses', bonus_empty:'No bonuses yet — invite friends!', bonus_active:'available', bonus_used:'used', bonus_tap:'Tap a code to copy it', top_title:'Top inviters', top_me:'Your place: {n}', q_wait:'No connection — the message will be sent later', d_promo:'Promo code', up_prep:'Preparing…', up_sending:'Sending {p}%', retry:'Retry', close_btn:'Close', err_network_t:'No connection', err_network_d:'Check your internet and try again. Your data is safe.', err_server_t:'Something went wrong', err_server_d:'The server is temporarily unavailable. Please try again in a minute.', err_notfound_t:'Not found', err_notfound_d:'The order was removed or you do not have access.', err_session_t:'Session expired', err_session_d:'Close the app and reopen it via the bot.', t_d:'d' },
+hy: { promo_label:'Պրոմոկոդ', promo_ph:'Մուտքագրեք կոդը', promo_apply:'Կիրառել', promo_ok:'{p}% զեղչը կկիրառվի պատվերի վրա', promo_bad:'Կոդը անվավեր է', promo_exp:'Կոդի ժամկետը լրացել է', promo_used_up:'Օգտագործման սահմանաչափը սպառված է', promo_used_you:'Դուք արդեն օգտագործել եք այս կոդը', promo_use:'Կիրառել', promo_left:'մնաց {x}', m_bonus:'🏷 Իմ բոնուսները', bonus_title:'Իմ բոնուսները', bonus_empty:'Բոնուսներ դեռ չկան՝ հրավիրեք ընկերներին։', bonus_active:'հասանելի է', bonus_used:'օգտագործված է', bonus_tap:'Սեղմեք կոդի վրա՝ պատճենելու համար', top_title:'Լավագույն հրավիրողները', top_me:'Ձեր տեղը՝ {n}', q_wait:'Կապ չկա՝ հաղորդագրությունը կուղարկվի ավելի ուշ', d_promo:'Պրոմոկոդ', up_prep:'Պատրաստվում է…', up_sending:'Ուղարկվում է {p}%', retry:'Կրկնել', close_btn:'Փակել', err_network_t:'Կապ չկա', err_network_d:'Ստուգեք ինտերնետը և կրկնեք։ Ձեր տվյալները չեն կորել։', err_server_t:'Ինչ-որ բան այնպես չգնաց', err_server_d:'Սերվերը ժամանակավորապես անհասանելի է։ Փորձեք կրկին մեկ րոպեից։', err_notfound_t:'Չի գտնվել', err_notfound_d:'Պատվերը հեռացվել է կամ դուք մուտք չունեք։', err_session_t:'Սեսիան անվավեր է', err_session_d:'Փակեք հավելվածը և կրկին բացեք բոտի միջոցով։', t_d:'օր' },
 };
 for (const l of ['ru', 'en', 'hy']) Object.assign(D[l], D2[l]);
 let L = ls.get('lang') || 'ru';
@@ -358,7 +412,21 @@ async function obFlush() {
 window.addEventListener('online', obFlush);
 setInterval(() => { if (!document.hidden && obGet().length) obFlush(); }, 12000);
 
-function toast(m) { const e = document.createElement('div'); e.className = 'toast'; e.textContent = m; document.body.appendChild(e); setTimeout(() => e.remove(), 2600); }
+const TOAST_ERR = /Не удалось|не отправ|Ошибка|ошиб|Слишком|Проверьте|Укажите|Заполните|Напишите|Введите|недействител|истёк|Лимит|больше 5|already|Could not|not sent|Invalid|expired|limit|Too many|Check |Fill in|Չհաջողվեց|չուղարկվեց|անվավեր|Չափազանց|Ստուգեք|Լրացրեք|մեծ է|սահմանաչափ/i;
+const TOAST_OK = /отправлена|Сохранено|сохранена|Скопировано|скопирован|Записано|Создано|Готово|обновлён|подставлен|Добавлено|Спасибо|Copied|copied|saved|filled|Thanks|Updated|Պատճենված|պահպանված|Շնորհակալություն|ուղարկված|լրացված/i;
+function toast(msg, type, opt = {}) { // типы: success / error / warn / info; тип определяется по тексту, если не указан
+  type = type || (TOAST_ERR.test(msg) ? 'error' : TOAST_OK.test(msg) ? 'success' : 'info');
+  let box = $('#toasts'); if (!box) { box = document.createElement('div'); box.id = 'toasts'; box.className = 'toasts'; box.setAttribute('role', 'status'); box.setAttribute('aria-live', 'polite'); document.body.appendChild(box); }
+  while (box.children.length >= 3) box.firstChild.remove();
+  const ICON = { success: '✓', error: '✕', warn: '!', info: 'i' }, ms = opt.ms || (type === 'error' ? 4200 : 2600);
+  const el = document.createElement('div'); el.className = 'tst ' + type;
+  el.innerHTML = `<i class="ic">${ICON[type]}</i><span class="tx">${esc(msg)}</span>${opt.action ? `<button type="button" class="act">${esc(opt.action)}</button>` : ''}<button type="button" class="cl" aria-label="close">✕</button><i class="tm" style="animation-duration:${ms}ms"></i>`;
+  const close = () => { if (!el.isConnected || el.classList.contains('out')) return; el.classList.add('out'); setTimeout(() => el.remove(), 220); };
+  el.querySelector('.cl').onclick = close; el.querySelector('.act')?.addEventListener('click', () => { close(); opt.fn?.(); });
+  box.appendChild(el); setTimeout(close, ms);
+  if (type !== 'info') { try { tg?.HapticFeedback?.notificationOccurred?.(type === 'warn' ? 'warning' : type); } catch {} }
+  return close;
+}
 function addTimer(fn, ms) { // цикл с переменной паузой; при свёрнутом приложении запросы не отправляются
   let stop = false, tid;
   const delay = () => typeof ms === 'function' ? ms() : ms;
@@ -377,7 +445,7 @@ async function api(path, opts = {}) {
       headers: {'Content-Type':'application/json','X-Init-Data': tg?.initData || '', ...(opts.headers||{})},
       body: opts.body ? JSON.stringify(opts.body) : undefined });
     const nt = r.headers.get('X-NT'); if (nt !== null) setBell(+nt);
-    if (r.status === 401 && !expiredShown) { expiredShown = true; toast(t('expired')); }
+    if (r.status === 401 && !expiredShown) { expiredShown = true; toast(t('expired'), 'warn', { ms: 6000 }); }
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
     $('#off')?.remove();
     return await r.json();
@@ -487,9 +555,38 @@ async function prepFile(file) {
     return new File([b], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' });
   } catch { return file; }
 }
-async function uploadFile(orderId, f, extra = {}) {
-  return fetch(`/api/orders/${orderId}/upload`, { method: 'POST', body: f, headers: { 'X-Init-Data': tg?.initData || '', 'X-File-Name': encodeURIComponent(f.name), 'X-File-Type': f.type || 'application/octet-stream', ...extra } });
+function uploadFile(orderId, f, extra = {}, onProgress, ctl) { // отправка файла с процентами, отменой и защитой от «зависания» сети
+  return new Promise((resolve, reject) => {
+    const x = new XMLHttpRequest(); let failed = false, stall = 0;
+    x.open('POST', `/api/orders/${orderId}/upload`);
+    x.setRequestHeader('X-Init-Data', tg?.initData || ''); x.setRequestHeader('X-File-Name', encodeURIComponent(f.name)); x.setRequestHeader('X-File-Type', f.type || 'application/octet-stream');
+    for (const [k, v] of Object.entries(extra)) x.setRequestHeader(k, v);
+    const fail = () => { failed = true; x.abort(); };                     // обрыв сети или 20 секунд без движения — ошибка с кнопкой «Повторить»
+    const arm = () => { clearTimeout(stall); stall = setTimeout(fail, 20000); };
+    const done = () => { clearTimeout(stall); window.removeEventListener('offline', fail); };
+    window.addEventListener('offline', fail); arm();
+    x.upload.onprogress = e => { arm(); if (e.lengthComputable) onProgress?.(Math.round(e.loaded / e.total * 100)); };
+    x.onload = () => { done(); resolve({ ok: x.status >= 200 && x.status < 300, status: x.status, json: async () => JSON.parse(x.responseText || 'null') }); };
+    x.onerror = x.ontimeout = () => { done(); reject(new Error('network')); };
+    x.onabort = () => { done(); reject(failed ? new Error('network') : Object.assign(new Error('cancelled'), { cancelled: true })); };
+    x.timeout = 120000; if (ctl) ctl.abort = () => x.abort();
+    x.send(f);
+  });
 }
+// экран ошибки с анимацией и кнопкой «Повторить»
+const ERRSVG = {
+  network: '<svg viewBox="0 0 64 64" fill="none" stroke="#00f3ff" stroke-width="3.2" stroke-linecap="round"><path class="arc a1" d="M8 24c13-11 35-11 48 0"/><path class="arc a2" d="M16 33c9-7 23-7 32 0"/><path class="arc a3" d="M24 42c5-4 11-4 16 0"/><circle cx="32" cy="50" r="2.6" fill="#00f3ff"/><path d="M12 56L52 8" stroke="#ff5d6c"/></svg>',
+  server: '<svg viewBox="0 0 64 64" fill="none" stroke="#ff5d6c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M32 8L58 54H6z"/><path d="M32 26v14"/><circle cx="32" cy="47" r="1.8" fill="#ff5d6c"/></svg>',
+  notfound: '<svg viewBox="0 0 64 64" fill="none" stroke="#00f3ff" stroke-width="3.2" stroke-linecap="round"><circle cx="28" cy="28" r="16"/><path d="M40 40l16 16"/><path d="M22 22l12 12M34 22L22 34" stroke="#a78bfa"/></svg>',
+  session: '<svg viewBox="0 0 64 64" fill="none" stroke="#ff5d6c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="28" width="36" height="28" rx="6"/><path d="M22 28v-8a10 10 0 0 1 20 0v8"/><circle cx="32" cy="42" r="3" fill="#ff5d6c"/></svg>',
+};
+const errKind = e => isNet(e) || e?.message === 'network' ? 'network' : e?.message === 'unauthorized' ? 'session' : ['not_found', 'forbidden'].includes(e?.message) ? 'notfound' : 'server';
+function errorScreen(kind, retry) {
+  const k = ERRSVG[kind] ? kind : 'server', main = $('#main'); clearTimers(); window.__tick = null; main.className = '';
+  main.innerHTML = `<div class="erx ${k}" role="alert">${ERRSVG[k]}<h3>${t('err_' + k + '_t')}</h3><p>${t('err_' + k + '_d')}</p>${k === 'session' ? `<button class="btn" id="er-x" type="button">${t('close_btn')}</button>` : `<button class="btn" id="er-r" type="button">${t('retry')}</button>`}</div>`;
+  $('#er-r')?.addEventListener('click', () => retry?.()); $('#er-x')?.addEventListener('click', () => tg?.close?.());
+}
+function hideSplash() { const s = $('#splash'); if (!s) return; setTimeout(() => { s.classList.add('out'); setTimeout(() => s.remove(), 500); }, Math.max(0, 750 - performance.now())); }
 function openGallery(startFid) {
   const fids = $$('#chat [data-kind="image"]').map(e => e.dataset.fid); let i = Math.max(0, fids.indexOf(startFid)), scale = 1, sx = 0, lastTap = 0;
   const d = document.createElement('div'); d.className = 'gal';
@@ -564,14 +661,16 @@ function renderForm() {
       <p style="color:var(--muted);font-size:.72rem;margin-top:6px">${t('f_files_hint')}</p><div class="chips" id="f-chips"></div></div>
     <div class="field"><label>${t('promo_label')}</label><div class="fl"><input id="f-promo" maxlength="24" placeholder="${esc(t('promo_ph'))}" style="text-transform:uppercase"><button type="button" class="btn small line" id="f-papply" style="width:auto;padding:0 14px">${t('promo_apply')}</button></div><p id="f-pmsg" style="font-size:.78rem;margin-top:6px"></p><div class="chips" id="f-pmy"></div></div>
     <label class="sw field"><span>${t('f_sub')}</span><input type="checkbox" id="f-sub" ${me.sub ? 'checked' : ''}></label>
-    <button class="btn" id="f-send">${t('f_send')}</button></div>`;
+    <button class="btn" id="f-send">${t('f_send')}</button><div class="prog" id="f-prog" hidden><i></i></div></div>`;
   const save = () => ls.set('draft', JSON.stringify({ name: $('#f-name').value, phone: $('#f-phone').value, desc: $('#f-desc').value, svc, via, ctime }));
   $('#f-svc').onchange = e => { svc = e.target.value; save(); };
   $('#f-time').onchange = e => { ctime = e.target.value; save(); };
   $$('#f-via button').forEach(b => b.onclick = () => { via = b.dataset.v; $$('#f-via button').forEach(x => x.classList.toggle('on', x === b)); save(); });
   ['#f-name', '#f-phone', '#f-desc'].forEach(q => $(q).addEventListener('input', save));
   $('#f-phone').addEventListener('focus', e => { if (!e.target.value.trim()) e.target.value = '+7 '; });
-  const chips = () => { $('#f-chips').innerHTML = files.map((f, i) => `<span>${esc(f.name.slice(0, 22))} <b data-i="${i}">✕</b></span>`).join(''); $$('#f-chips b').forEach(b => b.onclick = () => { files.splice(+b.dataset.i, 1); chips(); }); };
+  const chips = () => { $('#f-chips').innerHTML = files.map((f, i) => `<span data-i="${i}">${esc(f.name.slice(0, 22))} <b data-i="${i}">✕</b></span>`).join(''); $$('#f-chips b').forEach(b => b.onclick = () => { files.splice(+b.dataset.i, 1); chips(); }); };
+  const chipProg = (i, p) => $(`#f-chips span[data-i="${i}"]`)?.style.setProperty('--p', p + '%');
+  const setBar = p => { const b = $('#f-prog'); b.hidden = false; b.firstElementChild.style.width = p + '%'; };
   $('#f-att').onclick = () => $('#f-file').click();
   $('#f-file').onchange = e => { for (const f of e.target.files) { if (files.length >= 3) break; if (f.size > MAX_FILE * 1.6 && !f.type.startsWith('image/')) { toast(t('f_big')); continue; } files.push(f); } e.target.value = ''; chips(); };
   $('#f-tgph')?.addEventListener('click', () => {
@@ -602,7 +701,13 @@ function renderForm() {
     btn.disabled = true; btn.innerHTML = `<span class="spin"></span>${t('f_sending')}`;
     try {
       const o = await api('/orders', { method: 'POST', body }); me.sub = body.sub;
-      for (let i = 0; i < files.length; i++) { btn.textContent = t('f_up', { n: i + 1, m: files.length }); const f = await prepFile(files[i]); if (f.size <= MAX_FILE) await uploadFile(o.id, f, { 'X-Silent': '1' }).catch(() => {}); }
+      let failed = 0;
+      for (let i = 0; i < files.length; i++) {
+        btn.textContent = t('f_up', { n: i + 1, m: files.length }); const f = await prepFile(files[i]);
+        if (f.size <= MAX_FILE) { const r = await uploadFile(o.id, f, { 'X-Silent': '1' }, p => { chipProg(i, p); btn.textContent = `${t('f_up', { n: i + 1, m: files.length })} · ${p}%`; setBar((i + p / 100) / files.length * 100); }).catch(() => null); if (!r?.ok) failed++; }
+        chipProg(i, 100);
+      }
+      if (failed) toast(t('c_file_fail'), 'warn');
       ls.del('draft'); tg.HapticFeedback?.notificationOccurred('success'); toast(t('f_sent', { id: o.id })); go('orders');
     } catch (err) { toast(err.message === 'rate_limit' ? t('f_rate') : err.message === 'bad_promo' ? t('promo_bad') : t('f_fail')); btn.disabled = false; btn.textContent = t('f_send'); }
   };
@@ -657,7 +762,7 @@ async function renderList() {
   };
   const load = async () => {
     if (openId || tab !== 'orders') return;
-    let l; try { l = await api(staff ? '/orders/admin' : '/orders/my'); } catch { return; }
+    let l; try { l = await api(staff ? '/orders/admin' : '/orders/my'); } catch (e) { if (!sig) errorScreen(errKind(e), () => renderList()); return; }
     const ns = JSON.stringify(l); if (ns === sig) return; sig = ns; list = l; paint();
   };
   let qt; $('#q')?.addEventListener('input', e => {
@@ -674,7 +779,7 @@ const timeline = o => `<ul class="tl">${(o.history?.length ? o.history : [{ s: o
 async function openOrder(id) {
   clearTimers(); openId = id; tab = 'orders'; renderNav(); tg?.BackButton?.show();
   const main = $('#main'); let o;
-  try { o = await api('/orders/' + id); } catch { main.innerHTML = `<div class="empty">${t('not_found')}</div>`; return; }
+  try { o = await api('/orders/' + id); } catch (e) { errorScreen(errKind(e), () => openOrder(id)); return; }
   const staff = me.staff, write = me.write;
   if (staff && !TEAM) try { TEAM = await api('/team'); } catch {}
   const mgrs = (TEAM || []).filter(m => m.role !== 'viewer');
@@ -846,7 +951,7 @@ async function openOrder(id) {
       const body = { text, reply_to: replyTo?.id, internal }; setReply(null);
       const cid = newCid();
       try { add(await api(`/orders/${id}/messages`, { method: 'POST', body: { ...body, cid } })); toBottom(); tg?.HapticFeedback?.impactOccurred?.('light'); }
-      catch (e) { if (isNet(e)) { const it = { path: `/orders/${id}/messages`, cid, body, oid: id }; obSet([...obGet(), it]); addPending(it); toast(t('q_wait')); } else { ta.value = text; toast(t('c_fail')); } }
+      catch (e) { if (isNet(e)) { const it = { path: `/orders/${id}/messages`, cid, body, oid: id }; obSet([...obGet(), it]); addPending(it); toast(t('q_wait'), 'warn'); } else { ta.value = text; toast(t('c_fail')); } }
       sending = false; if (keep) ta.focus();
     };
     $('#go').addEventListener('pointerdown', e => e.preventDefault()); $('#go').onclick = send; // кнопка не забирает фокус — клавиатура не закрывается
@@ -865,11 +970,30 @@ async function openOrder(id) {
       attachMentions(ta, $('#mn'));
     }
     $('#clip').onclick = () => $('#file').click();
-    $('#file').onchange = async e => {
-      let f = e.target.files[0]; e.target.value = ''; if (!f) return; f = await prepFile(f);
-      if (f.size > MAX_FILE) return toast(t('f_big')); toast(t('c_file_send'));
-      try { const r = await uploadFile(id, f, { 'X-Caption': encodeURIComponent(ta.value.trim()) }); if (!r.ok) throw 0; add(await r.json()); ta.value = ''; ta.style.height = ''; toBottom(); } catch { toast(t('c_file_fail')); }
+    const sendFileFlow = (file, caption) => {
+      const el = document.createElement('div'); el.className = 'msg me pend upl'; chat.querySelector('.empty')?.remove(); chat.appendChild(el); toBottom();
+      const ctl = {}; let cancelled = false;
+      const paint = (state, pct = 0) => {
+        el.innerHTML = state === 'fail'
+          ? `<div class="uname">📎 ${esc(file.name)}</div><div class="ust bad">${t('c_file_fail')}</div><div class="uact"><button type="button" data-a="retry">${t('retry')}</button><button type="button" data-a="x" aria-label="cancel">✕</button></div>`
+          : `<div class="uname">📎 ${esc(file.name)} <small>${sizeStr(file.size)}</small></div><div class="bar"><i style="width:${pct}%"></i></div><div class="uact"><span class="ust">${state === 'prep' ? t('up_prep') : t('up_sending', { p: pct })}</span><button type="button" data-a="x" aria-label="cancel">✕</button></div>`;
+        el.querySelector('[data-a=x]').onclick = () => { cancelled = true; ctl.abort?.(); el.remove(); };
+        el.querySelector('[data-a=retry]')?.addEventListener('click', run);
+      };
+      const run = async () => {
+        cancelled = false; paint('prep');
+        try {
+          const f = await prepFile(file); if (cancelled) return;
+          if (f.size > MAX_FILE) { el.remove(); toast(t('f_big'), 'error'); return; }
+          paint('send', 0);
+          const r = await uploadFile(id, f, { 'X-Caption': encodeURIComponent(caption) }, p => { const b = el.querySelector('.bar i'); if (b) b.style.width = p + '%'; const s = el.querySelector('.ust'); if (s) s.textContent = t('up_sending', { p }); }, ctl);
+          if (!r.ok) throw new Error('http');
+          const m = await r.json(); el.remove(); add(m); if (caption && ta.value.trim() === caption) { ta.value = ''; ta.style.height = ''; } toBottom();
+        } catch (err) { if (err.cancelled || cancelled) return; paint('fail'); toast(t('c_file_fail'), 'error'); }
+      };
+      run();
     };
+    $('#file').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) sendFileFlow(f, ta.value.trim()); };
   }
   window.__tick = () => { poll(); refresh(); };
   await poll();
@@ -881,7 +1005,7 @@ async function openOrder(id) {
 const ACTL = { promo: 'Промокод', templates: 'Шаблоны', cfg: 'Настройки', time: 'Время', status: 'Статус', assign: 'Назначение', meta: 'Параметры', note: 'Заметка', pin: 'Закрепил', unpin: 'Открепил', team_add: 'В команду', team_remove: 'Из команды', broadcast: 'Рассылка', bulk_status: 'Массово: статус', bulk_assign: 'Массово: назначение', bulk_priority: 'Массово: приоритет' };
 async function renderStats() {
   const main = $('#main'); main.innerHTML = '<div class="skel"></div><div class="skel"></div>';
-  let s; try { s = await api('/stats'); } catch { main.innerHTML = '<div class="empty">Нет доступа или ошибка загрузки</div>'; return; }
+  let s; try { s = await api('/stats'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }
   const mx = Math.max(1, ...s.orders_by_day), f = s.funnel, pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
   const src = Object.entries(s.sources).sort((a, b) => b[1] - a[1]);
   main.innerHTML = `<div class="card"><p class="h2">Заказы</p><div class="kpi"><div><b>${s.total}</b><span>Всего</span></div><div><b>${s.by_status.IN_PROGRESS}</b><span>В работе</span></div><div><b>${s.by_status.NEW}</b><span>Ожидают</span></div><div><b>${s.urgent}</b><span>Срочные</span></div></div>
@@ -892,7 +1016,7 @@ async function renderStats() {
     <div class="card"><p class="h2">Источники</p>${src.map(([k, n]) => `<div class="li"><span>${esc(k)}</span><b>${n}</b></div>`).join('') || '—'}<div class="li"><span>По приглашению друга</span><b>${s.referred}</b></div></div>`;
 }
 async function renderTeam() {
-  const main = $('#main'); let list; try { list = await api('/team'); } catch { main.innerHTML = '<div class="empty">Ошибка загрузки</div>'; return; }
+  const main = $('#main'); let list; try { list = await api('/team'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }
   TEAM = list; const RL = { owner: 'владелец', manager: 'менеджер', viewer: 'только просмотр' };
   main.innerHTML = `<div class="card"><p class="h2">Команда</p>${list.map(m => `<div class="li"><span>${esc(m.name)} <small>ID ${m.id} · ${RL[m.role]}</small></span>${m.role === 'owner' ? '' : `<button class="lnk" data-rm="${m.id}" style="color:var(--rej);background:none;border:0">убрать</button>`}</div>`).join('')}</div>
     <div class="card"><p class="h2">Добавить человека</p><p style="color:var(--muted);font-size:.8rem;margin-bottom:10px">Попросите его написать боту /start, а свой числовой ID получить у @userinfobot.</p>
@@ -902,7 +1026,7 @@ async function renderTeam() {
   $('#t-add').onclick = async () => { try { await api('/team', { method: 'POST', body: { id: +$('#t-id').value, name: $('#t-nm').value, role: $('#t-r').value } }); toast('Добавлено'); renderTeam(); } catch { toast('Проверьте ID'); } };
 }
 async function renderBcast() {
-  const main = $('#main'); let d; try { d = await api('/broadcast'); } catch { main.innerHTML = '<div class="empty">Ошибка загрузки</div>'; return; }
+  const main = $('#main'); let d; try { d = await api('/broadcast'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }
   main.innerHTML = `<div class="card"><p class="h2">Рассылка</p><p style="color:var(--muted);font-size:.82rem;margin-bottom:10px">Получат только клиенты, давшие согласие (галочка в форме или в меню). В конец сообщения автоматически добавляется ссылка на отписку.<br>Подписчиков: <b style="color:var(--cyan)">${d.subscribers}</b></p>
     <textarea id="b-t" maxlength="3500" placeholder="Текст сообщения"></textarea><div class="prog"><i id="b-p"></i></div><p id="b-s" style="font-size:.8rem;color:var(--muted)"></p><button class="btn" id="b-go" ${d.subscribers ? '' : 'disabled'}>Отправить всем подписчикам</button></div>`;
   $('#b-go').onclick = async () => {
@@ -917,12 +1041,12 @@ async function renderBcast() {
   };
 }
 async function renderAudit() {
-  const main = $('#main'); let list; try { list = await api('/audit'); } catch { main.innerHTML = '<div class="empty">Ошибка загрузки</div>'; return; }
+  const main = $('#main'); let list; try { list = await api('/audit'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }
   main.innerHTML = `<div class="card"><p class="h2">Журнал действий</p>${list.map(a => `<div class="li"><span>${esc(a.name)} · ${esc(ACTL[a.action] || a.action)}${a.order ? ' #' + a.order : ''}<br><small>${esc(a.detail || '')}</small></span><small>${time(a.at)}</small></div>`).join('') || '—'}</div>`;
 }
 
 async function renderPromos() {
-  const main = $('#main'); let list; try { list = await api('/promos'); } catch { main.innerHTML = '<div class="empty">Ошибка загрузки</div>'; return; }
+  const main = $('#main'); let list; try { list = await api('/promos'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }
   const top = await api('/ref/top').catch(() => ({ top: [] }));
   main.innerHTML = `<div class="card"><p class="h2">Промокоды и акции</p>${list.length ? list.map(p => `<div class="li"><span><b>${esc(p.code)}</b> −${p.percent}% ${p.banner ? '📣' : ''}<br><small>${p.mode === 'single' ? 'разовый' : p.mode === 'per_user' ? '1 раз на клиента' : 'многоразовый'} · ${esc(p.title || '')} · использовано ${p.uses}${p.max_uses ? '/' + p.max_uses : ''}${p.expires_at ? ' · до ' + new Date(p.expires_at).toLocaleDateString('ru-RU') : ''}${p.active ? '' : ' · выключен'}</small></span><span><button type="button" data-t="${esc(p.code)}" style="background:none;border:0;color:var(--cyan)">${p.active ? 'выкл' : 'вкл'}</button> <button type="button" data-x="${esc(p.code)}" style="background:none;border:0;color:var(--rej)">✕</button></span></div>`).join('') : '<p style="color:var(--muted)">Пока нет</p>'}</div>
     <div class="card"><p class="h2">Новый промокод</p><label>Код (пусто — создать автоматически)</label><input id="p-c" maxlength="20" style="text-transform:uppercase">
@@ -937,7 +1061,7 @@ async function renderPromos() {
   $('#p-add').onclick = async () => { try { await api('/promos', { method: 'POST', body: { code: $('#p-c').value, percent: $('#p-p').value, max_uses: $('#p-m').value, mode: $('#p-mode').value, title: $('#p-t').value, expires: $('#p-e').value, banner: $('#p-b').checked } }); toast('Создано'); renderPromos(); } catch (e) { toast(e.message === 'exists' ? 'Такой код уже есть' : 'Проверьте поля (скидка 1–90%)'); } };
 }
 async function renderAuto() {
-  const main = $('#main'); let c; try { c = await api('/cfg'); } catch { main.innerHTML = '<div class="empty">Ошибка загрузки</div>'; return; }
+  const main = $('#main'); let c; try { c = await api('/cfg'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }
   main.innerHTML = `<div class="card"><p class="h2">Контроль скорости ответа</p><p style="color:var(--muted);font-size:.8rem;margin-bottom:10px">Если заявка или сообщение клиента остаются без ответа дольше указанного времени, владельцу и ответственному приходит оповещение. 0 — выключить.</p><label>Минут без ответа</label><input id="a-sla" type="number" min="0" max="1440" value="${c.sla_min}"></div>
     <div class="card"><p class="h2">Автоворонки в боте</p>
       <label class="sw"><span>Напоминание о брошенной заявке (через 3 часа)</span><input type="checkbox" id="a-ab" ${c.auto_aband ? 'checked' : ''}></label>
@@ -972,7 +1096,7 @@ async function renderTchat() { // чат команды: упоминания @�
     attachMentions(ta, $('#mn'));
     const send = async () => {
       const text = ta.value.trim(); if (!text) return; ta.value = ''; ta.style.height = ''; lastAct = Date.now(); const cid = newCid();
-      try { add(await api('/teamchat', { method: 'POST', body: { text, cid } })); toBottom(); } catch (e) { if (isNet(e)) { const it = { path: '/teamchat', cid, body: { text } }; obSet([...obGet(), it]); addPending(it); toast(t('q_wait')); } else { ta.value = text; toast(t('c_fail')); } }
+      try { add(await api('/teamchat', { method: 'POST', body: { text, cid } })); toBottom(); } catch (e) { if (isNet(e)) { const it = { path: '/teamchat', cid, body: { text } }; obSet([...obGet(), it]); addPending(it); toast(t('q_wait'), 'warn'); } else { ta.value = text; toast(t('c_fail')); } }
     };
     $('#go').addEventListener('pointerdown', e => e.preventDefault()); $('#go').onclick = send; // кнопка не забирает фокус — клавиатура не закрывается
     ta.addEventListener('input', () => { lastAct = Date.now(); ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 110) + 'px'; });
@@ -991,7 +1115,7 @@ async function init() {
     if (tg?.sendData && tg.platform && tg.platform !== 'unknown') setTimeout(reopen, 700);
     return;
   }
-  try { me = await api('/me'); } catch { $('#main').innerHTML = `<div class="empty">${t('auth_fail')}</div>`; return; }
+  try { me = await api('/me'); } catch (e) { errorScreen(errKind(e) === 'network' ? 'network' : 'session', () => location.reload()); return; }
   L = me.lang || L; ls.set('lang', L); renderHeader();
   tg.BackButton?.onClick(() => go('orders'));
   api('/track', { method: 'POST', body: { e: 'open', param: tg.initDataUnsafe?.start_param || '' } }).catch(() => {});
@@ -1000,7 +1124,8 @@ async function init() {
   const h0 = location.hash.slice(1); obFlush();
   go(me.staff ? (h0 === 'tchat' ? 'tchat' : 'orders') : (h0 === 'orders' ? 'orders' : 'new'));
 }
-init();
+init().finally(hideSplash);
+setTimeout(hideSplash, 9000);
 
 </script>
 </body>

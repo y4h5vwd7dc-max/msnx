@@ -187,10 +187,41 @@ async function mkPromo(s, p) {
   if (await getJ(s, `promo:${code}`)) code = rndCode();
   const pr = { code, percent: p.percent, title: p.title || '', kind: p.kind || 'public', owner_uid: p.owner_uid || null, expires_at: p.expires_at || null, max_uses: p.max_uses || null, uses: 0, active: true, banner: !!p.banner, mode: p.mode || 'multi', per_user: !!p.per_user, used_by: [], created_at: Date.now() };
   await putJ(s, `promo:${code}`, pr);
-  const idx = pr.owner_uid ? `pmy:${pr.owner_uid}` : 'pubidx', a = (await getJ(s, idx)) || []; a.push(code); await putJ(s, idx, a.slice(-100));
+  const idx = pr.owner_uid ? `pmy:${pr.owner_uid}` : 'pubidx', a = (await getJ(s, idx)) || []; a.push(code); await putJ(s, idx, a.slice(idx === 'pubidx' ? -500 : -100));
   return code;
 }
 const promoState = (pr, uid) => !pr || !pr.active ? 'invalid' : (pr.expires_at && pr.expires_at < Date.now()) ? 'expired' : (pr.max_uses && pr.uses >= pr.max_uses) ? 'used_up' : (pr.owner_uid && pr.owner_uid !== uid) ? 'invalid' : (pr.per_user && (pr.used_by || []).includes(uid)) ? 'used_by_you' : 'ok';
+// Атомарное изменение счётчика использований (защита от гонки: два клиента не займут один разовый код)
+async function claimPromo(s, code, uid) {
+  const key = `promo:${code}`;
+  for (let i = 0; i < 6; i++) {
+    const r = await s.getWithMetadata(key, { type: 'json' }), pr = r?.data, st = promoState(pr, uid);
+    if (st !== 'ok') return { ok: false, reason: st };
+    pr.uses = (pr.uses || 0) + 1;
+    if (pr.owner_uid) pr.active = false;
+    if (pr.per_user) (pr.used_by ||= []).push(uid);
+    const w = await s.set(key, JSON.stringify(pr), r.etag ? { onlyIfMatch: r.etag } : undefined);
+    if (w?.modified !== false) return { ok: true, pr };
+  }
+  return { ok: false, reason: 'busy' };
+}
+// delta -1: вернуть код (заказ отклонён / не создан), +1: занять снова (заказ вернули в работу)
+async function adjustPromo(s, code, uid, delta) {
+  const key = `promo:${code}`;
+  for (let i = 0; i < 6; i++) {
+    const r = await s.getWithMetadata(key, { type: 'json' }), pr = r?.data;
+    if (!pr) return;
+    pr.uses = Math.max(0, (pr.uses || 0) + delta);
+    if (pr.owner_uid) pr.active = delta < 0;
+    if (pr.per_user) {
+      pr.used_by ||= [];
+      if (delta < 0) { const k = pr.used_by.indexOf(uid); if (k >= 0) pr.used_by.splice(k, 1); }
+      else pr.used_by.push(uid);
+    }
+    const w = await s.set(key, JSON.stringify(pr), r.etag ? { onlyIfMatch: r.etag } : undefined);
+    if (w?.modified !== false) return;
+  }
+}
 async function roster(s) {
   const team = await getTeam(s);
   return [{ id: ADMIN_ID, name: (await getUser(s, ADMIN_ID))?.name || 'Владелец', role: 'owner' }, ...Object.entries(team).map(([id, v]) => ({ id: Number(id), name: v.name, role: v.role }))];
@@ -270,9 +301,9 @@ async function setStatus(s, id, status, reason = '', actor = null) {
     else await send(o.ref_by, tr(rl, 'ref_done'));
     await pushNt(s, o.ref_by, { type: 'ref', text: tr(rl, 'ntn_ref') });
   }
-  if (status === 'REJECTED' && o.promo && !o.promo_released) { // отклонённый заказ возвращает промокод
-    await patchOrder(s, o.id, x => { x.promo_released = true; });
-    const pr = await getJ(s, `promo:${o.promo.code}`); if (pr) { pr.uses = Math.max(0, pr.uses - 1); if (pr.owner_uid) pr.active = true; if (pr.per_user && pr.used_by) pr.used_by = pr.used_by.filter(x => x !== o.user_id); await putJ(s, `promo:${pr.code}`, pr); }
+  if (o.promo) { // отклонённый заказ возвращает промокод; если его вернули в работу — код снова занят
+    if (status === 'REJECTED' && !o.promo_released) { await patchOrder(s, o.id, x => { x.promo_released = true; }); await adjustPromo(s, o.promo.code, o.user_id, -1); }
+    else if (status !== 'REJECTED' && o.promo_released) { await patchOrder(s, o.id, x => { x.promo_released = false; }); await adjustPromo(s, o.promo.code, o.user_id, +1); }
   }
   await bump(s, `ver:${o.id}`);
   return o;
@@ -571,8 +602,13 @@ const handle = async (req) => {
     return json(await getCfg(s));
   }
   if (path === '/promo/check' && req.method === 'POST') {
+    const rk = `pchk:${tu.id}`, rl = (await getJ(s, rk)) || { n: 0, t: 0 };
+    if (Date.now() - rl.t > 600000) { rl.n = 0; rl.t = Date.now(); }
+    if (rl.n >= 15) return json({ error: 'rate_limit' }, 429); // защита от подбора кодов
     const pr = await getJ(s, `promo:${clip(body.code, 24).toUpperCase()}`), st = promoState(pr, tu.id);
-    return json(st === 'ok' ? { ok: true, code: pr.code, percent: pr.percent, title: pr.title } : { ok: false, reason: st });
+    if (st === 'ok') return json({ ok: true, code: pr.code, percent: pr.percent, title: pr.title });
+    rl.n++; await putJ(s, rk, rl);
+    return json({ ok: false, reason: st });
   }
   if (path === '/promo/banners') {
     const list = (await Promise.all(((await getJ(s, 'pubidx')) || []).map(c => getJ(s, `promo:${c}`)))).filter(p => p && p.banner && promoState(p, tu.id) === 'ok');
@@ -580,22 +616,29 @@ const handle = async (req) => {
   }
   if (path === '/promo/my') {
     const list = (await Promise.all(((await getJ(s, `pmy:${tu.id}`)) || []).map(c => getJ(s, `promo:${c}`)))).filter(Boolean);
-    return json(list.map(p => ({ code: p.code, percent: p.percent, kind: p.kind, active: promoState(p, tu.id) === 'ok' })).reverse());
+    return json(list.map(p => { const st = promoState(p, tu.id); return { code: p.code, percent: p.percent, kind: p.kind, active: st === 'ok', state: st }; }).reverse());
   }
   if (path === '/promos') {
     if (!owner) return deny();
     if (req.method === 'POST') {
       const percent = Math.round(Number(body.percent));
       if (!(percent >= 1 && percent <= 90)) return json({ error: 'invalid' }, 400);
-      const code = String(body.code || '').toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 20);
+      const raw = String(body.code || '').trim().toUpperCase(), code = raw.replace(/[^A-Z0-9_-]/g, '');
+      if (raw && (code !== raw || code.length < 3 || code.length > 20)) return json({ error: 'bad_code' }, 400);
       if (code && await getJ(s, `promo:${code}`)) return json({ error: 'exists' }, 409);
-      const exp = /^\d{4}-\d{2}-\d{2}$/.test(body.expires || '') ? Date.parse(body.expires + 'T23:59:59Z') - TZ * 3600000 : null;
+      let exp = null;
+      if (body.expires) {
+        const t0 = /^\d{4}-\d{2}-\d{2}$/.test(body.expires) ? Date.parse(body.expires + 'T23:59:59Z') : NaN;
+        if (Number.isNaN(t0) || new Date(t0).toISOString().slice(0, 10) !== body.expires) return json({ error: 'bad_date' }, 400); // 31 февраля и т.п.
+        exp = t0 - TZ * 3600000;
+        if (exp < Date.now()) return json({ error: 'past_date' }, 400);
+      }
       const mode = ['single', 'per_user', 'multi'].includes(body.mode) ? body.mode : 'multi'; // разовый / один раз на клиента / многоразовый
       const lim = Math.round(Number(body.max_uses)) > 0 ? Math.round(Number(body.max_uses)) : null;
       const c = await mkPromo(s, { code, percent, title: clip(body.title, 40), expires_at: exp, max_uses: mode === 'single' ? 1 : lim, mode, per_user: mode === 'per_user', banner: !!body.banner });
       await audit(s, actor, 'promo', null, `${c} −${percent}%`);
     }
-    return json((await Promise.all(((await getJ(s, 'pubidx')) || []).map(c => getJ(s, `promo:${c}`)))).filter(Boolean).reverse());
+    return json((await Promise.all(((await getJ(s, 'pubidx')) || []).map(c => getJ(s, `promo:${c}`)))).filter(Boolean).map(p => ({ ...p, state: promoState(p, -1) })).reverse());
   }
   if ((path === '/promos/toggle' || path === '/promos/delete') && req.method === 'POST') {
     if (!owner) return deny();
@@ -650,10 +693,16 @@ const handle = async (req) => {
     if (!staff && mine.filter(o => Date.now() - o.created_at < 600000).length >= 3) return json({ error: 'rate_limit' }, 429);
     const [u] = await touchUser(s, tu, typeof body.sub === 'boolean' ? { sub: body.sub } : {});
     let promo = null; const pcode = clip(body.promo, 24).toUpperCase();
-    if (pcode) { const pr = await getJ(s, `promo:${pcode}`), st = promoState(pr, tu.id); if (st !== 'ok') return json({ error: 'bad_promo', reason: st }, 400); promo = { code: pr.code, percent: pr.percent }; }
-    const o = await createOrder(s, { user_id: tu.id, username: tu.username || null, name, phone, service_type, description, contact: { via, time }, source: u.src || null, ref_by: u.ref || null,
-      status: 'NEW', priority: 'normal', tags: [], assignee: null, promo, created_at: Date.now() });
-    if (promo) { const pr = await getJ(s, `promo:${promo.code}`); pr.uses++; if (pr.owner_uid) pr.active = false; if (pr.per_user) (pr.used_by ||= []).push(tu.id); await putJ(s, `promo:${pr.code}`, pr); }
+    if (pcode) { // код занимается атомарно ДО создания заказа
+      const c = await claimPromo(s, pcode, tu.id);
+      if (!c.ok) return c.reason === 'busy' ? json({ error: 'busy' }, 503) : json({ error: 'bad_promo', reason: c.reason }, 400);
+      promo = { code: c.pr.code, percent: c.pr.percent };
+    }
+    let o;
+    try {
+      o = await createOrder(s, { user_id: tu.id, username: tu.username || null, name, phone, service_type, description, contact: { via, time }, source: u.src || null, ref_by: u.ref || null,
+        status: 'NEW', priority: 'normal', tags: [], assignee: null, promo, created_at: Date.now() });
+    } catch (e) { if (promo) await adjustPromo(s, promo.code, tu.id, -1).catch(() => {}); throw e; }
     await track(s, tu.id, 'submit');
     const txt = `🔔 <b>Новый заказ #${o.id}</b>\n\n👤 ${esc(name)}\n📞 ${esc(phone)}\n✈️ ${o.username ? '@' + esc(o.username) : 'без username'}\n💼 ${esc(service_type)}\n📲 Связь: ${VIA_RU[via]}, ${TIME_RU[time]}${o.source ? `\n🏷 Источник: ${esc(o.source)}` : ''}${o.ref_by ? '\n🎁 По приглашению клиента' : ''}${promo ? `\n🏷 Промокод ${promo.code} (−${promo.percent}%)` : ''}\n\n📝 ${esc(description)}`;
     for (const uid of writers(team)) { await send(uid, txt, adminKb(o)); await pushNt(s, uid, { type: 'order', order: o.id, text: `Новый заказ #${o.id} · ${name}` }); }

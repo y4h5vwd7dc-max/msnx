@@ -466,6 +466,72 @@ svg.ic.fill{fill:currentColor}
 @media (max-width:360px){.role{display:none}.chip{padding:.4rem .7rem}.mgrid{grid-template-columns:1fr}.mgrid .mt:last-child:nth-child(odd){grid-column:auto}}
 .num .dot{margin-left:2px}
 .file-row,.fbtn{display:flex;align-items:center;gap:8px}
+/* ===== v6 ===== */
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+/* окно по центру (Мои бонусы, ⓘ заказа) */
+.sheet.ctr{align-items:center;padding:18px}
+.sheet.ctr .card{max-width:420px;max-height:78vh;border-radius:22px;border:1px solid rgba(var(--a1),.22);padding:18px 16px 16px;animation:pop .2s ease both;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.sheet.ctr .card::before{display:none}
+.sheet.ctr h3{padding-right:34px;margin-top:0}
+.sheet.ctr .x{top:10px;right:10px}
+/* флаги языков */
+.flg{display:inline-block;width:20px;height:14px;border-radius:3px;overflow:hidden;flex:none;line-height:0;box-shadow:0 0 0 1px rgba(255,255,255,.22),0 1px 3px rgba(0,0,0,.4)}
+.flg svg{display:block;width:100%;height:100%}
+#lg button{display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+/* системные эмодзи в чате */
+.emo button,.rx .r{font-family:var(--sans),"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji"}
+.sheet .card:has(.emo) .x{display:none}
+.sheet .act{justify-content:flex-start;gap:10px}.sheet .act svg.ic{width:17px;height:17px;color:var(--cyan)}
+.sheet .info{grid-template-columns:112px 1fr}
+.emo button{font-size:1.5rem;line-height:1}
+.rx .r{font-size:.82rem}
+/* вкладки клиента */
+nav:has(.tab){margin:8px 14px 0;padding:3px;gap:3px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+nav .tab{padding:.46rem .6rem;border-radius:11px;border:0;background:transparent;box-shadow:none;font-size:.8rem;letter-spacing:.03em}
+nav .tab.on{background:var(--grad);color:var(--ink);box-shadow:0 4px 14px rgba(var(--a1),.3)}
+/* компактная форма заявки */
+.fm{padding:12px;border-radius:16px}
+.fm .field{margin-bottom:8px}
+.fm label{font-size:.58rem;letter-spacing:.12em;margin-bottom:3px}
+.fm input,.fm select,.fm textarea{padding:.44rem .7rem;border-radius:10px;font-size:16px;line-height:1.3}
+.fm textarea{min-height:60px;height:60px}
+.fm .seg{margin-bottom:6px;gap:5px}.fm .seg button{padding:.4rem .2rem;font-size:.8rem;border-radius:10px}
+.fm .lrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lnk2{background:none;border:0;color:var(--cyan);font:600 .7rem var(--sans);padding:0 0 3px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.fm .attrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fm .attrow .btn{width:auto;flex:none;padding:.42rem .8rem;font-size:.8rem}
+.fm .attrow p{color:var(--muted);font-size:.68rem;margin:0;flex:1;min-width:110px;line-height:1.25}
+.fm .attrow .chips{width:100%;margin-top:0}
+.fm .chips:empty,.fm #f-pmsg:empty{display:none}
+.fm #f-pmsg{margin-top:4px!important;font-size:.72rem!important}
+.fm .chips{margin-top:6px}
+.fm .fl .btn.small{padding:.48rem .8rem;font-size:.8rem}
+.fm label.sw{margin:2px 0 10px;font-size:.82rem;letter-spacing:0;text-transform:none;font-family:inherit;color:var(--text)}
+.fm #f-send{padding:.7rem;font-size:.9rem;border-radius:11px}
+/* горизонтальное меню фильтров */
+#ctl.filters{display:flex;align-items:center;gap:6px;overflow:visible;padding:0}
+#ctl .fsc{flex:1;min-width:0;display:flex;gap:3px;overflow-x:auto;padding:3px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);scrollbar-width:none;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+#ctl .fsc::-webkit-scrollbar{display:none}
+#ctl .fsc.fr{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent)}
+#ctl .fsc.fl2{-webkit-mask-image:linear-gradient(270deg,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(270deg,#000 calc(100% - 26px),transparent)}
+#ctl .fsc.fr.fl2{-webkit-mask-image:linear-gradient(90deg,transparent,#000 26px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,transparent,#000 26px,#000 calc(100% - 26px),transparent)}
+#ctl .chip{flex:none;display:inline-flex;align-items:center;gap:5px;padding:.34rem .6rem;border-radius:11px;border:0;background:transparent;box-shadow:none;color:var(--muted);font:700 .74rem var(--sans);letter-spacing:.01em;line-height:1.2;white-space:nowrap;transition:background .2s,color .2s,box-shadow .2s}
+#ctl .chip svg.ic{width:14px;height:14px}
+#ctl .chip em{font:700 .62rem var(--mono);font-style:normal;padding:.06rem .38rem;border-radius:8px;background:rgba(255,255,255,.08);color:#b9c3d6}
+#ctl .chip.z:not(.on){opacity:.55}
+#ctl .chip.on{background:var(--grad);color:var(--ink);box-shadow:0 4px 14px rgba(var(--a1),.28)}
+#ctl .chip.on em{background:rgba(3,6,12,.22);color:var(--ink)}
+#ctl .chip.f-NEW:not(.on) svg.ic{color:var(--new)}
+#ctl .chip.f-IN_PROGRESS:not(.on) svg.ic{color:var(--prog)}
+#ctl .chip.f-DONE:not(.on) svg.ic{color:var(--done)}
+#ctl .chip.f-URGENT:not(.on) svg.ic{color:#ff7a45}
+.fsel{flex:none;width:38px;height:38px;border-radius:13px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
+.fsel svg.ic{width:17px;height:17px}.fsel.on{border-color:var(--cyan);color:var(--cyan);background:rgba(var(--a1),.12)}
+/* кнопка ⓘ в списке заказов */
+.num .oi{position:relative;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:rgba(var(--a1),.06);color:var(--cyan);cursor:pointer;flex:none;transition:transform .15s,background .2s}
+.num .oi::after{content:"";position:absolute;inset:-8px}
+.num .oi svg.ic{width:13px;height:13px}
+.num .oi:active{transform:scale(.88);background:rgba(var(--a1),.18)}
 </style>
 <script>
 /* ===== MAISONAX · сезонная система оформления =====
@@ -750,7 +816,7 @@ const SERVICES = ['Telegram Mini App','Чат-бот','Сайт под ключ'
 const svcName = s => { const i = SERVICES.indexOf(s); return i >= 0 ? t('svc' + i) : s; };
 const EMOJI = ['👍','❤️','🔥','😂','👏','✅'];
 const RXI = { '❤️': 'heart', '🔥': 'fire', '😂': 'laugh', '👏': 'sparkle', '✅': 'okc' };
-const rxi = e => RXI[e] ? ic(RXI[e]) : esc(e);
+const rxi = e => esc(e);   // реакции — системные эмодзи
 const MAX_FILE = 5 * 1024 * 1024;
 const time = ts => new Date(ts).toLocaleString(LOC[L], {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
 const hm = ts => new Date(ts).toLocaleTimeString(LOC[L], {hour:'2-digit',minute:'2-digit'});
@@ -844,6 +910,12 @@ const IC = {
   arrowup:'<path d="M12 19V6M6.5 11.5 12 6l5.5 5.5"/>',
   play:'<path d="M8 5.5v13l10.5-6.5z"/>', stop:'<rect x="6.5" y="6.5" width="11" height="11" rx="2.2"/>'
 };
+const FLAG = {
+  ru: '<rect width="24" height="5.4" fill="#fff"/><rect y="5.3" width="24" height="5.4" fill="#0039a6"/><rect y="10.6" width="24" height="5.4" fill="#d52b1e"/>',
+  en: '<svg viewBox="0 0 60 30" width="24" height="16" preserveAspectRatio="none"><rect width="60" height="30" fill="#012169"/><path d="M0 0 60 30M60 0 0 30" stroke="#fff" stroke-width="6"/><path d="M0 0 60 30M60 0 0 30" stroke="#c8102e" stroke-width="2.4"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#c8102e" stroke-width="6"/></svg>',
+  hy: '<rect width="24" height="5.4" fill="#d90012"/><rect y="5.3" width="24" height="5.4" fill="#0033a0"/><rect y="10.6" width="24" height="5.4" fill="#f2a800"/>'
+};
+const flag = k => `<span class="flg" aria-hidden="true"><svg viewBox="0 0 24 16" width="20" height="14" preserveAspectRatio="none">${FLAG[k]}</svg></span>`;
 const ic = (n, c = '') => `<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
 async function api(path, opts = {}) {
   const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 20000);
@@ -863,8 +935,8 @@ async function api(path, opts = {}) {
 }
 
 /* ---------- Окна, колокольчик, меню ---------- */
-function sheet(html) {
-  const d = document.createElement('div'); d.className = 'sheet';
+function sheet(html, opt = {}) {
+  const d = document.createElement('div'); d.className = 'sheet' + (opt.center ? ' ctr' : '');
   d.innerHTML = `<div class="card"><button class="x" aria-label="close">${ic('close')}</button>${html}</div>`;
   document.body.appendChild(d);
   const card = d.querySelector('.card'); card.setAttribute('role', 'dialog'); card.setAttribute('aria-modal', 'true');
@@ -874,7 +946,7 @@ function sheet(html) {
   d.addEventListener('click', e => { if (e.target === d) close(); });
   d.querySelector('.x').onclick = close;
   let y0 = null;   // свайп вниз закрывает окно
-  card.addEventListener('touchstart', e => { y0 = card.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
+  card.addEventListener('touchstart', e => { y0 = !opt.center && card.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
   card.addEventListener('touchmove', e => { if (y0 === null) return; const dy = e.touches[0].clientY - y0; if (dy > 0) { card.style.transition = 'none'; card.style.transform = `translateY(${dy}px)`; } }, { passive: true });
   card.addEventListener('touchend', e => { if (y0 === null) return; const dy = e.changedTouches[0].clientY - y0; y0 = null; card.style.transition = 'transform .2s'; if (dy > 90) close(); else card.style.transform = ''; });
   return { el: card, close };
@@ -908,7 +980,7 @@ function openMenu() {
   const nm = me.name || tg?.initDataUnsafe?.user?.first_name || '—', rl = RN[String(me.role || '').toUpperCase()] || me.role || (staff ? 'Команда' : 'Клиент');
   const mt = (g, i, x) => `<button class="mt" data-g="${g}">${ic(i)}<span>${x}</span></button>`, mr = (g, i, x) => `<button class="mrow" data-g="${g}">${ic(i)}<span>${x}</span>${ic('chev')}</button>`;
   const sh = sheet(`<div class="mprof"><div class="mav">${esc(String(nm)[0].toUpperCase())}</div><div><b>${esc(nm)}</b><small>${esc(rl)}</small></div></div>
-    <div class="msec">${t('m_lang')}</div><div class="seg" id="lg">${[['ru','Русский'],['en','English'],['hy','Հայերեն']].map(([k, n]) => `<button data-l="${k}" class="${L === k ? 'on' : ''}">${n}</button>`).join('')}</div>
+    <div class="msec">${t('m_lang')}</div><div class="seg" id="lg">${[['ru','Русский'],['en','English'],['hy','Հայերեն']].map(([k, n]) => `<button data-l="${k}" class="${L === k ? 'on' : ''}">${flag(k)}<span>${n}</span></button>`).join('')}</div>
     ${(S => S ? `<label>${S.t('ttl')}</label><div class="seg" id="thm">${[['auto', S.t('auto')], ['classic', S.t('classic')]].map(([k, n]) => `<button data-m="${k}" class="${S.mode() === k ? 'on' : ''}">${n}</button>`).join('')}</div><label class="sw" style="margin-bottom:8px"><span>${S.t('fx')}</span><input type="checkbox" id="fxsw" ${S.fxOn() ? 'checked' : ''}></label><p id="thn" style="color:var(--muted);font-size:.75rem;margin:0 0 12px">${S.t('now')}</p>${me.owner ? `<label>${S.t('prev')}</label><select id="thp" style="margin-bottom:12px"><option value="auto">—</option>${S.list().map(x => `<option value="${x.id}">${x.e} ${x.name}</option>`).join('')}</select>` : ''}` : '')(window.Season)}
     ${staff ? `<div class="msec">Работа</div><div class="mgrid">${mt('tchat', 'chat', 'Чат команды')}${me.write ? mt('stats', 'stats', 'Статистика') : ''}${me.owner ? mt('team', 'users', 'Команда') + mt('bcast', 'mega', 'Рассылка') + mt('audit', 'journal', 'Журнал') + mt('promos', 'tag', 'Промокоды') + mt('auto', 'gear', 'Автоматизация') : ''}</div>`
       : `<label class="sw" style="margin:12px 0 0"><span>${t('m_news')}</span><input type="checkbox" id="sub" ${me.sub ? 'checked' : ''}></label>${mr('bonus', 'tag', t('m_bonus'))}${mr('ref', 'gift', t('m_ref'))}`}`);
@@ -930,7 +1002,7 @@ function openRef() {
 }
 async function openBonus() {
   let list = []; try { list = await api('/promo/my'); } catch {}
-  const sh = sheet(`<h3>${t('bonus_title')}</h3>${list.length ? list.map(p => `<button class="nt ${p.active ? 'new' : ''}" data-c="${esc(p.code)}"><span><b>${esc(p.code)}</b> · −${p.percent}%</span><small>${p.active ? t('bonus_active') : t('bonus_used')}</small></button>`).join('') + `<p style="color:var(--muted);font-size:.75rem">${t('bonus_tap')}</p>` : `<div class="empty">${t('bonus_empty')}</div>`}`);
+  const sh = sheet(`<h3>${t('bonus_title')}</h3>${list.length ? list.map(p => `<button class="nt ${p.active ? 'new' : ''}" data-c="${esc(p.code)}"><span><b>${esc(p.code)}</b> · −${p.percent}%</span><small>${p.active ? t('bonus_active') : t('bonus_used')}</small></button>`).join('') + `<p style="color:var(--muted);font-size:.75rem;text-align:center;margin-top:4px">${t('bonus_tap')}</p>` : `<div class="empty">${t('bonus_empty')}</div>`}`, { center: true });
   sh.el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { navigator.clipboard?.writeText(b.dataset.c); toast(t('c_copied')); });
 }
 function manageTpl(done) { // шаблоны ответов команды
@@ -1070,16 +1142,15 @@ function renderForm() {
   const VIA = ['telegram', 'phone', 'whatsapp'], TIMES = ['any', 'morning', 'day', 'evening'];
   let svc = SERVICES.includes(d.svc) ? d.svc : SERVICES[0], via = VIA.includes(d.via) ? d.via : 'telegram', ctime = TIMES.includes(d.ctime) ? d.ctime : 'any', files = [];
   const main = $('#main');
-  main.innerHTML = `<div id="pb"></div><div class="card">
+  main.innerHTML = `<div id="pb"></div><div class="card fm">
     <div class="field"><label>${t('f_name')}</label><input id="f-name" maxlength="80" value="${esc(d.name ?? u?.first_name ?? '')}"></div>
-    <div class="field"><label>${t('f_phone')}</label><input id="f-phone" type="tel" inputmode="tel" placeholder="+7 999 000 00 00" value="${esc(d.phone || me.phone || '+7 ')}">
-      ${tg?.requestContact || me.phone ? `<button type="button" class="btn small line" id="f-tgph" style="margin-top:8px">${t('f_tgphone')}</button>` : ''}</div>
+    <div class="field"><div class="lrow"><label>${t('f_phone')}</label>${tg?.requestContact || me.phone ? `<button type="button" class="lnk2" id="f-tgph">${t('f_tgphone')}</button>` : ''}</div><input id="f-phone" type="tel" inputmode="tel" placeholder="+7 999 000 00 00" value="${esc(d.phone || me.phone || '+7 ')}"></div>
     <div class="field"><label>${t('f_service')}</label><select id="f-svc">${SERVICES.map((s, i) => `<option value="${esc(s)}" ${s === svc ? 'selected' : ''}>${t('svc' + i)}</option>`).join('')}</select></div>
     <div class="field"><label>${t('f_contact')}</label><div class="seg seg3" id="f-via">${VIA.map(v => `<button type="button" data-v="${v}" class="${v === via ? 'on' : ''}">${t('f_via_' + v)}</button>`).join('')}</div>
       <label>${t('f_time')}</label><select id="f-time">${TIMES.map(v => `<option value="${v}" ${v === ctime ? 'selected' : ''}>${t('f_time_' + v)}</option>`).join('')}</select></div>
     <div class="field"><label>${t('f_desc')}</label><textarea id="f-desc" maxlength="2000" placeholder="${esc(t('f_desc_ph'))}">${esc(d.desc || '')}</textarea></div>
-    <div class="field"><button type="button" class="btn small line" id="f-att">${ic('clip','s')} ${t('f_files')}</button><input type="file" id="f-file" hidden multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip">
-      <p style="color:var(--muted);font-size:.72rem;margin-top:6px">${t('f_files_hint')}</p><div class="chips" id="f-chips"></div></div>
+    <div class="field attrow"><button type="button" class="btn small line" id="f-att">${ic('clip','s')} ${t('f_files')}</button><input type="file" id="f-file" hidden multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip">
+      <p>${t('f_files_hint')}</p><div class="chips" id="f-chips"></div></div>
     <div class="field"><label>${t('promo_label')}</label><div class="fl"><input id="f-promo" maxlength="24" placeholder="${esc(t('promo_ph'))}" style="text-transform:uppercase"><button type="button" class="btn small line" id="f-papply" style="width:auto;padding:0 14px">${t('promo_apply')}</button></div><p id="f-pmsg" style="font-size:.78rem;margin-top:6px"></p><div class="chips" id="f-pmy"></div></div>
     <label class="sw field"><span>${t('f_sub')}</span><input type="checkbox" id="f-sub" ${me.sub ? 'checked' : ''}></label>
     <button class="btn" id="f-send">${t('f_send')}</button><div class="prog" id="f-prog" hidden><i></i></div></div>`;
@@ -1088,6 +1159,7 @@ function renderForm() {
   $('#f-time').onchange = e => { ctime = e.target.value; save(); };
   $$('#f-via button').forEach(b => b.onclick = () => { via = b.dataset.v; $$('#f-via button').forEach(x => x.classList.toggle('on', x === b)); save(); });
   ['#f-name', '#f-phone', '#f-desc'].forEach(q => $(q).addEventListener('input', save));
+  { const ta = $('#f-desc'), grow = () => { ta.style.height = 'auto'; ta.style.height = Math.min(Math.max(ta.scrollHeight + 2, 60), 150) + 'px'; }; ta.addEventListener('input', grow); grow(); }
   $('#f-phone').addEventListener('focus', e => { if (!e.target.value.trim()) e.target.value = '+7 '; });
   const chips = () => { $('#f-chips').innerHTML = files.map((f, i) => `<span data-i="${i}">${esc(f.name.slice(0, 22))} <b data-i="${i}">${ic('close','s')}</b></span>`).join(''); $$('#f-chips b').forEach(b => b.onclick = () => { files.splice(+b.dataset.i, 1); chips(); }); };
   const chipProg = (i, p) => $(`#f-chips span[data-i="${i}"]`)?.style.setProperty('--p', p + '%');
@@ -1141,12 +1213,12 @@ async function renderList() {
   main.innerHTML = `${staff ? '<div id="ctl" class="filters"></div><input class="search" id="q" type="search" placeholder="Поиск: №, имя, телефон, сообщения" autocomplete="off">' : ''}<div id="lst" class="lst"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div><div id="bulk"></div>`;
   let list = [], sig = '', hits = {};
   const unread = o => staff ? o.unread_admin : o.unread_client, done = o => ['COMPLETED', 'REJECTED'].includes(o.status);
-  const FIL = [['ALL', 'Все'], ['NEW', 'Новые'], ['IN_PROGRESS', 'В работе'], ['DONE', 'Завершённые'], ['MINE', 'Мои'], ['URGENT', ic('fire','s') + ' Срочные']];
+  const FIL = [['ALL', 'Все', 'board'], ['NEW', 'Новые', 'sparkle'], ['IN_PROGRESS', 'В работе', 'play'], ['DONE', 'Готово', 'okc'], ['MINE', 'Мои', 'user'], ['URGENT', 'Срочные', 'fire']];
   const inF = (o, f) => f === 'ALL' ? true : f === 'DONE' ? done(o) : f === 'MINE' ? o.assignee?.id === me.id : f === 'URGENT' ? o.priority === 'urgent' && !done(o) : o.status === f;
   const match = o => !query || hits[o.id] || [o.id, o.name, o.phone, o.username, o.service_type, o.description, (o.tags || []).join(' '), o.assignee?.name].join(' ').toLowerCase().includes(query);
   const prio = o => o.priority === 'urgent' ? ' ' + ic('fire', 's pr-u') : o.priority === 'high' ? ' ' + ic('arrowup', 's pr-h') : '';
   const card = o => `<button class="card order${sel.has(o.id) ? ' sel' : ''}" data-id="${o.id}">
-      <div class="row"><span class="num">${selMode ? `<i class="chk${sel.has(o.id) ? ' on' : ''}"></i>` : ''}#${o.id}${staff ? prio(o) : ''}${unread(o) ? '<i class="dot"></i>' : ''}</span>${badge(o.status)}</div>
+      <div class="row"><span class="num">${selMode ? `<i class="chk${sel.has(o.id) ? ' on' : ''}"></i>` : ''}#${o.id}${staff ? prio(o) : ''}${unread(o) ? '<i class="dot"></i>' : ''}<span class="oi" role="button" tabindex="0" data-info="${o.id}" aria-label="info">${ic('info')}</span></span>${badge(o.status)}</div>
       <div class="row"><b>${esc(staff ? o.name : svcName(o.service_type))}</b><span class="sub">${ago(o.created_at)}</span></div>
       <div class="sub">${esc(staff ? svcName(o.service_type) + ' · ' + o.description : o.description)}</div>
       ${staff && (o.tags?.length || o.assignee || o.budget) ? `<div class="meta">${(o.tags || []).map(x => `<span class="tag">${esc(x)}</span>`).join('')}${o.assignee ? `<span class="tag as">${ic('user','s')}${esc(o.assignee.name)}</span>` : ''}${o.budget ? `<span class="tag">${ic('coin','s')}${money(o.budget)}</span>` : ''}</div>` : ''}
@@ -1155,13 +1227,15 @@ async function renderList() {
       ${o.last ? `<div class="prev ${unread(o) ? 'new' : ''}">${o.last.from === 'ADMIN' ? (staff ? 'Вы' : t('o_team')) : esc(staff ? o.name : t('o_you'))}: ${esc(o.last.text)}</div>` : ''}</button>`;
   const paint = () => {
     if (staff) {
-      $('#ctl').innerHTML = FIL.map(([k, l]) => `<button class="chip ${filter === k ? 'on' : ''}" data-f="${k}">${l} · ${list.filter(o => inF(o, k)).length}</button>`).join('') + (write ? `<button class="chip ${selMode ? 'on' : ''}" id="selB">${ic('selbox','s')} Выбрать</button>` : '');
+      $('#ctl').innerHTML = `<div class="fsc">${FIL.map(([k, l, i]) => { const n = list.filter(o => inF(o, k)).length; return `<button class="chip f-${k} ${filter === k ? 'on' : ''} ${n ? '' : 'z'}" data-f="${k}">${ic(i)}<span>${l}</span><em>${n}</em></button>`; }).join('')}</div>${write ? `<button class="fsel ${selMode ? 'on' : ''}" id="selB" aria-label="Выбрать" title="Выбрать">${ic('selbox')}</button>` : ''}`;
+      { const sc = $('#ctl .fsc'), on = sc.querySelector('.on'), edge = () => { sc.classList.toggle('fr', sc.scrollLeft + sc.clientWidth < sc.scrollWidth - 4); sc.classList.toggle('fl2', sc.scrollLeft > 4); }; if (on) sc.scrollLeft = Math.max(0, on.offsetLeft - (sc.clientWidth - on.offsetWidth) / 2); edge(); sc.addEventListener('scroll', edge, { passive: true }); }
       $$('#ctl [data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; paint(); });
       $('#selB')?.addEventListener('click', () => { selMode = !selMode; sel.clear(); paint(); });
     }
     const shown = list.filter(o => (!staff || inF(o, filter)) && match(o)), keep = main.scrollTop;
     $('#lst').innerHTML = shown.length ? shown.map(card).join('') : (staff ? '<div class="emptyx"><div class="eic">' + ic('folder') + '</div><div>Ничего не найдено</div></div>' : `<div class="emptyx"><div class="eic">${ic('board')}</div><div>${t('o_none')}</div><button class="btn" id="goNew">${t('o_make')}</button></div>`);
     $('#goNew')?.addEventListener('click', () => go('new'));
+    $$('#lst .oi').forEach(b => b.onclick = e => { e.stopPropagation(); e.preventDefault(); openOrderInfo(+b.dataset.info); });
     $$('#lst .order').forEach(b => b.onclick = () => { const id = +b.dataset.id; if (selMode) { sel.has(id) ? sel.delete(id) : sel.add(id); paint(); } else openOrder(id); });
     $('#bulk').innerHTML = selMode && sel.size ? `<div class="bulk"><b>Выбрано: ${sel.size}</b><div class="bb"><button data-a="IN_PROGRESS">В работу</button><button data-a="COMPLETED">Завершить</button><button data-a="REJECTED">Отклонить…</button><button data-a="urgent">${ic('fire','s')} Срочно</button><button data-a="assign">${ic('user','s')} Назначить…</button></div></div>` : '';
     $$('#bulk [data-a]').forEach(b => b.onclick = () => bulkDo(b.dataset.a));
@@ -1197,6 +1271,22 @@ async function renderList() {
 
 /* ---------- Заказ + чат ---------- */
 const timeline = o => `<ul class="tl">${(o.history?.length ? o.history : [{ s: o.status, at: o.created_at }]).map(e => `<li class="${e.s}">${esc(t('st_' + e.s))}<small>${time(e.at)}</small>${e.r ? `<em>${esc(e.r)}</em>` : ''}</li>`).join('')}</ul>`;
+function orderInfo(o, staff) {
+  return `<dl class="info"><dt>${t('d_client')}</dt><dd>${esc(o.name)}</dd><dt>${t('d_service')}</dt><dd>${esc(svcName(o.service_type))}</dd>
+    ${staff ? `<dt>Телефон</dt><dd><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a> <button class="cpb" id="copy" type="button" title="Скопировать номер" aria-label="Скопировать номер">${ic('copy')}</button></dd><dt>Telegram</dt><dd>${o.username ? `<a href="https://t.me/${esc(o.username)}" id="tgl">@${esc(o.username)}</a>` : `<a href="tg://user?id=${o.user_id}">открыть профиль</a>`}</dd>` : ''}
+    ${o.contact ? `<dt>${t('d_contact')}</dt><dd>${esc(t('f_via_' + o.contact.via))} · ${esc(t('f_time_' + o.contact.time))}</dd>` : ''}
+    ${staff && o.source ? `<dt>Источник</dt><dd>${esc(o.source)}</dd>` : ''}${staff && o.ref_by ? `<dt>Пригласил</dt><dd>ID ${o.ref_by}</dd>` : ''}
+    ${!staff && o.assignee ? `<dt>${t('d_manager')}</dt><dd>${esc(o.assignee.name)}</dd>` : ''}${o.promo ? `<dt>${t('d_promo')}</dt><dd>${esc(o.promo.code)} −${o.promo.percent}%</dd>` : ''}<dt>${t('d_task')}</dt><dd>${esc(o.description)}</dd></dl>`;
+}
+async function openOrderInfo(id) {   // компактное окно ⓘ прямо из списка заказов
+  let o; try { o = await api('/orders/' + id); } catch { return toast(t('f_fail')); }
+  const staff = me.staff;
+  const extra = staff ? `<dl class="info" style="margin-top:10px"><dt>Приоритет</dt><dd>${({ normal: 'Обычный', high: 'Высокий', urgent: 'Срочно' })[o.priority || 'normal']}</dd>${o.budget ? `<dt>Бюджет</dt><dd>${money(o.budget)}</dd>` : ''}${o.assignee ? `<dt>Ответственный</dt><dd>${esc(o.assignee.name)}</dd>` : ''}${o.tags?.length ? `<dt>Метки</dt><dd>${o.tags.map(esc).join(', ')}</dd>` : ''}</dl>` : '';
+  const sh = sheet(`<h3 style="display:flex;align-items:center;gap:8px"><span class="num">${t('d_order', { id: o.id })}</span>${badge(o.status)}</h3>${orderInfo(o, staff)}${extra}${timeline(o)}<button class="btn small" id="oi-open" type="button" style="margin-top:14px">${ic('chat','s')} Открыть чат</button>`, { center: true });
+  sh.el.querySelector('#oi-open').onclick = () => { sh.close(); openOrder(id); };
+  sh.el.querySelector('#copy')?.addEventListener('click', async e => { try { await navigator.clipboard.writeText(o.phone); toast(t('c_copied')); } catch { toast(t('f_fail'), 'error'); } });
+  sh.el.querySelector('#tgl')?.addEventListener('click', e => { if (tg?.openTelegramLink) { e.preventDefault(); tg.openTelegramLink(e.currentTarget.href); } });
+}
 async function openOrder(id) {
   clearTimers(); openId = id; tab = 'orders'; renderNav(); tg?.BackButton?.show();
   const main = $('#main'); let o;
@@ -1208,11 +1298,7 @@ async function openOrder(id) {
   let tags = [...(o.tags || [])], last = 0, since = 0, lastDay = '', sending = false, lastAct = Date.now(), replyTo = null, internal = false, otherRead = 0, lastTyp = 0, bsig = '';
   const msgs = new Map();
   const PR = { normal: 'Обычный', high: 'Высокий', urgent: 'Срочно' };
-  const info = `<dl class="info"><dt>${t('d_client')}</dt><dd>${esc(o.name)}</dd><dt>${t('d_service')}</dt><dd>${esc(svcName(o.service_type))}</dd>
-    ${staff ? `<dt>Телефон</dt><dd><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a> <button class="cpb" id="copy" type="button" title="Скопировать номер" aria-label="Скопировать номер">${ic('copy')}</button></dd><dt>Telegram</dt><dd>${o.username ? `<a href="https://t.me/${esc(o.username)}" id="tgl">@${esc(o.username)}</a>` : `<a href="tg://user?id=${o.user_id}">открыть профиль</a>`}</dd>` : ''}
-    ${o.contact ? `<dt>${t('d_contact')}</dt><dd>${esc(t('f_via_' + o.contact.via))} · ${esc(t('f_time_' + o.contact.time))}</dd>` : ''}
-    ${staff && o.source ? `<dt>Источник</dt><dd>${esc(o.source)}</dd>` : ''}${staff && o.ref_by ? `<dt>Пригласил</dt><dd>ID ${o.ref_by}</dd>` : ''}
-    ${!staff && o.assignee ? `<dt>${t('d_manager')}</dt><dd>${esc(o.assignee.name)}</dd>` : ''}${o.promo ? `<dt>${t('d_promo')}</dt><dd>${esc(o.promo.code)} −${o.promo.percent}%</dd>` : ''}<dt>${t('d_task')}</dt><dd>${esc(o.description)}</dd></dl>`;
+  const info = orderInfo(o, staff);
   const tasksBox = `<div class="field" style="margin:14px 0 0"><label>Задачи</label><div id="tk-list"></div>${write ? '<div class="fl"><input id="tk-new" maxlength="120" placeholder="Новая задача + Enter"><button type="button" class="btn small line" id="tk-add" style="width:auto;padding:0 14px">＋</button></div>' : ''}</div><div class="field" style="margin:14px 0 0"><label>Время в заказе: <b id="tm-total" style="color:var(--cyan)"></b></label>${write ? '<div class="tags" id="tm-btns"><button type="button" data-m="15">+15 мин</button><button type="button" data-m="30">+30 мин</button><button type="button" data-m="60">+1 ч</button><button type="button" data-m="120">+2 ч</button><button type="button" id="tm-timer">'+ic('play','s')+' Таймер</button></div>' : ''}<div id="tm-log"></div></div>`;
   const metaForm = !staff ? '' : write ? `<div class="meta-form" style="margin-top:14px">
       <label>Ответственный</label><select id="m-as"><option value="">— не назначен —</option>${mgrs.map(m => `<option value="${m.id}" ${o.assignee?.id === m.id ? 'selected' : ''}>${esc(m.name)}</option>`).join('')}</select>

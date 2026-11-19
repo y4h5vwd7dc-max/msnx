@@ -553,6 +553,62 @@ input[type=date]::-webkit-date-and-time-value{text-align:left;min-width:0}
 .card.order.urgent{border-color:rgba(255,122,69,.55);background:linear-gradient(135deg,rgba(255,122,69,.10),rgba(255,255,255,.02))}
 .pinhdr{font-family:var(--mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:#ff7a45;margin:2px 2px 0;display:flex;align-items:center;gap:6px}
 .li>span:last-child{flex:none;display:flex;align-items:center;gap:8px}
+/* v9: завершение заказа и оплата */
+.ib[hidden]{display:none}
+.ib.fin{background:var(--grad);border-color:transparent;color:#06101a;box-shadow:0 4px 16px rgba(var(--a1),.35)}
+.ib.fin svg.ic{width:22px;height:22px;stroke-width:2.6}
+.ib.fin.unpaid{background:linear-gradient(135deg,#ff5d6c,#ff8a5d);color:#fff;box-shadow:0 4px 16px rgba(255,93,108,.4)}
+.ib.fin.paid{background:linear-gradient(135deg,#2fe38f,#3dffa0);color:#04170d;box-shadow:0 4px 16px rgba(61,255,160,.38)}
+.sysmsg{align-self:center;width:min(94%,380px);margin:10px 0}
+.pcard{position:relative;overflow:hidden;border-radius:20px;padding:14px 14px 10px;border:1px solid rgba(255,138,93,.5);background:linear-gradient(160deg,rgba(255,93,108,.15),rgba(255,138,93,.05) 55%,rgba(255,255,255,.02));box-shadow:0 10px 30px rgba(0,0,0,.3);text-align:left;white-space:normal}
+.pcard::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,#ff5d6c,#ff8a5d)}
+.pc-top{display:flex;gap:10px;align-items:center}
+.pc-ic{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ff5d6c,#ff8a5d);color:#fff;box-shadow:0 4px 14px rgba(255,93,108,.4)}
+.pc-ic svg.ic{width:19px;height:19px;stroke-width:2.6}
+.pc-top small,.pc-sum small{display:block;font:700 .58rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pc-top b{display:block;font-size:1rem;line-height:1.25}
+.pc-sum{margin:12px 0 10px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.08)}
+.pc-sum strong{display:block;font-size:1.9rem;line-height:1.2;font-weight:800;letter-spacing:-.01em;background:linear-gradient(90deg,#ffb27a,#ff7a8a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pc-st{display:inline-flex;align-items:center;gap:7px;margin-top:4px;font-size:.76rem;font-weight:700;color:#ff8a8f}
+.pc-st::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;animation:pcp 1.8s infinite}
+@keyframes pcp{0%{box-shadow:0 0 0 0 rgba(255,93,108,.55)}100%{box-shadow:0 0 0 8px rgba(255,93,108,0)}}
+.pc-req{display:grid;gap:7px}
+.pc-row{display:flex;align-items:center;gap:9px;font-size:.88rem;min-width:0}
+.pc-row svg.ic{flex:none;width:16px;height:16px;color:var(--cyan)}
+.pc-row span{flex:none;width:112px;color:var(--muted);font-size:.74rem}
+.pc-row b{min-width:0;overflow-wrap:anywhere;font-weight:700}
+.pc-note{margin-top:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.05);font-size:.82rem;line-height:1.35}
+.pc-paid{display:flex;align-items:center;gap:7px;color:var(--done);font-size:.84rem;font-weight:600}
+.pc-act{display:flex;gap:8px;margin-top:12px}
+.pc-act button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:.55rem .4rem;border-radius:12px;border:1px solid var(--line);background:rgba(var(--a1),.08);color:var(--cyan);font:700 .78rem var(--sans);cursor:pointer}
+.pc-ft{display:flex;justify-content:space-between;gap:8px;margin-top:9px;font:.6rem var(--mono);color:var(--muted)}
+.pc-ft span{display:inline-flex;align-items:center;gap:4px}
+.pcard.paid{border-color:rgba(61,255,160,.5);background:linear-gradient(160deg,rgba(61,255,160,.15),rgba(61,255,160,.04) 55%,rgba(255,255,255,.02))}
+.pcard.paid::before{background:linear-gradient(90deg,#2fe38f,#3dffa0)}
+.pcard.paid .pc-ic{background:linear-gradient(135deg,#2fe38f,#3dffa0);color:#04170d;box-shadow:0 4px 14px rgba(61,255,160,.4)}
+.pcard.paid .pc-sum strong{background:linear-gradient(90deg,#3dffa0,#9dffd6);-webkit-background-clip:text;background-clip:text}
+.pcard.paid .pc-st{color:var(--done)}.pcard.paid .pc-st::before{animation:none}
+.sysmsg.paid{width:auto;margin:6px 0;text-align:center}
+.sysmsg.paid span{display:inline-flex;align-items:center;gap:6px;padding:.38rem .95rem;border-radius:50px;border:1px solid rgba(61,255,160,.45);background:rgba(61,255,160,.1);color:var(--done);font-size:.8rem;font-weight:700}
+.sysmsg.paid small{display:block;margin-top:3px;font:.58rem var(--mono);color:var(--muted)}
+.sysmsg.hit .pcard,.sysmsg.flash .pcard{outline:2px solid var(--new);outline-offset:2px}
+.paybn{flex:none;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,93,108,.5);background:linear-gradient(135deg,rgba(255,93,108,.16),rgba(255,138,93,.08));border-radius:14px;padding:7px 12px;cursor:pointer}
+.paybn svg.ic{flex:none;width:22px;height:22px;color:#ff8a8f}
+.paybn div{flex:1;min-width:0}.paybn small{display:block;font:700 .56rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.paybn b{font-size:.98rem}.paybn>span{font-size:.76rem;color:#ff8a8f;font-weight:700}
+body.kb #bn .paybn{display:none}
+.tag.pay{font-weight:700}
+.tag.pay.unpaid{color:#ff8a8f;border-color:rgba(255,93,108,.6);background:rgba(255,93,108,.14)}
+.tag.pay.paid{color:var(--done);border-color:rgba(61,255,160,.55);background:rgba(61,255,160,.12)}
+#ctl .chip.f-UNPAID:not(.on) svg.ic{color:#ff8a8f}
+.fp-h{color:var(--muted);font-size:.8rem;margin:-4px 0 12px;line-height:1.4}
+.fp-l{margin:14px 0 6px;font:700 .6rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.btn.btn.ghost{background:rgba(255,255,255,.07);color:var(--text,#e8f0f7);box-shadow:none;border:1px solid var(--line)}
+.fp-acts{display:flex;gap:8px;align-items:stretch}.fp-acts .btn{margin:0;width:auto;flex:1}.fp-acts .btn.ghost{flex:.55}
+.fp-acts{position:sticky;bottom:-8px;z-index:3;margin-top:12px;padding:10px 0 8px;background:linear-gradient(180deg,rgba(13,16,26,0),#0d101a 28%)}
+.fp-free{display:block;margin:12px auto 4px}
+.btn.pm-ok{background:linear-gradient(135deg,#2fe38f,#3dffa0);color:#04170d;box-shadow:0 8px 30px rgba(61,255,160,.28)}
+.btn.pm-ok svg.ic{width:18px;height:18px;stroke-width:2.6}
 </style>
 <script>
 /* ===== MAISONAX · сезонная система оформления =====
@@ -825,9 +881,9 @@ hy: { tab_new:'Նոր հայտ', tab_orders:'Իմ պատվերները', back:'�
  bell:'Ծանուցումներ', bell_empty:'Ծանուցումներ դեռ չկան', menu:'Ընտրացանկ', m_lang:'Լեզու', m_news:'Նորություններ և ակցիաներ', m_ref:'Հրավիրել ընկերոջը', ref_title:'Հրավիրեք ընկերոջը', ref_text:'Ուղարկեք հղումը ընկերոջը։ Երբ նա ավարտի պատվերը, դուք բոնուս կստանաք. պայմանները կճշտի թիմը։', ref_copy:'Պատճենել հղումը', ref_share:'Կիսվել', ref_stats:'Հրավիրված՝ {i} · Ավարտել են պատվերը՝ {c}', ref_copied:'Հղումը պատճենված է', ref_nolink:'Հղումը դեռ հասանելի չէ' },
 };
 const D2 = {
-ru: { promo_label:'Промокод', promo_ph:'Введите код', promo_apply:'Применить', promo_ok:'Скидка {p}% применится к заказу', promo_bad:'Код недействителен', promo_exp:'Срок действия кода истёк', promo_used_up:'Лимит использований исчерпан', promo_used_you:'Вы уже использовали этот код', promo_use:'Применить', promo_left:'осталось {x}', m_bonus:'Мои бонусы', bonus_title:'Мои бонусы', bonus_empty:'Бонусов пока нет — приглашайте друзей!', bonus_active:'доступен', bonus_used:'использован', bonus_exp:'истёк', bonus_tap:'Нажмите, чтобы скопировать код', top_title:'Топ приглашающих', top_me:'Ваше место: {n}', q_wait:'Нет сети — сообщение отправится позже', d_promo:'Промокод', up_prep:'Подготовка…', up_sending:'Отправка {p}%', retry:'Повторить', close_btn:'Закрыть', err_network_t:'Нет связи', err_network_d:'Проверьте интернет и повторите. Ваши данные не потеряны.', err_server_t:'Что-то пошло не так', err_server_d:'Сервер временно недоступен. Попробуйте ещё раз через минуту.', err_notfound_t:'Не найдено', err_notfound_d:'Заказ удалён или у вас нет к нему доступа.', err_session_t:'Сессия недействительна', err_session_d:'Закройте приложение и откройте его заново через бота.', t_d:'д' },
-en: { promo_label:'Promo code', promo_ph:'Enter code', promo_apply:'Apply', promo_ok:'{p}% off will be applied to your order', promo_bad:'Invalid code', promo_exp:'This code has expired', promo_used_up:'Usage limit reached', promo_used_you:'You have already used this code', promo_use:'Apply', promo_left:'{x} left', m_bonus:'My bonuses', bonus_title:'My bonuses', bonus_empty:'No bonuses yet — invite friends!', bonus_active:'available', bonus_used:'used', bonus_exp:'expired', bonus_tap:'Tap a code to copy it', top_title:'Top inviters', top_me:'Your place: {n}', q_wait:'No connection — the message will be sent later', d_promo:'Promo code', up_prep:'Preparing…', up_sending:'Sending {p}%', retry:'Retry', close_btn:'Close', err_network_t:'No connection', err_network_d:'Check your internet and try again. Your data is safe.', err_server_t:'Something went wrong', err_server_d:'The server is temporarily unavailable. Please try again in a minute.', err_notfound_t:'Not found', err_notfound_d:'The order was removed or you do not have access.', err_session_t:'Session expired', err_session_d:'Close the app and reopen it via the bot.', t_d:'d' },
-hy: { promo_label:'Պրոմոկոդ', promo_ph:'Մուտքագրեք կոդը', promo_apply:'Կիրառել', promo_ok:'{p}% զեղչը կկիրառվի պատվերի վրա', promo_bad:'Կոդը անվավեր է', promo_exp:'Կոդի ժամկետը լրացել է', promo_used_up:'Օգտագործման սահմանաչափը սպառված է', promo_used_you:'Դուք արդեն օգտագործել եք այս կոդը', promo_use:'Կիրառել', promo_left:'մնաց {x}', m_bonus:'Իմ բոնուսները', bonus_title:'Իմ բոնուսները', bonus_empty:'Բոնուսներ դեռ չկան՝ հրավիրեք ընկերներին։', bonus_active:'հասանելի է', bonus_used:'օգտագործված է', bonus_exp:'ժամկետը լրացել է', bonus_tap:'Սեղմեք կոդի վրա՝ պատճենելու համար', top_title:'Լավագույն հրավիրողները', top_me:'Ձեր տեղը՝ {n}', q_wait:'Կապ չկա՝ հաղորդագրությունը կուղարկվի ավելի ուշ', d_promo:'Պրոմոկոդ', up_prep:'Պատրաստվում է…', up_sending:'Ուղարկվում է {p}%', retry:'Կրկնել', close_btn:'Փակել', err_network_t:'Կապ չկա', err_network_d:'Ստուգեք ինտերնետը և կրկնեք։ Ձեր տվյալները չեն կորել։', err_server_t:'Ինչ-որ բան այնպես չգնաց', err_server_d:'Սերվերը ժամանակավորապես անհասանելի է։ Փորձեք կրկին մեկ րոպեից։', err_notfound_t:'Չի գտնվել', err_notfound_d:'Պատվերը հեռացվել է կամ դուք մուտք չունեք։', err_session_t:'Սեսիան անվավեր է', err_session_d:'Փակեք հավելվածը և կրկին բացեք բոտի միջոցով։', t_d:'օր' },
+ru: { pay_done:'Заказ завершён', pay_title:'Ваш заказ завершён', pay_sum:'Сумма к оплате', pay_bank:'Банк', pay_phone:'Номер телефона', pay_to:'Получатель', pay_wait:'Ожидает оплаты', pay_paid:'Оплачено', pay_paid_on:'Оплата получена · {d}', pay_cp_num:'Номер', pay_cp_sum:'Сумма', pay_edited:'изменено', pay_unpaid_tag:'Не оплачено', pay_paid_tag:'Оплачено', pay_thx:'Оплата получена. Спасибо!', pay_bn:'К оплате', pay_bn_go:'Реквизиты', d_pay:'Оплата', promo_label:'Промокод', promo_ph:'Введите код', promo_apply:'Применить', promo_ok:'Скидка {p}% применится к заказу', promo_bad:'Код недействителен', promo_exp:'Срок действия кода истёк', promo_used_up:'Лимит использований исчерпан', promo_used_you:'Вы уже использовали этот код', promo_use:'Применить', promo_left:'осталось {x}', m_bonus:'Мои бонусы', bonus_title:'Мои бонусы', bonus_empty:'Бонусов пока нет — приглашайте друзей!', bonus_active:'доступен', bonus_used:'использован', bonus_exp:'истёк', bonus_tap:'Нажмите, чтобы скопировать код', top_title:'Топ приглашающих', top_me:'Ваше место: {n}', q_wait:'Нет сети — сообщение отправится позже', d_promo:'Промокод', up_prep:'Подготовка…', up_sending:'Отправка {p}%', retry:'Повторить', close_btn:'Закрыть', err_network_t:'Нет связи', err_network_d:'Проверьте интернет и повторите. Ваши данные не потеряны.', err_server_t:'Что-то пошло не так', err_server_d:'Сервер временно недоступен. Попробуйте ещё раз через минуту.', err_notfound_t:'Не найдено', err_notfound_d:'Заказ удалён или у вас нет к нему доступа.', err_session_t:'Сессия недействительна', err_session_d:'Закройте приложение и откройте его заново через бота.', t_d:'д' },
+en: { pay_done:'Order completed', pay_title:'Your order is completed', pay_sum:'Amount due', pay_bank:'Bank', pay_phone:'Phone number', pay_to:'Recipient', pay_wait:'Awaiting payment', pay_paid:'Paid', pay_paid_on:'Payment received · {d}', pay_cp_num:'Number', pay_cp_sum:'Amount', pay_edited:'edited', pay_unpaid_tag:'Unpaid', pay_paid_tag:'Paid', pay_thx:'Payment received. Thank you!', pay_bn:'Amount due', pay_bn_go:'Details', d_pay:'Payment', promo_label:'Promo code', promo_ph:'Enter code', promo_apply:'Apply', promo_ok:'{p}% off will be applied to your order', promo_bad:'Invalid code', promo_exp:'This code has expired', promo_used_up:'Usage limit reached', promo_used_you:'You have already used this code', promo_use:'Apply', promo_left:'{x} left', m_bonus:'My bonuses', bonus_title:'My bonuses', bonus_empty:'No bonuses yet — invite friends!', bonus_active:'available', bonus_used:'used', bonus_exp:'expired', bonus_tap:'Tap a code to copy it', top_title:'Top inviters', top_me:'Your place: {n}', q_wait:'No connection — the message will be sent later', d_promo:'Promo code', up_prep:'Preparing…', up_sending:'Sending {p}%', retry:'Retry', close_btn:'Close', err_network_t:'No connection', err_network_d:'Check your internet and try again. Your data is safe.', err_server_t:'Something went wrong', err_server_d:'The server is temporarily unavailable. Please try again in a minute.', err_notfound_t:'Not found', err_notfound_d:'The order was removed or you do not have access.', err_session_t:'Session expired', err_session_d:'Close the app and reopen it via the bot.', t_d:'d' },
+hy: { pay_done:'Պատվերն ավարտված է', pay_title:'Ձեր պատվերն ավարտված է', pay_sum:'Վճարման ենթակա գումար', pay_bank:'Բանկ', pay_phone:'Հեռախոսահամար', pay_to:'Ստացող', pay_wait:'Սպասում է վճարման', pay_paid:'Վճարված է', pay_paid_on:'Վճարումը ստացված է · {d}', pay_cp_num:'Համար', pay_cp_sum:'Գումար', pay_edited:'փոփոխված', pay_unpaid_tag:'Չվճարված', pay_paid_tag:'Վճարված', pay_thx:'Վճարումը ստացված է։ Շնորհակալություն։', pay_bn:'Վճարման ենթակա', pay_bn_go:'Տվյալներ', d_pay:'Վճարում', promo_label:'Պրոմոկոդ', promo_ph:'Մուտքագրեք կոդը', promo_apply:'Կիրառել', promo_ok:'{p}% զեղչը կկիրառվի պատվերի վրա', promo_bad:'Կոդը անվավեր է', promo_exp:'Կոդի ժամկետը լրացել է', promo_used_up:'Օգտագործման սահմանաչափը սպառված է', promo_used_you:'Դուք արդեն օգտագործել եք այս կոդը', promo_use:'Կիրառել', promo_left:'մնաց {x}', m_bonus:'Իմ բոնուսները', bonus_title:'Իմ բոնուսները', bonus_empty:'Բոնուսներ դեռ չկան՝ հրավիրեք ընկերներին։', bonus_active:'հասանելի է', bonus_used:'օգտագործված է', bonus_exp:'ժամկետը լրացել է', bonus_tap:'Սեղմեք կոդի վրա՝ պատճենելու համար', top_title:'Լավագույն հրավիրողները', top_me:'Ձեր տեղը՝ {n}', q_wait:'Կապ չկա՝ հաղորդագրությունը կուղարկվի ավելի ուշ', d_promo:'Պրոմոկոդ', up_prep:'Պատրաստվում է…', up_sending:'Ուղարկվում է {p}%', retry:'Կրկնել', close_btn:'Փակել', err_network_t:'Կապ չկա', err_network_d:'Ստուգեք ինտերնետը և կրկնեք։ Ձեր տվյալները չեն կորել։', err_server_t:'Ինչ-որ բան այնպես չգնաց', err_server_d:'Սերվերը ժամանակավորապես անհասանելի է։ Փորձեք կրկին մեկ րոպեից։', err_notfound_t:'Չի գտնվել', err_notfound_d:'Պատվերը հեռացվել է կամ դուք մուտք չունեք։', err_session_t:'Սեսիան անվավեր է', err_session_d:'Փակեք հավելվածը և կրկին բացեք բոտի միջոցով։', t_d:'օր' },
 };
 for (const l of ['ru', 'en', 'hy']) Object.assign(D[l], D2[l]);
 let L = ls.get('lang') || 'ru';
@@ -847,6 +903,19 @@ const ago = ts => { const m = Math.floor((Date.now() - ts) / 6e4); if (m < 1) re
 const sizeStr = n => n > 1048576 ? (n/1048576).toFixed(1) + ' МБ' : Math.ceil(n/1024) + ' КБ';
 const badge = s => `<span class="badge ${s}">${esc(t('st_' + s))}</span>`;
 const money = n => Number(n || 0).toLocaleString('ru-RU');
+const ruble = n => money(n) + '\u00A0₽';
+function payCard(p, x = {}) { // системная карточка «Заказ завершён» (чат, предпросмотр, окно оплаты)
+  const paid = p.status === 'paid', dt = ts => new Date(ts).toLocaleString(LOC[L], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return `<div class="pcard ${paid ? 'paid' : 'unpaid'}">
+    <div class="pc-top"><span class="pc-ic">${ic(paid ? 'ticks' : 'check')}</span><div><small>${t('pay_done')}${x.id ? ' · #' + x.id : ''}</small><b>${t('pay_title')}</b></div></div>
+    <div class="pc-sum"><small>${t('pay_sum')}</small><strong>${p.amount > 0 ? ruble(p.amount) : '—'}</strong><span class="pc-st">${paid ? t('pay_paid') : t('pay_wait')}</span></div>
+    ${paid ? `<div class="pc-paid">${ic('okc', 's')} ${esc(t('pay_paid_on', { d: p.paid_at ? dt(p.paid_at) : '' }))}</div>`
+      : `<div class="pc-req"><div class="pc-row">${ic('bank', 's')}<span>${t('pay_bank')}</span><b>${esc(p.bank)}</b></div><div class="pc-row">${ic('phone', 's')}<span>${t('pay_phone')}</span><b>${esc(p.phone)}</b></div><div class="pc-row">${ic('user', 's')}<span>${t('pay_to')}</span><b>${esc(p.holder)}</b></div></div>
+      ${p.note ? `<div class="pc-note">${esc(p.note)}</div>` : ''}
+      ${x.preview ? '' : `<div class="pc-act"><button type="button" data-cp="phone">${ic('copy', 's')} ${t('pay_cp_num')}</button><button type="button" data-cp="sum">${ic('copy', 's')} ${t('pay_cp_sum')}</button></div>`}`}
+    <div class="pc-ft"><span>${x.at ? hm(x.at) : ''}</span>${x.edited ? `<span>${ic('pencil', 's')} ${t('pay_edited')}</span>` : ''}</div></div>`;
+}
+const payTag = o => o.pay ? `<span class="tag pay ${o.pay.status}">${ic(o.pay.status === 'paid' ? 'okc' : 'coin', 's')}${t(o.pay.status === 'paid' ? 'pay_paid_tag' : 'pay_unpaid_tag')}${o.pay.status === 'paid' ? '' : ' · ' + ruble(o.pay.amount)}</span>` : '';
 
 let me = null, tab = 'new', timers = [], openId = null, expiredShown = false, TEAM = null, formTracked = false;
 const blobCache = new Map();
@@ -906,6 +975,7 @@ const IC = {
   eye:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
   sliders:'<path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2"/><circle cx="9" cy="16" r="2"/>',
   copy:'<rect x="8.5" y="8.5" width="11" height="11" rx="2.6"/><path d="M15.5 8.5V6.6a2.1 2.1 0 0 0-2.1-2.1H6.6a2.1 2.1 0 0 0-2.1 2.1v6.8a2.1 2.1 0 0 0 2.1 2.1h1.9"/>',
+  bank:'<path d="M3.6 9.4 12 4l8.4 5.4H3.6Z"/><path d="M6 10.4v6.2M10 10.4v6.2M14 10.4v6.2M18 10.4v6.2M3.8 19.6h16.4"/>', phone:'<rect x="7" y="3" width="10" height="18" rx="2.6"/><path d="M10.8 18h2.4"/>', pencil:'<path d="m4.2 19.8.9-3.9L16.6 4.4a2.1 2.1 0 0 1 3 3L8.1 18.9z"/><path d="m14.6 6.4 3 3"/>',
   check:'<path d="m5 12.6 4.4 4.4L19 7.4"/>',
   chat:'<path d="M20 12.2a7.7 7.7 0 0 1-11.3 6.8L4 20l1.1-4A7.7 7.7 0 1 1 20 12.2z"/>',
   stats:'<path d="M5 20V11M12 20V4M19 20v-6"/>',
@@ -1237,8 +1307,8 @@ async function renderList() {
   main.innerHTML = `${staff ? '<div id="ctl" class="filters"></div><input class="search" id="q" type="search" placeholder="Поиск: №, имя, телефон, сообщения" autocomplete="off">' : ''}<div id="lst" class="lst"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div><div id="bulk"></div>`;
   let list = [], sig = '', hits = {};
   const unread = o => staff ? o.unread_admin : o.unread_client, done = o => ['COMPLETED', 'REJECTED'].includes(o.status);
-  const FIL = [['ALL', 'Все', 'board'], ['NEW', 'Новые', 'sparkle'], ['IN_PROGRESS', 'В работе', 'play'], ['DONE', 'Готово', 'okc'], ['MINE', 'Мои', 'user'], ['URGENT', 'Срочные', 'fire']];
-  const inF = (o, f) => f === 'ALL' ? true : f === 'DONE' ? done(o) : f === 'MINE' ? o.assignee?.id === me.id : f === 'URGENT' ? o.priority === 'urgent' && !done(o) : o.status === f;
+  const FIL = [['ALL', 'Все', 'board'], ['NEW', 'Новые', 'sparkle'], ['IN_PROGRESS', 'В работе', 'play'], ['DONE', 'Готово', 'okc'], ['MINE', 'Мои', 'user'], ['URGENT', 'Срочные', 'fire'], ['UNPAID', 'Не оплачены', 'coin']];
+  const inF = (o, f) => f === 'ALL' ? true : f === 'DONE' ? done(o) : f === 'MINE' ? o.assignee?.id === me.id : f === 'URGENT' ? o.priority === 'urgent' && !done(o) : f === 'UNPAID' ? o.pay?.status === 'unpaid' : o.status === f;
   const match = o => !query || hits[o.id] || [o.id, o.name, o.phone, o.username, o.service_type, o.description, (o.tags || []).join(' '), o.assignee?.name].join(' ').toLowerCase().includes(query);
   const prio = o => o.priority === 'urgent' ? ' ' + ic('fire', 's pr-u') : o.priority === 'high' ? ' ' + ic('arrowup', 's pr-h') : '';
   const isU = o => o.priority === 'urgent' && !done(o);
@@ -1246,10 +1316,10 @@ async function renderList() {
       <div class="row"><span class="num">${selMode ? `<i class="chk${sel.has(o.id) ? ' on' : ''}"></i>` : ''}#${o.id}${staff ? prio(o) : ''}${unread(o) ? '<i class="dot"></i>' : ''}<span class="oi" role="button" tabindex="0" data-info="${o.id}" aria-label="info">${ic('info')}</span></span>${badge(o.status)}</div>
       <div class="row"><b>${esc(staff ? o.name : svcName(o.service_type))}</b><span class="sub">${ago(o.created_at)}</span></div>
       <div class="sub">${esc(staff ? svcName(o.service_type) + ' · ' + o.description : o.description)}</div>
-      ${staff && (o.tags?.length || o.assignee || o.budget) ? `<div class="meta">${(o.tags || []).map(x => `<span class="tag">${esc(x)}</span>`).join('')}${o.assignee ? `<span class="tag as">${ic('user','s')}${esc(o.assignee.name)}</span>` : ''}${o.budget ? `<span class="tag">${ic('coin','s')}${money(o.budget)}</span>` : ''}</div>` : ''}
+      ${(staff && (o.tags?.length || o.assignee || (o.budget && !o.pay))) || o.pay ? `<div class="meta">${payTag(o)}${staff ? (o.tags || []).map(x => `<span class="tag">${esc(x)}</span>`).join('') + (o.assignee ? `<span class="tag as">${ic('user','s')}${esc(o.assignee.name)}</span>` : '') + (o.budget && !o.pay ? `<span class="tag">${ic('coin','s')}${money(o.budget)}</span>` : '') : ''}</div>` : ''}
       ${o.status === 'REJECTED' && o.reject_reason ? `<div class="prev rej">${esc(t('o_reason', { r: o.reject_reason }))}</div>` : ''}
       ${hits[o.id] ? `<div class="prev ht">${ic('chat','s')} ${esc(hits[o.id])}</div>` : ''}
-      ${o.last ? `<div class="prev ${unread(o) ? 'new' : ''}">${o.last.from === 'ADMIN' ? (staff ? 'Вы' : t('o_team')) : esc(staff ? o.name : t('o_you'))}: ${esc(o.last.text)}</div>` : ''}</button>`;
+      ${o.last ? `<div class="prev ${unread(o) ? 'new' : ''}">${o.last.from === 'SYSTEM' ? '' : (o.last.from === 'ADMIN' ? (staff ? 'Вы' : t('o_team')) : esc(staff ? o.name : t('o_you'))) + ': '}${esc(o.last.text)}</div>` : ''}</button>`;
   const paint = () => {
     if (staff) {
       $('#ctl').innerHTML = `<div class="fsc">${FIL.map(([k, l, i]) => { const n = list.filter(o => inF(o, k)).length; return `<button class="chip f-${k} ${filter === k ? 'on' : ''} ${n ? '' : 'z'}" data-f="${k}">${ic(i)}<span>${l}</span><em>${n}</em></button>`; }).join('')}</div>${write ? `<button class="fsel ${selMode ? 'on' : ''}" id="selB" aria-label="Выбрать" title="Выбрать">${ic('selbox')}</button>` : ''}`;
@@ -1301,7 +1371,7 @@ function orderInfo(o, staff) {
     ${staff ? `<dt>Телефон</dt><dd><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a> <button class="cpb" id="copy" type="button" title="Скопировать номер" aria-label="Скопировать номер">${ic('copy')}</button></dd><dt>Telegram</dt><dd>${o.username ? `<a href="https://t.me/${esc(o.username)}" id="tgl">@${esc(o.username)}</a>` : `<a href="tg://user?id=${o.user_id}">открыть профиль</a>`}</dd>` : ''}
     ${o.contact ? `<dt>${t('d_contact')}</dt><dd>${esc(t('f_via_' + o.contact.via))} · ${esc(t('f_time_' + o.contact.time))}</dd>` : ''}
     ${staff && o.source ? `<dt>Источник</dt><dd>${esc(o.source)}</dd>` : ''}${staff && o.ref_by ? `<dt>Пригласил</dt><dd>ID ${o.ref_by}</dd>` : ''}
-    ${!staff && o.assignee ? `<dt>${t('d_manager')}</dt><dd>${esc(o.assignee.name)}</dd>` : ''}${o.promo ? `<dt>${t('d_promo')}</dt><dd>${esc(o.promo.code)} −${o.promo.percent}%</dd>` : ''}<dt>${t('d_task')}</dt><dd>${esc(o.description)}</dd></dl>`;
+    ${!staff && o.assignee ? `<dt>${t('d_manager')}</dt><dd>${esc(o.assignee.name)}</dd>` : ''}${o.promo ? `<dt>${t('d_promo')}</dt><dd>${esc(o.promo.code)} −${o.promo.percent}%</dd>` : ''}${o.pay ? `<dt>${t('d_pay')}</dt><dd>${payTag(o)}</dd>` : ''}<dt>${t('d_task')}</dt><dd>${esc(o.description)}</dd></dl>`;
 }
 async function openOrderInfo(id) {   // компактное окно ⓘ прямо из списка заказов
   let o; try { o = await api('/orders/' + id); } catch { return toast(t('f_fail')); }
@@ -1335,7 +1405,7 @@ async function openOrder(id) {
       <div class="field note" style="margin:14px 0 0"><label>Заметка (видна только команде)</label><textarea id="note" maxlength="1000" placeholder="Договорённости, напоминания…">${esc(o.note || '')}</textarea></div>`
     : `<dl class="info" style="margin-top:12px"><dt>Приоритет</dt><dd>${PR[o.priority || 'normal']}</dd><dt>Бюджет</dt><dd>${o.budget ?? '—'}</dd><dt>Оплачено</dt><dd>${o.paid ?? '—'}</dd><dt>Срок</dt><dd>${o.deadline || '—'}</dd>${o.note ? `<dt>Заметка</dt><dd>${esc(o.note)}</dd>` : ''}</dl>`;
   main.className = 'chatmode';
-  main.innerHTML = `<div class="chead"><button class="ib" id="back" aria-label="back">${ic('back')}</button><div class="cav">${staff ? esc((o.name || '?')[0].toUpperCase()) : 'M'}</div><div class="ct"><b>${t('d_order', { id: o.id })}</b><div class="csub"><span id="st">${badge(o.status)}</span><span class="sv">${esc(staff ? o.name : (o.assignee?.name || svcName(o.service_type)))}</span><span class="typing" id="typ" hidden>${t('c_typing')}</span></div></div><button class="ib" id="sbtn" aria-label="${t('c_search')}">${ic('search')}</button><button class="ib" id="ibtn" aria-label="info">${ic('info')}</button></div>
+  main.innerHTML = `<div class="chead"><button class="ib" id="back" aria-label="back">${ic('back')}</button><div class="cav">${staff ? esc((o.name || '?')[0].toUpperCase()) : 'M'}</div><div class="ct"><b>${t('d_order', { id: o.id })}</b><div class="csub"><span id="st">${badge(o.status)}</span><span class="sv">${esc(staff ? o.name : (o.assignee?.name || svcName(o.service_type)))}</span><span class="typing" id="typ" hidden>${t('c_typing')}</span></div></div><button class="ib" id="sbtn" aria-label="${t('c_search')}">${ic('search')}</button><button class="ib" id="ibtn" aria-label="info">${ic('info')}</button>${write ? `<button class="ib fin" id="fbtn" type="button" aria-label="Завершить заказ" title="Завершить заказ">${ic('check')}</button>` : ''}</div>
     <div id="bn"></div>
     <div class="chatcard"><div class="csearch" id="cs" hidden><input id="cs-i" placeholder="${esc(t('c_search'))}"><small id="cs-n"></small><button id="cs-p" aria-label="prev">${ic('up')}</button><button id="cs-x" aria-label="next">${ic('down')}</button></div>
       <div class="cwrap"><div class="chat" id="chat" data-stick="1"><div class="empty">${t('c_empty')}</div></div><button class="fab" id="fab" hidden aria-label="down">${ic('down')}<i id="fabn" hidden></i></button></div>
@@ -1346,14 +1416,16 @@ async function openOrder(id) {
 
   const chat = $('#chat'), ta = $('#txt');
   window.__onVp = () => { if (chat.dataset.stick === '1') chat.scrollTop = chat.scrollHeight; }; window.__fit?.();
-  const paintAll = r => { Object.assign(o, r); $('#st').innerHTML = badge(r.status); $('#tlw').innerHTML = timeline(r); paintBanners(r); };
+  const paintFin = () => { const b = $('#fbtn'); if (!b) return; b.hidden = o.status === 'REJECTED'; b.classList.toggle('unpaid', o.pay?.status === 'unpaid'); b.classList.toggle('paid', o.pay?.status === 'paid'); const lb = o.pay ? 'Оплата по заказу' : 'Завершить заказ'; b.setAttribute('aria-label', lb); b.title = lb; };
+  const paintAll = r => { Object.assign(o, r); if (!r.pay) delete o.pay; $('#st').innerHTML = badge(r.status); $('#tlw').innerHTML = timeline(r); paintBanners(r); paintFin(); };
   function paintBanners(r) {
-    const rv = !staff && r.status === 'COMPLETED', sg = JSON.stringify([r.status, r.reject_reason, r.review, r.pinned, rv]); if (sg === bsig) return; bsig = sg;
+    const rv = !staff && r.status === 'COMPLETED', sg = JSON.stringify([r.status, r.reject_reason, r.review, r.pinned, rv, r.pay && [r.pay.status, r.pay.amount, r.pay.msg_id]]); if (sg === bsig) return; bsig = sg;
     const stars = n => `<span class="stv">${ic('star','s fill').repeat(n)}${ic('star','s').repeat(5 - n)}</span>`; let h = '';
     if (r.status === 'REJECTED' && r.reject_reason) h += `<div class="reason"><b>${t('d_reason')}</b>${esc(r.reject_reason)}</div>`;
     if (rv) h += r.review ? `<div class="reason ok"><b>${t('r_yours')}</b>${stars(r.review.rating)}${r.review.text ? '<br>' + esc(r.review.text) : ''}</div>`
       : `<div class="card" style="flex:none"><b>${t('r_title')}</b><div class="stars">${[1, 2, 3, 4, 5].map(n => `<button data-star="${n}" aria-label="${n}">${ic('star')}</button>`).join('')}</div><textarea id="rv-t" maxlength="500" placeholder="${esc(t('r_ph'))}" style="min-height:60px"></textarea><button class="btn small" id="rv-send" style="margin-top:8px">${t('r_send')}</button></div>`;
     if (staff && r.review) h += `<div class="reason ok"><b>Отзыв клиента</b>${stars(r.review.rating)}${r.review.text ? '<br>' + esc(r.review.text) : ''}</div>`;
+    if (r.pay?.status === 'unpaid') h += `<div class="paybn" data-pay="${r.pay.msg_id || ''}">${ic('coin')}<div><small>${t('pay_bn')}</small><b>${ruble(r.pay.amount)}</b></div><span>${t('pay_bn_go')} ›</span></div>`;
     if (r.pinned) h += `<div class="pin" data-pin="${r.pinned.id}">${ic('pin','s')} <span>${esc(r.pinned.text)}</span></div>`;
     $('#bn').innerHTML = h;
   }
@@ -1364,6 +1436,7 @@ async function openOrder(id) {
     if (sb) { stars = +sb.dataset.star; $$('#bn [data-star]').forEach(b => b.classList.toggle('on', +b.dataset.star <= stars)); return; }
     if (e.target.closest('#rv-send')) { if (!stars) return; try { const r = await api(`/orders/${id}/review`, { method: 'POST', body: { rating: stars, text: $('#rv-t').value } }); o.review = r.review; paintBanners(o); toast(t('r_thanks')); } catch { toast(t('f_fail')); } return; }
     const pn = e.target.closest('[data-pin]'); if (pn) jump(+pn.dataset.pin);
+    const pb = e.target.closest('[data-pay]'); if (pb && pb.dataset.pay) jump(+pb.dataset.pay);
   });
   const jump = mid => { const e = msgs.get(mid)?.el; if (!e) return; e.scrollIntoView({ block: 'center' }); e.classList.add('flash'); setTimeout(() => e.classList.remove('flash'), 1000); };
 
@@ -1424,8 +1497,17 @@ async function openOrder(id) {
   const paintTicks = () => $$('#chat .msg.me .tk').forEach(tk => { const rd = Math.floor(+tk.closest('.msg').dataset.id / 10) <= otherRead; tk.classList.toggle('rd', rd); tk.innerHTML = rd ? ic('ticks') : ic('tick'); tk.classList.toggle('rd', rd); });
   let unread = 0; const fabPaint = () => { $('#fab').hidden = chat.dataset.stick === '1'; $('#fabn').textContent = unread; $('#fabn').hidden = !unread; };
   const toBottom = () => { chat.scrollTop = chat.scrollHeight; chat.dataset.stick = '1'; unread = 0; fabPaint(); }; $('#fab').onclick = toBottom;
+  const paintSys = e => { const m = e.m; e.el.innerHTML = m.sys === 'pay' ? payCard(m.pay, { id: m.order_id, at: m.created_at, edited: m.edited_at }) : `<span>${ic('okc', 's')} ${esc(t('pay_thx'))}</span><small>${hm(m.created_at)}</small>`; };
+  const addSys = m => {
+    if (!msgs.size) chat.querySelector('.empty')?.remove();
+    last = Math.max(last, m.id); lastAct = Date.now();
+    if (dayKey(m.created_at) !== lastDay) { lastDay = dayKey(m.created_at); chat.insertAdjacentHTML('beforeend', `<div class="day">${dayLabel(m.created_at)}</div>`); }
+    const el = document.createElement('div'); el.className = 'sysmsg ' + m.sys; el.dataset.id = m.id; el.dataset.at = new Date(m.created_at).getTime(); el.dataset.t = (m.text || '').toLowerCase();
+    chat.appendChild(el); const e = { m, el }; msgs.set(m.id, e); paintSys(e);
+  };
   const add = m => {
     if (msgs.has(m.id)) return;
+    if (m.sender_type === 'SYSTEM') return addSys(m);
     if (!msgs.size) chat.querySelector('.empty')?.remove();
     last = Math.max(last, m.id); lastAct = Date.now();
     if (dayKey(m.created_at) !== lastDay) { lastDay = dayKey(m.created_at); chat.insertAdjacentHTML('beforeend', `<div class="day">${dayLabel(m.created_at)}</div>`); }
@@ -1440,6 +1522,14 @@ async function openOrder(id) {
   const setReply = m => { replyTo = m ? { id: m.id, name: m.sender_name || (m.sender_type === 'ADMIN' ? t('o_team') : t('o_you')), text: m.text || m.file?.name || '' } : null; const rb = $('#rb'); rb.hidden = !replyTo; rb.innerHTML = replyTo ? `<span>${ic('reply','s')} <b>${esc(replyTo.name)}</b>: ${esc(replyTo.text.slice(0, 60))}</span><button id="rb-x" aria-label="cancel">${ic('close','s')}</button>` : ''; $('#rb-x')?.addEventListener('click', () => setReply(null)); ta?.focus(); };
   chat.addEventListener('scroll', () => { chat.dataset.stick = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80 ? '1' : '0'; if (chat.dataset.stick === '1') unread = 0; fabPaint(); }, { passive: true });
   chat.addEventListener('click', e => {
+    const sc = e.target.closest('.sysmsg.pay');
+    if (sc) {
+      const ent = msgs.get(+sc.dataset.id); if (!ent) return;
+      const cp = e.target.closest('[data-cp]');
+      if (cp) { const p = ent.m.pay; navigator.clipboard?.writeText(cp.dataset.cp === 'sum' ? String(p.amount) : p.phone); toast(t('c_copied')); tg?.HapticFeedback?.impactOccurred?.('light'); }
+      else if (write) openFin();
+      return;
+    }
     const el = e.target.closest('.msg'); if (!el) return; const ent = msgs.get(+el.dataset.id); if (!ent) return;
     const q = e.target.closest('.quote'); if (q) return jump(+q.dataset.q);
     const r = e.target.closest('.r'); if (r) return react(ent.m, r.dataset.e);
@@ -1461,7 +1551,7 @@ async function openOrder(id) {
   /* поиск в чате */
   let hitEls = [], hi = 0;
   const showHit = () => { $('#cs-n').textContent = hitEls.length ? `${hi + 1}/${hitEls.length}` : ($('#cs-i').value ? t('c_none') : ''); hitEls[hi]?.scrollIntoView({ block: 'center' }); };
-  const doSearch = () => { const q = $('#cs-i').value.trim().toLowerCase(); $$('#chat .msg.hit').forEach(x => x.classList.remove('hit')); hitEls = q ? $$('#chat .msg').filter(x => x.dataset.t.includes(q)) : []; hitEls.forEach(x => x.classList.add('hit')); hi = hitEls.length - 1; showHit(); };
+  const doSearch = () => { const q = $('#cs-i').value.trim().toLowerCase(); $$('#chat .hit').forEach(x => x.classList.remove('hit')); hitEls = q ? $$('#chat .msg, #chat .sysmsg').filter(x => x.dataset.t.includes(q)) : []; hitEls.forEach(x => x.classList.add('hit')); hi = hitEls.length - 1; showHit(); };
   $('#sbtn').onclick = () => { const c = $('#cs'); c.hidden = !c.hidden; if (!c.hidden) $('#cs-i').focus(); else { $('#cs-i').value = ''; doSearch(); } };
   $('#cs-i').oninput = doSearch; $('#cs-x').onclick = () => { if (hitEls.length) { hi = (hi + 1) % hitEls.length; showHit(); } }; $('#cs-p').onclick = () => { if (hitEls.length) { hi = (hi - 1 + hitEls.length) % hitEls.length; showHit(); } };
 
@@ -1480,12 +1570,53 @@ async function openOrder(id) {
       if (stSig && r.st !== stSig) refresh(); stSig = r.st;
       if (obGet().length) obFlush();
       const stick = chat.dataset.stick === '1' || !msgs.size; r.m.forEach(add);
-      r.mods.forEach(x => { const e = msgs.get(x.id); if (e) { e.m.reactions = x.reactions; paintRx(e); } });
+      r.mods.forEach(x => { const e = msgs.get(x.id); if (!e) return; if (x.pay) { e.m.pay = x.pay; e.m.edited_at = x.edited_at; paintSys(e); } if (x.reactions !== undefined) { e.m.reactions = x.reactions; paintRx(e); } });
       otherRead = r.read; paintTicks(); $('#typ').hidden = !r.typing; if (r.typing) lastAct = Date.now();
       if (r.pinned) o.pinned = r.pinned; else delete o.pinned; paintBanners(o);
-      if (r.m.length && stick) toBottom(); else if (r.m.length) { unread += r.m.filter(x => (staff ? x.sender_type !== 'ADMIN' : x.sender_type !== 'CLIENT')).length; fabPaint(); }
+      if (r.m.length && stick) toBottom(); else if (r.m.length) { unread += r.m.filter(x => (staff ? x.sender_type === 'CLIENT' : x.sender_type !== 'CLIENT')).length; fabPaint(); }
     } catch {} finally { polling = false; }
   };
+  const openFin = async () => { // завершение заказа: сумма → карточка клиенту; позже можно изменить или подтвердить оплату
+    let d; try { d = await api(`/orders/${id}/pay`); } catch { return toast(t('f_fail')); }
+    const cur = d.pay, askOk = q => new Promise(r => tg?.showConfirm ? tg.showConfirm(q, r) : r(confirm(q)));
+    const done = async msg => { tg?.HapticFeedback?.notificationOccurred?.('success'); toast(msg); await refresh(); poll(); };
+    const manage = () => {
+      const paid = cur.status === 'paid';
+      const sh = sheet(`<h3>Оплата · заказ #${id}</h3><div id="pm-card">${payCard(cur, { id, at: cur.requested_at, preview: true })}</div>
+        ${paid ? '<button class="btn ghost" id="pm-un" type="button" style="margin-top:12px">Снять отметку об оплате</button>' : `<button class="btn pm-ok" id="pm-ok" type="button" style="margin-top:12px">${ic('check', 's')} Подтвердить оплату</button>`}
+        <button class="btn line" id="pm-ed" type="button" style="margin-top:8px">Изменить сумму или реквизиты</button>`);
+      const q = x => sh.el.querySelector(x);
+      const setPaid = async v => { if (!await askOk(v ? `Подтвердить получение ${ruble(cur.amount)}? Клиент получит уведомление.` : 'Снять отметку об оплате?')) return; try { await api(`/orders/${id}/pay`, { method: 'PATCH', body: { paid: v } }); sh.close(); done(v ? 'Оплата подтверждена' : 'Отметка снята'); } catch { toast('Не удалось. Повторите'); } };
+      q('#pm-ok')?.addEventListener('click', () => setPaid(true)); q('#pm-un')?.addEventListener('click', () => setPaid(false));
+      q('#pm-ed').onclick = () => { sh.close(); form(); };
+    };
+    const form = () => {
+      const v = cur || { amount: d.budget || '', ...d.defaults, note: '', status: 'unpaid' };
+      const sh = sheet(`<h3>${cur ? 'Изменить оплату' : 'Завершить заказ #' + id}</h3>
+        <p class="fp-h">${cur ? 'Карточка в чате обновится на месте, клиент получит уведомление.' : 'Заказ получит статус «Исполнен», а клиент — карточку с суммой и реквизитами.'}</p>
+        <label>Сумма к оплате, ₽</label><input id="fp-a" type="number" inputmode="decimal" min="0" step="any" placeholder="25000" value="${v.amount || ''}">
+        <label style="margin-top:10px">Банк</label><input id="fp-b" maxlength="40" value="${esc(v.bank)}">
+        <div class="two" style="margin-top:10px"><div><label>Номер телефона</label><input id="fp-p" type="tel" inputmode="tel" maxlength="30" value="${esc(v.phone)}"></div><div><label>Получатель</label><input id="fp-h" maxlength="40" value="${esc(v.holder)}"></div></div>
+        <label style="margin-top:10px">Комментарий клиенту</label><textarea id="fp-n" maxlength="300" placeholder="Необязательно, например: оплатить в течение 3 дней" style="min-height:60px">${esc(v.note || '')}</textarea>
+        <div class="fp-l">Так увидит клиент</div><div id="fp-prev"></div>
+        <div class="acts fp-acts"><button class="btn ghost" id="fp-no" type="button">Отмена</button><button class="btn" id="fp-ok" type="button">${cur ? 'Сохранить и отправить' : 'Завершить и отправить'}</button></div>
+        ${!cur && o.status !== 'COMPLETED' ? '<button type="button" class="lnk2 fp-free" id="fp-free">Завершить без оплаты</button>' : ''}`);
+      const q = x => sh.el.querySelector(x), val = k => q(k).value.trim();
+      const prev = () => { const a = Number(val('#fp-a')) || 0; q('#fp-prev').innerHTML = payCard({ amount: a, bank: val('#fp-b') || d.defaults.bank, phone: val('#fp-p') || d.defaults.phone, holder: val('#fp-h') || d.defaults.holder, note: val('#fp-n'), status: cur?.status === 'paid' && a === cur.amount ? 'paid' : 'unpaid', paid_at: cur?.paid_at }, { id, at: Date.now(), preview: true }); };
+      ['#fp-a', '#fp-b', '#fp-p', '#fp-h', '#fp-n'].forEach(k => q(k).addEventListener('input', prev)); prev();
+      if (!cur) setTimeout(() => q('#fp-a').focus(), 80);
+      q('.x').onclick = q('#fp-no').onclick = () => sh.close();
+      q('#fp-ok').onclick = async e => {
+        const amount = Number(val('#fp-a')); if (!(amount > 0)) { q('#fp-a').focus(); return toast('Укажите сумму'); }
+        const b = e.currentTarget; b.disabled = true;
+        try { await api(`/orders/${id}/pay`, { method: 'POST', body: { amount, bank: val('#fp-b'), phone: val('#fp-p'), holder: val('#fp-h'), note: val('#fp-n') } }); sh.close(); done(cur ? 'Изменения отправлены клиенту' : 'Заказ завершён — клиент получил реквизиты'); }
+        catch (er) { b.disabled = false; toast(er.message === 'bad_phone' ? 'Проверьте номер телефона' : er.message === 'bad_amount' ? 'Укажите сумму' : 'Не удалось. Повторите'); }
+      };
+      q('#fp-free')?.addEventListener('click', async () => { if (!await askOk('Завершить заказ без суммы к оплате?')) return; try { await api(`/orders/${id}/status`, { method: 'PATCH', body: { status: 'COMPLETED' } }); sh.close(); done('Заказ завершён'); } catch { toast('Не удалось. Повторите'); } });
+    };
+    cur ? manage() : form();
+  };
+  $('#fbtn')?.addEventListener('click', openFin); paintFin();
   const refresh = async () => { try { paintAll(await api('/orders/' + id)); if (write) { const s = $('#status'); if (s && document.activeElement !== s) s.value = o.status; } } catch {} };
   if (ta) {
     ta.value = ls.get('dr' + id) || ''; if (ta.value) { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 110) + 'px'; } // черновик
@@ -1546,7 +1677,7 @@ async function openOrder(id) {
 }
 
 /* ---------- Экраны команды ---------- */
-const ACTL = { promo: 'Промокод', templates: 'Шаблоны', cfg: 'Настройки', time: 'Время', status: 'Статус', assign: 'Назначение', meta: 'Параметры', note: 'Заметка', pin: 'Закрепил', unpin: 'Открепил', team_add: 'В команду', team_remove: 'Из команды', broadcast: 'Рассылка', bulk_status: 'Массово: статус', bulk_assign: 'Массово: назначение', bulk_priority: 'Массово: приоритет' };
+const ACTL = { promo: 'Промокод', pay: 'Оплата', templates: 'Шаблоны', cfg: 'Настройки', time: 'Время', status: 'Статус', assign: 'Назначение', meta: 'Параметры', note: 'Заметка', pin: 'Закрепил', unpin: 'Открепил', team_add: 'В команду', team_remove: 'Из команды', broadcast: 'Рассылка', bulk_status: 'Массово: статус', bulk_assign: 'Массово: назначение', bulk_priority: 'Массово: приоритет' };
 async function renderStats() {
   const main = $('#main'); main.innerHTML = '<div class="skel"></div><div class="skel"></div>';
   let s; try { s = await api('/stats'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }
@@ -1618,8 +1749,9 @@ async function renderAuto() {
       <label class="sw" style="margin-top:12px"><span>Просьба об отзыве (через 7 дней после выполнения)</span><input type="checkbox" id="a-rv" ${c.auto_review ? 'checked' : ''}></label>
       <label class="sw" style="margin-top:12px"><span>Поздравления подписчикам (Новый год, 8 Марта, армянское Рождество)</span><input type="checkbox" id="a-ho" ${c.auto_holiday ? 'checked' : ''}></label></div>
     <div class="card"><p class="h2">Бонусы за приглашения</p><div class="two"><div><label>Скидка пригласившему, %</label><input id="a-rr" type="number" min="0" max="90" value="${c.ref_reward_pct}"></div><div><label>Скидка другу, %</label><input id="a-rw" type="number" min="0" max="90" value="${c.ref_welcome_pct}"></div></div><p style="color:var(--muted);font-size:.75rem;margin-top:8px">Пригласивший получает личный промокод, когда друг завершит заказ. 0 — не выдавать.</p></div>
+    <div class="card"><p class="h2">Реквизиты для оплаты</p><p style="color:var(--muted);font-size:.8rem;margin-bottom:10px">Подставляются при завершении заказа. В каждом заказе их можно изменить.</p><label>Банк</label><input id="a-pb" maxlength="40" value="${esc(c.pay_bank)}"><div class="two" style="margin-top:10px"><div><label>Номер телефона</label><input id="a-pp" type="tel" maxlength="30" value="${esc(c.pay_phone)}"></div><div><label>Получатель</label><input id="a-ph" maxlength="40" value="${esc(c.pay_holder)}"></div></div></div>
     <button class="btn" id="a-save">Сохранить</button>`;
-  $('#a-save').onclick = async () => { try { await api('/cfg', { method: 'PUT', body: { sla_min: $('#a-sla').value, auto_aband: $('#a-ab').checked, auto_review: $('#a-rv').checked, auto_holiday: $('#a-ho').checked, ref_reward_pct: $('#a-rr').value, ref_welcome_pct: $('#a-rw').value } }); toast('Сохранено'); } catch { toast('Не удалось сохранить'); } };
+  $('#a-save').onclick = async () => { try { await api('/cfg', { method: 'PUT', body: { sla_min: $('#a-sla').value, auto_aband: $('#a-ab').checked, auto_review: $('#a-rv').checked, auto_holiday: $('#a-ho').checked, ref_reward_pct: $('#a-rr').value, ref_welcome_pct: $('#a-rw').value, pay_bank: $('#a-pb').value, pay_phone: $('#a-pp').value, pay_holder: $('#a-ph').value } }); toast('Сохранено'); } catch (e) { toast(e.message === 'bad_phone' ? 'Проверьте номер телефона' : 'Не удалось сохранить'); } };
 }
 async function renderTchat() { // чат команды: упоминания @имя, мгновенная доставка, очередь без сети
   const main = $('#main'); main.className = 'chatmode';

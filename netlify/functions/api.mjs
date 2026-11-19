@@ -32,7 +32,7 @@ async function waitVer(s, key, cv, waitSec) {
   return v ?? 0;
 }
 const TZ = Number(process.env.TZ_OFFSET ?? 4); // часовой пояс команды (для поздравлений), по умолчанию UTC+4
-const DEFCFG = { sla_min: 30, auto_aband: true, auto_review: true, auto_holiday: true, ref_reward_pct: 5, ref_welcome_pct: 0 };
+const DEFCFG = { sla_min: 30, auto_aband: true, auto_review: true, auto_holiday: true, ref_reward_pct: 5, ref_welcome_pct: 0, pay_bank: 'Т-Банк', pay_phone: '+7 999 007-06-07', pay_holder: 'Давид С.' };
 const getCfg = async s => ({ ...DEFCFG, ...((await getJ(s, 'cfg')) || {}) });
 const DEFAULT_TPL = [
   { id: 't1', title: 'Принял заявку', text: 'Здравствуйте, {имя}! Принял заявку {номер}, изучаю детали.' },
@@ -96,9 +96,9 @@ const I = {
   },
 };
 const I2 = {
-  ru: { ref_reward: '🎉 Ваш друг завершил заказ! Ваш промокод <b>{code}</b> — скидка {pct}% на следующий заказ.', welcome_promo: '🎁 Для вас промокод <b>{code}</b>: скидка {pct}% на первый заказ. Введите его в форме заявки.', aband: '👋 Вы начали оформлять заявку. Завершите — мы ответим быстро!', review_ask: '⭐ Как вам работа по заказу <b>#{id}</b>? Оставьте короткий отзыв — это займёт полминуты.', hol_ny: '🎄 С Новым годом! Команда MAISONAX желает вам ярких проектов и больших успехов. ✨', hol_w: '🌷 С 8 Марта! Команда MAISONAX поздравляет вас и желает вдохновения и тепла.', hol_xm: '✨ С Рождеством!' },
-  en: { ref_reward: '🎉 Your friend completed an order! Your promo code <b>{code}</b> gives {pct}% off your next order.', welcome_promo: '🎁 Promo code <b>{code}</b> for you: {pct}% off your first order. Enter it in the request form.', aband: "👋 You started a request. Finish it — we'll reply fast!", review_ask: '⭐ How was your order <b>#{id}</b>? Leave a short review — it takes half a minute.', hol_ny: '🎄 Happy New Year! The MAISONAX team wishes you bright projects and great success. ✨', hol_w: "🌷 Happy Women's Day! The MAISONAX team wishes you inspiration and warmth.", hol_xm: '✨ Merry Christmas!' },
-  hy: { ref_reward: '🎉 Ձեր ընկերը ավարտեց պատվերը։ Ձեր պրոմոկոդը՝ <b>{code}</b>, {pct}% զեղչ հաջորդ պատվերի համար։', welcome_promo: '🎁 Ձեզ համար պրոմոկոդ՝ <b>{code}</b>, {pct}% զեղչ առաջին պատվերի համար։ Մուտքագրեք այն հայտի ձևում։', aband: '👋 Դուք սկսել եք հայտ լրացնել։ Ավարտեք՝ մենք արագ կպատասխանենք։', review_ask: '⭐ Ինչպե՞ս էր աշխատանքը <b>#{id}</b> պատվերով։ Թողեք կարճ կարծիք՝ կտևի կես րոպե։', hol_ny: '🎄 Շնորհավոր Նոր տարի։ MAISONAX թիմը ձեզ մաղթում է վառ նախագծեր և մեծ հաջողություններ։ ✨', hol_w: '🌷 Շնորհավոր Մարտի 8-ը։ MAISONAX թիմը ձեզ մաղթում է ոգեշնչում և ջերմություն։', hol_xm: '✨ Շնորհավոր Սուրբ Ծնունդ և Աստվածահայտնություն։ MAISONAX թիմը ձեզ մաղթում է խաղաղություն և ջերմություն։' },
+  ru: { pay_req: '✅ <b>Заказ #{id} завершён</b>\n\n💳 К оплате: <b>{sum}</b>\n🏦 Перевод на {bank}\n📱 <code>{phone}</code> ({holder}){note}', pay_upd: '✏️ <b>Оплата по заказу #{id} обновлена</b>\n\n💳 К оплате: <b>{sum}</b>\n🏦 Перевод на {bank}\n📱 <code>{phone}</code> ({holder}){note}', pay_ok: '💚 <b>Оплата по заказу #{id} получена</b>\nСпасибо, что выбрали MAISONAX!', ntn_pay: 'Заказ #{id}: к оплате {sum}', ntn_paid: 'Заказ #{id}: оплата получена', ref_reward: '🎉 Ваш друг завершил заказ! Ваш промокод <b>{code}</b> — скидка {pct}% на следующий заказ.', welcome_promo: '🎁 Для вас промокод <b>{code}</b>: скидка {pct}% на первый заказ. Введите его в форме заявки.', aband: '👋 Вы начали оформлять заявку. Завершите — мы ответим быстро!', review_ask: '⭐ Как вам работа по заказу <b>#{id}</b>? Оставьте короткий отзыв — это займёт полминуты.', hol_ny: '🎄 С Новым годом! Команда MAISONAX желает вам ярких проектов и больших успехов. ✨', hol_w: '🌷 С 8 Марта! Команда MAISONAX поздравляет вас и желает вдохновения и тепла.', hol_xm: '✨ С Рождеством!' },
+  en: { pay_req: '✅ <b>Order #{id} is completed</b>\n\n💳 Amount due: <b>{sum}</b>\n🏦 Transfer to {bank}\n📱 <code>{phone}</code> ({holder}){note}', pay_upd: '✏️ <b>Payment details for order #{id} were updated</b>\n\n💳 Amount due: <b>{sum}</b>\n🏦 Transfer to {bank}\n📱 <code>{phone}</code> ({holder}){note}', pay_ok: '💚 <b>Payment for order #{id} received</b>\nThank you for choosing MAISONAX!', ntn_pay: 'Order #{id}: {sum} due', ntn_paid: 'Order #{id}: payment received', ref_reward: '🎉 Your friend completed an order! Your promo code <b>{code}</b> gives {pct}% off your next order.', welcome_promo: '🎁 Promo code <b>{code}</b> for you: {pct}% off your first order. Enter it in the request form.', aband: "👋 You started a request. Finish it — we'll reply fast!", review_ask: '⭐ How was your order <b>#{id}</b>? Leave a short review — it takes half a minute.', hol_ny: '🎄 Happy New Year! The MAISONAX team wishes you bright projects and great success. ✨', hol_w: "🌷 Happy Women's Day! The MAISONAX team wishes you inspiration and warmth.", hol_xm: '✨ Merry Christmas!' },
+  hy: { pay_req: '✅ <b>Պատվեր #{id}-ը ավարտված է</b>\n\n💳 Վճարման ենթակա գումար՝ <b>{sum}</b>\n🏦 Փոխանցում {bank}\n📱 <code>{phone}</code> ({holder}){note}', pay_upd: '✏️ <b>Պատվեր #{id}-ի վճարման տվյալները թարմացվել են</b>\n\n💳 Վճարման ենթակա գումար՝ <b>{sum}</b>\n🏦 Փոխանցում {bank}\n📱 <code>{phone}</code> ({holder}){note}', pay_ok: '💚 <b>Պատվեր #{id}-ի վճարումը ստացված է</b>\nՇնորհակալություն MAISONAX-ին ընտրելու համար։', ntn_pay: 'Պատվեր #{id}. վճարման ենթակա՝ {sum}', ntn_paid: 'Պատվեր #{id}. վճարումը ստացված է', ref_reward: '🎉 Ձեր ընկերը ավարտեց պատվերը։ Ձեր պրոմոկոդը՝ <b>{code}</b>, {pct}% զեղչ հաջորդ պատվերի համար։', welcome_promo: '🎁 Ձեզ համար պրոմոկոդ՝ <b>{code}</b>, {pct}% զեղչ առաջին պատվերի համար։ Մուտքագրեք այն հայտի ձևում։', aband: '👋 Դուք սկսել եք հայտ լրացնել։ Ավարտեք՝ մենք արագ կպատասխանենք։', review_ask: '⭐ Ինչպե՞ս էր աշխատանքը <b>#{id}</b> պատվերով։ Թողեք կարճ կարծիք՝ կտևի կես րոպե։', hol_ny: '🎄 Շնորհավոր Նոր տարի։ MAISONAX թիմը ձեզ մաղթում է վառ նախագծեր և մեծ հաջողություններ։ ✨', hol_w: '🌷 Շնորհավոր Մարտի 8-ը։ MAISONAX թիմը ձեզ մաղթում է ոգեշնչում և ջերմություն։', hol_xm: '✨ Շնորհավոր Սուրբ Ծնունդ և Աստվածահայտնություն։ MAISONAX թիմը ձեզ մաղթում է խաղաղություն և ջերմություն։' },
 };
 for (const l of ['ru', 'en', 'hy']) Object.assign(I[l], I2[l]);
 const tr = (l, k, v = {}) => (I[l]?.[k] ?? I.ru[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? '');
@@ -259,8 +259,29 @@ const pub = (o, staff) => { // служебные поля — только ко
   const r = { ...o }; HIDE.forEach(k => delete r[k]);
   if (r.assignee) r.assignee = { name: r.assignee.name };
   if (r.pinned?.internal) delete r.pinned;
+  if (r.pay) r.pay = { ...paySnap(r.pay), requested_at: r.pay.requested_at, msg_id: r.pay.msg_id };
   return r;
 };
+const paySnap = p => ({ amount: p.amount, bank: p.bank, phone: p.phone, holder: p.holder, note: p.note || '', status: p.status, paid_at: p.paid_at || null });
+const fmtSum = n => { const [i, f] = (Math.round(Number(n) * 100) / 100).toFixed(2).split('.'); return i.replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0') + (f === '00' ? '' : ',' + f) + '\u00A0₽'; };
+const payText = p => `Ваш заказ завершён. Сумма к оплате: ${fmtSum(p.amount)}. Перевод на ${p.bank}, номер телефона ${p.phone} (${p.holder})${p.note ? '. ' + p.note : ''}`;
+const payVars = (o, p) => ({ id: o.id, sum: fmtSum(p.amount), bank: esc(p.bank), phone: esc(p.phone), holder: esc(p.holder), note: p.note ? '\n\n💬 ' + esc(p.note) : '' });
+async function putSysMsg(s, o, sys, text, extra = {}) { // системное сообщение в чате (не от собеседника)
+  const id = Date.now() * 10 + crypto.randomInt(10), msg = { id, order_id: o.id, sender_type: 'SYSTEM', sender_name: 'MAISONAX', sys, text, created_at: Date.now(), ...extra };
+  await putJ(s, mkey(o.id, id), msg); return msg;
+}
+async function updPayMsg(s, o, patch) { // карточку оплаты можно менять «на месте»: клиент увидит обновление без перезагрузки
+  if (!o.pay?.msg_id) return;
+  const key = mkey(o.id, o.pay.msg_id), m = await getJ(s, key); if (!m) return;
+  Object.assign(m, patch); await putJ(s, key, m);
+  const mk = `mod:${o.id}`, mods = (await getJ(s, mk)) || [];
+  mods.push({ id: m.id, at: Date.now(), pay: m.pay, edited_at: m.edited_at || null }); await putJ(s, mk, mods.slice(-40));
+}
+async function notifyPay(s, o, key, extra = {}) { // Telegram + колокольчик клиенту
+  const l = (await getUser(s, o.user_id))?.lang || 'ru', v = o.pay ? payVars(o, o.pay) : { id: o.id };
+  await send(o.user_id, tr(l, key, v), chatKb(o.id, l));
+  await pushNt(s, o.user_id, { type: 'pay', order: o.id, text: tr(l, key === 'pay_ok' ? 'ntn_paid' : 'ntn_pay', { id: o.id, sum: v.sum || '' }), ...extra });
+}
 async function patchOrder(s, id, fn) { const o = await getOrder(s, id); if (!o) return null; fn(o); await putJ(s, `order:${id}`, o); return o; }
 async function listOrders(s) {
   const { blobs } = await s.list({ prefix: 'order:' });
@@ -278,7 +299,7 @@ async function createOrder(s, data) {
     return o;
   }
 }
-async function setStatus(s, id, status, reason = '', actor = null) {
+async function setStatus(s, id, status, reason = '', actor = null, quiet = false) {
   let changed = false;
   const o = await patchOrder(s, id, x => {
     changed = x.status !== status || (status === 'REJECTED' && x.reject_reason !== reason);
@@ -287,9 +308,11 @@ async function setStatus(s, id, status, reason = '', actor = null) {
     if (status === 'REJECTED') { x.reject_reason = reason; x.rejected_at = Date.now(); } else { delete x.reject_reason; delete x.rejected_at; }
   });
   if (!o || !changed) return o;
-  const l = (await getUser(s, o.user_id))?.lang || 'ru';
-  await send(o.user_id, tr(l, 'st_' + status, { id: o.id, reason: esc(o.reject_reason || '') }), chatKb(o.id, l));
-  await pushNt(s, o.user_id, { type: 'status', order: o.id, text: tr(l, 'ntn_status', { id: o.id }) + ' — ' + tr(l, 'lbl_' + status).slice(3) });
+  if (!quiet) {
+    const l = (await getUser(s, o.user_id))?.lang || 'ru';
+    await send(o.user_id, tr(l, 'st_' + status, { id: o.id, reason: esc(o.reject_reason || '') }), chatKb(o.id, l));
+    await pushNt(s, o.user_id, { type: 'status', order: o.id, text: tr(l, 'ntn_status', { id: o.id }) + ' — ' + tr(l, 'lbl_' + status).slice(3) });
+  }
   if (actor) await audit(s, actor, 'status', o.id, status + (reason ? ': ' + reason : ''));
   if (status === 'COMPLETED' && o.ref_by && !o.ref_credited) {
     await patchOrder(s, o.id, x => { x.ref_credited = true; });
@@ -595,7 +618,9 @@ const handle = async (req) => {
     if (!owner) return deny();
     if (req.method === 'PUT') {
       const n = x => Math.min(90, Math.max(0, Math.round(Number(x) || 0)));
-      const c = { sla_min: Math.min(1440, Math.max(0, Math.round(Number(body.sla_min) || 0))), auto_aband: !!body.auto_aband, auto_review: !!body.auto_review, auto_holiday: !!body.auto_holiday, ref_reward_pct: n(body.ref_reward_pct), ref_welcome_pct: n(body.ref_welcome_pct) };
+      const PH = /^[+\d\s()\-]{5,30}$/, pb = clip(body.pay_bank, 40), pp = clip(body.pay_phone, 30), ph = clip(body.pay_holder, 40);
+      if (pp && !PH.test(pp)) return json({ error: 'bad_phone' }, 400);
+      const c = { pay_bank: pb || DEFCFG.pay_bank, pay_phone: pp || DEFCFG.pay_phone, pay_holder: ph || DEFCFG.pay_holder, sla_min: Math.min(1440, Math.max(0, Math.round(Number(body.sla_min) || 0))), auto_aband: !!body.auto_aband, auto_review: !!body.auto_review, auto_holiday: !!body.auto_holiday, ref_reward_pct: n(body.ref_reward_pct), ref_welcome_pct: n(body.ref_welcome_pct) };
       await putJ(s, 'cfg', c); await audit(s, actor, 'cfg', null, JSON.stringify(c));
       return json(c);
     }
@@ -739,7 +764,7 @@ const handle = async (req) => {
   }
 
   const rx = path.match(/^\/orders\/(\d+)\/messages\/(\d+)\/react$/);
-  const m = rx ? [null, rx[1], 'react'] : path.match(/^\/orders\/(\d+)(?:\/(status|messages|upload|note|meta|assign|pin|typing|review|tasks|time))?$/);
+  const m = rx ? [null, rx[1], 'react'] : path.match(/^\/orders\/(\d+)(?:\/(status|messages|upload|note|meta|assign|pin|typing|review|tasks|time|pay))?$/);
   if (!m) return json({ error: 'not_found' }, 404);
   const o = await getOrder(s, m[1]);
   if (!o) return json({ error: 'not_found' }, 404);
@@ -769,6 +794,63 @@ const handle = async (req) => {
     const r = await patchOrder(s, o.id, x => Object.assign(x, upd));
     await audit(s, actor, 'meta', o.id, `приоритет ${upd.priority}, бюджет ${upd.budget ?? '—'}, оплачено ${upd.paid ?? '—'}`);
     return json(r);
+  }
+  if (m[2] === 'pay') {
+    if (!write) return deny();
+    if (req.method === 'GET') {
+      const cfg = await getCfg(s);
+      return json({ pay: o.pay || null, status: o.status, budget: o.budget ?? null, defaults: { bank: cfg.pay_bank, phone: cfg.pay_phone, holder: cfg.pay_holder } });
+    }
+    if (req.method === 'POST') { // завершить заказ + выставить сумму (или изменить уже выставленную)
+      const amount = num(body.amount);
+      if (!amount || amount <= 0) return json({ error: 'bad_amount' }, 400);
+      const cfg = await getCfg(s), bank = clip(body.bank, 40) || cfg.pay_bank, phone = clip(body.phone, 30) || cfg.pay_phone, holder = clip(body.holder, 40) || cfg.pay_holder, note = clip(body.note, 300);
+      if (!/^[+\d\s()\-]{5,30}$/.test(phone)) return json({ error: 'bad_phone' }, 400);
+      const prev = o.pay, now = Date.now(), pay = { amount, bank, phone, holder, note, status: prev?.status || 'unpaid', requested_at: prev?.requested_at || now, requested_by: prev?.requested_by || actor.name, msg_id: prev?.msg_id };
+      if (!prev) {
+        if (o.status !== 'COMPLETED') await setStatus(s, o.id, 'COMPLETED', '', actor, true); // уведомление клиенту будет одно — с реквизитами
+        const msg = await putSysMsg(s, o, 'pay', payText(pay), { pay: paySnap(pay) });
+        pay.msg_id = msg.id;
+        const fresh = await patchOrder(s, o.id, x => { x.pay = pay; x.budget = amount; x.unread_client = true; (x.notif ||= {}).client = now; x.last = { at: now, from: 'SYSTEM', text: '💳 ' + fmtSum(amount) }; });
+        await bump(s, `ver:${o.id}`);
+        await notifyPay(s, fresh, 'pay_req');
+        await audit(s, actor, 'pay', o.id, `завершён, к оплате ${fmtSum(amount)}`);
+        return json({ ok: true, pay: fresh.pay, msg });
+      }
+      const same = prev.amount === amount && prev.bank === bank && prev.phone === phone && prev.holder === holder && (prev.note || '') === note;
+      if (same) return json({ ok: true, pay: prev });
+      if (prev.status === 'paid' && prev.amount !== amount) { pay.status = 'unpaid'; } // сумма изменилась — прежняя оплата не считается
+      const fresh = await patchOrder(s, o.id, x => {
+        x.pay = { ...pay }; x.budget = amount;
+        if (pay.status === 'unpaid') { if (x.paid === prev.amount) x.paid = null; }
+        x.unread_client = true; (x.notif ||= {}).client = now; x.last = { at: now, from: 'SYSTEM', text: '✏️ ' + fmtSum(amount) };
+      });
+      await updPayMsg(s, fresh, { pay: paySnap(fresh.pay), text: payText(fresh.pay), edited_at: now });
+      await bump(s, `ver:${o.id}`);
+      await notifyPay(s, fresh, 'pay_upd');
+      await audit(s, actor, 'pay', o.id, `изменено: ${fmtSum(amount)}, ${bank}, ${phone}`);
+      return json({ ok: true, pay: fresh.pay });
+    }
+    if (req.method === 'PATCH') { // подтвердить / снять отметку об оплате
+      if (!o.pay) return json({ error: 'no_pay' }, 404);
+      const paid = !!body.paid;
+      if ((o.pay.status === 'paid') === paid) return json({ ok: true, pay: o.pay });
+      const now = Date.now();
+      const fresh = await patchOrder(s, o.id, x => {
+        x.pay.status = paid ? 'paid' : 'unpaid';
+        if (paid) { x.pay.paid_at = now; x.pay.paid_by = actor.name; x.paid = x.pay.amount; }
+        else { delete x.pay.paid_at; delete x.pay.paid_by; if (x.paid === x.pay.amount) x.paid = null; }
+      });
+      await updPayMsg(s, fresh, { pay: paySnap(fresh.pay) });
+      if (paid) {
+        await putSysMsg(s, fresh, 'paid', 'Оплата получена. Спасибо!');
+        await patchOrder(s, o.id, x => { x.unread_client = true; (x.notif ||= {}).client = now; x.last = { at: now, from: 'SYSTEM', text: '💚 ' + fmtSum(x.pay.amount) }; });
+      }
+      await bump(s, `ver:${o.id}`);
+      if (paid) await notifyPay(s, fresh, 'pay_ok');
+      await audit(s, actor, 'pay', o.id, paid ? 'оплата подтверждена' : 'отметка об оплате снята');
+      return json({ ok: true, pay: fresh.pay });
+    }
   }
   if (m[2] === 'assign' && req.method === 'PATCH') {
     if (!write) return deny();
@@ -867,7 +949,7 @@ const handle = async (req) => {
       const tt = await getJ(s, `typ:${o.id}:${staff ? 'client' : 'admin'}`);
       const mods = ((await getJ(s, `mod:${o.id}`)) || []).filter(x => x.at > since);
       const fo2 = (await getOrder(s, o.id)) || fo;
-      return json({ m: msgs, typing: !!tt && Date.now() - tt < 7000, mods, now: Date.now(), v: ver, st: `${fo2.status}|${fo2.reject_reason || ''}|${fo2.review ? 1 : 0}|${fo2.assignee?.id || 0}`, read: staff ? fo2.read_client_at || 0 : fo2.read_admin_at || 0, pinned: pub(fo2, staff).pinned || null });
+      return json({ m: msgs, typing: !!tt && Date.now() - tt < 7000, mods, now: Date.now(), v: ver, st: `${fo2.status}|${fo2.reject_reason || ''}|${fo2.review ? 1 : 0}|${fo2.assignee?.id || 0}|${fo2.pay?.status || ''}|${fo2.pay?.amount || ''}`, read: staff ? fo2.read_client_at || 0 : fo2.read_admin_at || 0, pinned: pub(fo2, staff).pinned || null });
     }
     if (req.method === 'POST') {
       if (staff && !write) return deny();

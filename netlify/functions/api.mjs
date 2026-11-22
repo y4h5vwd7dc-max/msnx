@@ -32,7 +32,7 @@ async function waitVer(s, key, cv, waitSec) {
   return v ?? 0;
 }
 const TZ = Number(process.env.TZ_OFFSET ?? 4); // часовой пояс команды (для поздравлений), по умолчанию UTC+4
-const DEFCFG = { sla_min: 30, auto_aband: true, auto_review: true, auto_holiday: true, ref_reward_pct: 5, ref_welcome_pct: 0, wheel_on: true, wheel_push: true, wheel_days: 7, wheel_valid: 21, pay_bank: 'Т-Банк', pay_phone: '+7 999 007-06-07', pay_holder: 'Давид С.' };
+const DEFCFG = { sla_min: 30, auto_aband: true, auto_review: true, auto_holiday: true, hol_gift_on: true, ref_reward_pct: 5, ref_welcome_pct: 0, wheel_on: true, wheel_push: true, wheel_days: 7, wheel_valid: 21, pay_bank: 'Т-Банк', pay_phone: '+7 999 007-06-07', pay_holder: 'Давид С.' };
 const getCfg = async s => ({ ...DEFCFG, ...((await getJ(s, 'cfg')) || {}) });
 const DEFAULT_TPL = [
   { id: 't1', title: 'Принял заявку', text: 'Здравствуйте, {имя}! Принял заявку {номер}, изучаю детали.' },
@@ -192,6 +192,33 @@ async function mkPromo(s, p) {
 }
 const promoState = (pr, uid) => !pr || !pr.active ? 'invalid' : (pr.expires_at && pr.expires_at < Date.now()) ? 'expired' : (pr.max_uses && pr.uses >= pr.max_uses) ? 'used_up' : (pr.owner_uid && pr.owner_uid !== uid) ? 'invalid' : (pr.per_user && (pr.used_by || []).includes(uid)) ? 'used_by_you' : 'ok';
 // Атомарное изменение счётчика использований (защита от гонки: два клиента не займут один разовый код)
+
+/* ---------- Праздничные подарки: личный промокод на время праздника ---------- */
+const HGIFT = { blackfriday: [15, 'BF'], newyear: [12, 'NY'], christmas: [10, 'XM'], valentine: [10, 'VD'], womens: [10, 'W8'], easter: [8, 'ES'], halloween: [8, 'HW'] };
+const easterW = y => { const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451), v = h + l - 7 * m + 114; return [Math.floor(v / 31), (v % 31) + 1, 0]; };
+const easterO = y => { const a = y % 4, b = y % 7, c = y % 19, d = (19 * c + 15) % 30, e = (2 * a + 4 * b - d + 34) % 7, v = d + e + 114; return [Math.floor(v / 31), (v % 31) + 1, 13]; };
+// окна совпадают с сезонными темами в index.html (pick): ЧП −4…+3 дня, Рождество, Новый год, 14 фев, 8 марта, Пасха, Хэллоуин
+function holNow(now, lang) {
+  const y = new Date(now + TZ * 3600000).getUTCFullYear(), day = 864e5, D = (yy, m, d) => Date.UTC(yy, m - 1, d) - TZ * 3600000;
+  const n1 = new Date(Date.UTC(y, 10, 1)).getUTCDay(), B = D(y, 11, 1 + ((4 - n1 + 7) % 7) + 22);
+  const [em, ed, ex] = (lang === 'ru' ? easterO : easterW)(y), E = D(y, em, ed + ex);
+  const c = [['blackfriday', B - 4 * day, B + 4 * day], ['christmas', D(y, 12, 24), D(y, 12, 27)], ['christmas', D(y, 1, 5), D(y, 1, 8)], ['newyear', D(y - 1, 12, 15), D(y, 1, 5)], ['newyear', D(y, 12, 15), D(y + 1, 1, 5)],
+    ['valentine', D(y, 2, 10), D(y, 2, 15)], ['womens', D(y, 3, 4), D(y, 3, 9)], ['easter', E - 6 * day, E + 2 * day], ['halloween', D(y, 10, 24), D(y, 11, 1)]];
+  const h = c.find(([, a, b]) => now >= a && now < b); return h ? { id: h[0], from: h[1], to: h[2] } : null;
+}
+async function holGift(s, uid, lang, cfg, claim) {
+  const cu = cfg.hol_gift_on ? (((await getJ(s, 'hgx')) || []).find(x => x.on && Date.now() >= x.from && Date.now() < x.to)) : null; // акция, добавленная владельцем вручную, важнее календаря
+  const h = cu ? { id: 'x' + cu.id, from: cu.from, to: cu.to } : cfg.hol_gift_on ? holNow(Date.now(), lang) : null; if (!h) return { on: false };
+  const [pct, pre] = cu ? [cu.pct, 'GF'] : HGIFT[h.id], key = `holg:${h.id}:${new Date(h.from + TZ * 3600000).getUTCFullYear()}:${uid}`;
+  let g = await getJ(s, key);
+  if (!g && claim) {
+    const code = await mkPromo(s, { code: `${pre}${String(new Date(h.from).getUTCFullYear()).slice(2)}-${Array.from({ length: 5 }, () => CODECH[crypto.randomInt(CODECH.length)]).join('')}`, percent: pct, title: cu ? cu.name : 'holiday:' + h.id, owner_uid: uid, kind: 'holiday', expires_at: h.to, max_uses: 1, mode: 'single' });
+    g = { code, at: Date.now() }; await putJ(s, key, g);
+  }
+  const pr = g ? await getJ(s, `promo:${g.code}`) : null;
+  return { on: true, id: h.id, pct, ...(cu ? { custom: true, name: cu.name } : {}), from: h.from, until: h.to, code: g?.code || null, state: pr ? promoState(pr, uid) : null };
+}
+
 async function claimPromo(s, code, uid) {
   const key = `promo:${code}`;
   for (let i = 0; i < 6; i++) {
@@ -713,7 +740,7 @@ const handle = async (req) => {
       const n = x => Math.min(90, Math.max(0, Math.round(Number(x) || 0)));
       const PH = /^[+\d\s()\-]{5,30}$/, pb = clip(body.pay_bank, 40), pp = clip(body.pay_phone, 30), ph = clip(body.pay_holder, 40);
       if (pp && !PH.test(pp)) return json({ error: 'bad_phone' }, 400);
-      const c = { pay_bank: pb || DEFCFG.pay_bank, pay_phone: pp || DEFCFG.pay_phone, pay_holder: ph || DEFCFG.pay_holder, sla_min: Math.min(1440, Math.max(0, Math.round(Number(body.sla_min) || 0))), auto_aband: !!body.auto_aband, auto_review: !!body.auto_review, auto_holiday: !!body.auto_holiday, ref_reward_pct: n(body.ref_reward_pct), ref_welcome_pct: n(body.ref_welcome_pct),
+      const c = { pay_bank: pb || DEFCFG.pay_bank, pay_phone: pp || DEFCFG.pay_phone, pay_holder: ph || DEFCFG.pay_holder, sla_min: Math.min(1440, Math.max(0, Math.round(Number(body.sla_min) || 0))), auto_aband: !!body.auto_aband, auto_review: !!body.auto_review, auto_holiday: !!body.auto_holiday, hol_gift_on: body.hol_gift_on === undefined ? true : !!body.hol_gift_on, ref_reward_pct: n(body.ref_reward_pct), ref_welcome_pct: n(body.ref_welcome_pct),
         wheel_on: body.wheel_on === undefined ? true : !!body.wheel_on, wheel_push: body.wheel_push === undefined ? true : !!body.wheel_push,
         wheel_days: Math.min(30, Math.max(1, Math.round(Number(body.wheel_days) || 7))), wheel_valid: Math.min(90, Math.max(3, Math.round(Number(body.wheel_valid) || 21))) };
       await putJ(s, 'cfg', c); await audit(s, actor, 'cfg', null, JSON.stringify(c));
@@ -721,6 +748,28 @@ const handle = async (req) => {
     }
     return json(await getCfg(s));
   }
+  if (path === '/holiday/custom') { // акции владельца: название, процент, срок
+    if (!owner) return deny();
+    const list = (await getJ(s, 'hgx')) || [], day = 864e5, D = v => /^\d{4}-\d{2}-\d{2}$/.test(v) ? Date.parse(v + 'T00:00:00Z') - TZ * 3600000 : NaN;
+    if (req.method === 'POST' && !body.op) {
+      const name = clip(body.name, 40), pct = Math.round(Number(body.percent)), from = D(String(body.from || '')), to = D(String(body.to || '')) + day;
+      if (!name) return json({ error: 'bad_name' }, 400);
+      if (!(pct >= 1 && pct <= 90)) return json({ error: 'bad_percent' }, 400);
+      if (!(from > 0) || !(to > from)) return json({ error: 'bad_date' }, 400);
+      if (to - from > 366 * day) return json({ error: 'too_long' }, 400);
+      if (to < Date.now()) return json({ error: 'past_date' }, 400);
+      if (list.length >= 40) return json({ error: 'limit' }, 400);
+      list.push({ id: crypto.randomBytes(4).toString('hex'), name, pct, from, to, on: true });
+      await putJ(s, 'hgx', list); await audit(s, actor, 'promo', null, `акция «${name}» −${pct}%`);
+    } else if (req.method === 'POST' && (body.op === 'toggle' || body.op === 'delete')) {
+      const i = list.findIndex(x => x.id === body.id); if (i < 0) return json({ error: 'not_found' }, 404);
+      if (body.op === 'delete') list.splice(i, 1); else list[i].on = !list[i].on;
+      await putJ(s, 'hgx', list);
+    }
+    return json(list.slice().reverse());
+  }
+  if (path === '/holiday' && !staff) return json(await holGift(s, tu.id, (await getJ(s, `usr:${tu.id}`))?.lang || 'ru', await getCfg(s), false));
+  if (path === '/holiday/claim' && req.method === 'POST' && !staff) return json(await holGift(s, tu.id, (await getJ(s, `usr:${tu.id}`))?.lang || 'ru', await getCfg(s), true));
   if (path === '/wheel') {
     const cfg = await getCfg(s), w = (await getJ(s, `wheel:${tu.id}`)) || wheelNew();
     return json({ ...wheelView(w, cfg, Date.now()), staff_demo: staff });

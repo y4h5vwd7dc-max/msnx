@@ -874,6 +874,46 @@ body.kb #bn .paybn{display:none}
 .nte b{color:var(--text);font-size:1rem}
 .nte .eic{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;color:var(--cyan);background:rgba(var(--a1),.08);border:1px solid var(--line);box-shadow:0 0 26px rgba(var(--a1),.2)}
 .nte .eic svg.ic{width:26px;height:26px}
+
+/* ===== v17: праздничный подарок — промокод к празднику (цвета берёт из текущей сезонной темы) ===== */
+.hg{position:relative;margin:0 0 12px;border-radius:22px;padding:1.5px;background:conic-gradient(from var(--hga,0deg),var(--c1),var(--c2),var(--c3),var(--c1));animation:hgspin 7s linear infinite;box-shadow:0 10px 34px rgba(var(--a1),.18)}
+@property --hga{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes hgspin{to{--hga:360deg}}
+.hgi{position:relative;overflow:hidden;border-radius:20.5px;padding:14px 14px 14px;background:radial-gradient(120% 140% at 0% 0%,rgba(var(--a1),.24),transparent 55%),radial-gradient(90% 120% at 100% 100%,rgba(var(--a2),.20),transparent 60%),linear-gradient(160deg,rgba(var(--bg-rgb),.96),rgba(var(--bg-rgb),.99));cursor:pointer}
+.hg.open .hgi{cursor:default}
+.hgw{position:absolute;right:-6px;top:-18px;font-size:7.4rem;font-weight:900;line-height:1;color:transparent;-webkit-text-stroke:1.5px rgba(var(--a1),.22);pointer-events:none;letter-spacing:-.04em}
+.hgs{position:absolute;inset:0;pointer-events:none}
+.hgs i{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--c1);box-shadow:0 0 10px 2px rgba(var(--a1),.8);animation:hgtw 2.6s ease-in-out infinite}
+.hgs i:nth-child(1){left:46%;top:14%}.hgs i:nth-child(2){left:78%;top:58%;animation-delay:.8s;background:var(--c2);box-shadow:0 0 10px 2px rgba(var(--a2),.8)}.hgs i:nth-child(3){left:30%;top:80%;animation-delay:1.5s;background:var(--c3);box-shadow:0 0 10px 2px rgba(var(--a3),.8)}
+@keyframes hgtw{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1.15)}}
+.hgr{position:relative;display:flex;align-items:center;gap:14px}
+.hgbox{flex:none;width:68px;height:68px;filter:drop-shadow(0 8px 16px rgba(var(--a1),.45));animation:hgbob 2.8s ease-in-out infinite}
+.hgbox .lid{transform-origin:32px 26px;transition:transform .6s cubic-bezier(.2,1.4,.4,1)}
+.hg.open .hgbox{animation:none}.hg.open .hgbox .lid{transform:translateY(-11px) rotate(-16deg)}
+.hgbox .beam{opacity:0;transition:opacity .5s .15s}.hg.open .hgbox .beam{opacity:1}
+@keyframes hgbob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
+.hgt{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.hgk{font-size:.62rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--c1)}
+.hgh{font-size:1.5rem;line-height:1.08;font-weight:900;letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hgsub{font-size:.8rem;color:var(--muted);line-height:1.3}
+.hgpill{flex:none;align-self:center;padding:9px 15px;border-radius:999px;font-size:.78rem;font-weight:800;letter-spacing:.04em;color:var(--ink);background:var(--grad);box-shadow:0 6px 20px rgba(var(--a1),.45);animation:hgpulse 2s ease-in-out infinite}
+@keyframes hgpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.hgcut{position:relative;margin:14px -14px 12px;height:0;border-top:2px dashed rgba(var(--a1),.4)}
+.hgcut::before,.hgcut::after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 1.5px rgba(var(--a1),.45)}
+.hgcut::before{left:-10px}.hgcut::after{right:-10px}
+.hgcode{display:flex;align-items:stretch;gap:8px;animation:hgpop .55s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes hgpop{from{opacity:0;transform:scale(.85) translateY(8px)}to{opacity:1;transform:none}}
+.hgcv{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:9px 12px;border-radius:14px;border:1.5px dashed rgba(var(--a1),.6);background:rgba(var(--a1),.09)}
+.hgcv small{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.hgcv b{font-family:var(--mono);font-size:1.18rem;letter-spacing:.12em;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hgcp{flex:none;width:50px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--c1);display:grid;place-items:center;cursor:pointer}
+.hgcp svg{width:20px;height:20px}
+.hgfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;font-size:.74rem;color:var(--muted)}
+.hgfoot b{color:var(--text);font-variant-numeric:tabular-nums}
+.hgcta{margin-top:11px;width:100%}
+.hgfine{margin:8px 0 0;font-size:.68rem;color:var(--muted);opacity:.8}
+.hg.used{animation:none;background:rgba(var(--a1),.25);box-shadow:none}.hg.used .hgi{opacity:.7;cursor:default}.hg.used .hgbox,.hg.used .hgs i{animation:none}.hg.used .hgcv b{text-decoration:line-through}
+@media (prefers-reduced-motion:reduce){.hg,.hgbox,.hgs i,.hgpill{animation:none!important}}
 </style>
 <script>
 /* ===== MAISONAX · сезонная система оформления =====
@@ -1153,6 +1193,13 @@ hy: { ptr_pull:'Քաշեք՝ թարմացնելու համար', ptr_go:'Բաց 
 for (const l of ['ru', 'en', 'hy']) Object.assign(D[l], D2[l]);
 const D3 = {"ru": {"w_title": "Колесо удачи", "m_wheel": "Колесо удачи", "w_d": "д", "w_err": "Не удалось покрутить. Попробуйте ещё раз", "w_off": "Колесо удачи сейчас недоступно", "w_ban_ready": "Ваше бесплатное вращение ждёт — приз выпадает каждый раз", "w_ban_gold": "Золотое вращение! Без мелких призов", "w_ban_extra": "Бонусных вращений: {n}", "w_ban_wait": "Следующее вращение через", "w_spin": "Крутить", "w_spin_free": "КРУТИТЬ БЕСПЛАТНО", "w_spin_gold": "ЗОЛОТОЕ ВРАЩЕНИЕ", "w_spin_bonus": "БОНУСНОЕ ВРАЩЕНИЕ", "w_spin_demo": "ТЕСТ · ничего не списывается", "w_wait": "Следующее вращение через {x}", "w_streak": "Серия недель", "w_streak_n": "{n} нед. подряд", "w_streak_hint": "Крутите каждую неделю: чем длиннее серия, тем выше шанс на крупные призы. Каждое 4-е вращение подряд — золотое: без мелких призов.", "w_earn": "Как получить ещё вращения", "w_earn_order": "Заказ выполнен", "w_earn_order_s": "Вращение за каждый завершённый заказ", "w_earn_review": "Оставьте отзыв", "w_earn_review_s": "Оцените работу — вращение в подарок", "w_earn_ref": "Друг завершил заказ", "w_earn_ref_s": "Пригласите друга — вам вращение и скидка", "w_prizes": "Что в колесе", "w_rar0": "часто", "w_rar1": "нередко", "w_rar2": "редко", "w_rar3": "джекпот", "w_fine": "Приз выпадает при каждом вращении. Призы — личные промокоды на {v} дн.: один приз на один заказ, скидки не суммируются.", "w_fine_streak": "Серия сохраняется, если пропустить не больше одной недели.", "w_remind": "Напоминать, когда колесо готово", "w_my": "Мои призы", "w_sub_on": "Напомним в Telegram", "w_sub_off": "Напоминания выключены", "w_seg_off": "СКИДКА", "w_s_jack": "ДЖЕКПОТ", "w_s_consult_a": "30 МИН", "w_s_consult_b": "КОНСУЛЬТ.", "w_s_prio_a": "VIP", "w_s_prio_b": "ОЧЕРЕДЬ", "w_s_again_a": "ЕЩЁ", "w_s_again_b": "РАЗ!", "w_you_won": "ВАШ ПРИЗ", "w_jackpot": "ДЖЕКПОТ!", "w_gold_kick": "ЗОЛОТОЕ ВРАЩЕНИЕ", "w_cap_pct": "скидка на следующую заявку", "w_cap_consult": "бесплатная консультация 30 минут", "w_cap_prio": "заявка вне очереди", "w_cap_again": "бонусное вращение — крутите ещё раз!", "w_valid": "Действует до {d}", "w_use": "Использовать в заявке", "w_again_btn": "Крутить ещё раз", "w_close": "Закрыть", "w_demo_note": "Тестовое вращение — приз не выдан", "wp_consult": "Консультация 30 мин", "wp_priority": "Приоритет в очереди", "promo_perk_ok": "Приз применён: {x}"}, "en": {"w_title": "Wheel of Fortune", "m_wheel": "Wheel of Fortune", "w_d": "d", "w_err": "Could not spin. Please try again", "w_off": "The wheel is unavailable right now", "w_ban_ready": "Your free spin is waiting — you win a prize every time", "w_ban_gold": "Golden spin! No small prizes", "w_ban_extra": "Bonus spins: {n}", "w_ban_wait": "Next spin in", "w_spin": "Spin", "w_spin_free": "SPIN FOR FREE", "w_spin_gold": "GOLDEN SPIN", "w_spin_bonus": "BONUS SPIN", "w_spin_demo": "TEST · nothing is spent", "w_wait": "Next spin in {x}", "w_streak": "Weekly streak", "w_streak_n": "{n} weeks in a row", "w_streak_hint": "Spin every week: the longer the streak, the better the odds of big prizes. Every 4th spin in a row is golden: no small prizes.", "w_earn": "Earn more spins", "w_earn_order": "Order completed", "w_earn_order_s": "A spin for every completed order", "w_earn_review": "Leave a review", "w_earn_review_s": "Rate our work and get a spin", "w_earn_ref": "A friend completed an order", "w_earn_ref_s": "Invite a friend — get a spin and a discount", "w_prizes": "What is on the wheel", "w_rar0": "common", "w_rar1": "fairly rare", "w_rar2": "rare", "w_rar3": "jackpot", "w_fine": "You win a prize on every spin. Prizes are personal promo codes valid for {v} days: one prize per order, discounts do not stack.", "w_fine_streak": "Your streak survives if you skip no more than one week.", "w_remind": "Remind me when the wheel is ready", "w_my": "My prizes", "w_sub_on": "We will remind you in Telegram", "w_sub_off": "Reminders are off", "w_seg_off": "OFF", "w_s_jack": "JACKPOT", "w_s_consult_a": "30 MIN", "w_s_consult_b": "CONSULT", "w_s_prio_a": "VIP", "w_s_prio_b": "QUEUE", "w_s_again_a": "ONE", "w_s_again_b": "MORE!", "w_you_won": "YOUR PRIZE", "w_jackpot": "JACKPOT!", "w_gold_kick": "GOLDEN SPIN", "w_cap_pct": "off your next request", "w_cap_consult": "free 30-minute consultation", "w_cap_prio": "your request skips the queue", "w_cap_again": "a bonus spin — spin again!", "w_valid": "Valid until {d}", "w_use": "Use in a request", "w_again_btn": "Spin again", "w_close": "Close", "w_demo_note": "Test spin — no prize issued", "wp_consult": "30-min consultation", "wp_priority": "Priority queue", "promo_perk_ok": "Prize applied: {x}"}, "hy": {"w_title": "Բախտի անիվ", "m_wheel": "Բախտի անիվ", "w_d": "օր", "w_err": "Չհաջողվեց պտտել։ Փորձեք նորից", "w_off": "Բախտի անիվն այժմ հասանելի չէ", "w_ban_ready": "Ձեր անվճար պտույտը սպասում է՝ մրցանակը երաշխավորված է", "w_ban_gold": "Ոսկե պտույտ։ Առանց մանր մրցանակների", "w_ban_extra": "Բոնուսային պտույտներ՝ {n}", "w_ban_wait": "Հաջորդ պտույտը՝", "w_spin": "Պտտել", "w_spin_free": "ՊՏՏԵԼ ԱՆՎՃԱՐ", "w_spin_gold": "ՈՍԿԵ ՊՏՈՒՅՏ", "w_spin_bonus": "ԲՈՆՈՒՍԱՅԻՆ ՊՏՈՒՅՏ", "w_spin_demo": "ՓՈՐՁ · ոչինչ չի ծախսվում", "w_wait": "Հաջորդ պտույտը՝ {x} հետո", "w_streak": "Շաբաթների շարք", "w_streak_n": "{n} շաբաթ անընդմեջ", "w_streak_hint": "Պտտեք ամեն շաբաթ․ որքան երկար է շարքը, այնքան մեծ է խոշոր մրցանակի հնարավորությունը։ Ամեն 4-րդ անընդմեջ պտույտը ոսկե է՝ առանց մանր մրցանակների։", "w_earn": "Ինչպես ստանալ ավելի շատ պտույտներ", "w_earn_order": "Պատվերն ավարտված է", "w_earn_order_s": "Պտույտ՝ յուրաքանչյուր ավարտված պատվերի համար", "w_earn_review": "Թողեք կարծիք", "w_earn_review_s": "Գնահատեք աշխատանքը՝ պտույտ նվեր", "w_earn_ref": "Ընկերն ավարտեց պատվերը", "w_earn_ref_s": "Հրավիրեք ընկերոջ՝ պտույտ և զեղչ", "w_prizes": "Ի՞նչ կա անիվում", "w_rar0": "հաճախ", "w_rar1": "երբեմն", "w_rar2": "հազվադեպ", "w_rar3": "ջեքփոթ", "w_fine": "Մրցանակ ստանում եք ամեն պտույտից։ Մրցանակները անձնական պրոմոկոդեր են՝ {v} օր ժամկետով․ մեկ պատվերին՝ մեկ մրցանակ, զեղչերը չեն գումարվում։", "w_fine_streak": "Շարքը պահպանվում է, եթե բաց թողնեք առավելագույնը մեկ շաբաթ։", "w_remind": "Հիշեցնել, երբ անիվը պատրաստ է", "w_my": "Իմ մրցանակները", "w_sub_on": "Կհիշեցնենք Telegram-ում", "w_sub_off": "Հիշեցումները անջատված են", "w_seg_off": "ԶԵՂՉ", "w_s_jack": "ՋԵՔՓՈԹ", "w_s_consult_a": "30 ՐՈՊԵ", "w_s_consult_b": "ԽՈՐՀ.", "w_s_prio_a": "VIP", "w_s_prio_b": "ՀԵՐԹ", "w_s_again_a": "ԷԼԻ", "w_s_again_b": "ՄԵԿ!", "w_you_won": "ՁԵՐ ՄՐՑԱՆԱԿԸ", "w_jackpot": "ՋԵՔՓՈԹ!", "w_gold_kick": "ՈՍԿԵ ՊՏՈՒՅՏ", "w_cap_pct": "զեղչ հաջորդ հայտի համար", "w_cap_consult": "անվճար 30 րոպե խորհրդատվություն", "w_cap_prio": "հայտը՝ հերթից դուրս", "w_cap_again": "բոնուսային պտույտ՝ պտտեք նորից։", "w_valid": "Գործում է մինչև {d}", "w_use": "Օգտագործել հայտում", "w_again_btn": "Պտտել նորից", "w_close": "Փակել", "w_demo_note": "Փորձնական պտույտ․ մրցանակ չի տրվել", "wp_consult": "Խորհրդատվություն 30 րոպե", "wp_priority": "Առաջնահերթություն հերթում", "promo_perk_ok": "Մրցանակը կիրառվեց՝ {x}"}};
 for (const l of ['ru', 'en', 'hy']) Object.assign(D[l], D3[l]);
+const D4 = {
+  ru: { hg_kick: 'Подарок к празднику', hg_title: '−{p}% на заказ', hg_sub: 'Откройте подарок — личный промокод только для вас', hg_open: 'Открыть', hg_left: 'Действует ещё {x}', hg_code: 'Ваш промокод', hg_copy: 'Скопировать', hg_copied: 'Промокод скопирован', hg_use: 'Применить в заявке', hg_used: 'Подарок использован — спасибо!', hg_fine: 'Личный промокод на один заказ. Скидки не суммируются.', hg_err: 'Не удалось открыть подарок. Попробуйте ещё раз' },
+  en: { hg_kick: 'Holiday gift', hg_title: '{p}% off your order', hg_sub: 'Open the gift — a personal promo code just for you', hg_open: 'Open', hg_left: '{x} left', hg_code: 'Your promo code', hg_copy: 'Copy', hg_copied: 'Promo code copied', hg_use: 'Use in a request', hg_used: 'Gift used — thank you!', hg_fine: 'Personal code, valid for one order. Discounts do not stack.', hg_err: 'Could not open the gift. Please try again' },
+  hy: { hg_kick: 'Տոնական նվեր', hg_title: '−{p}% զեղչ պատվերի համար', hg_sub: 'Բացեք նվերը՝ անձնական պրոմոկոդ միայն ձեզ համար', hg_open: 'Բացել', hg_left: 'Մնաց {x}', hg_code: 'Ձեր պրոմոկոդը', hg_copy: 'Պատճենել', hg_copied: 'Պրոմոկոդը պատճենված է', hg_use: 'Կիրառել հայտում', hg_used: 'Նվերն օգտագործված է․ շնորհակալություն', hg_fine: 'Անձնական պրոմոկոդ՝ մեկ պատվերի համար։ Զեղչերը չեն գումարվում։', hg_err: 'Չհաջողվեց բացել նվերը։ Փորձեք նորից' }
+};
+for (const l of ['ru', 'en', 'hy']) Object.assign(D[l], D4[l]);
+
 let L = ls.get('lang') || 'ru';
 const t = (k, v) => String(D[L]?.[k] ?? D.ru[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => v?.[x] ?? '');
 const LOC = { ru: 'ru-RU', en: 'en-GB', hy: 'hy-AM' };
@@ -1506,6 +1553,31 @@ async function wheelBanner(box) {
   }
 }
 
+
+/* ---------- Праздничный подарок: блок с промокодом к празднику (v17) ---------- */
+const HG_BOX = '<svg class="hgbox" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hgG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--c1)"/><stop offset=".6" style="stop-color:var(--c2)"/><stop offset="1" style="stop-color:var(--c3)"/></linearGradient></defs><path class="beam" d="M32 26 12 4M32 26 32 0M32 26 52 4" stroke="var(--c1)" stroke-width="2.4" stroke-linecap="round" fill="none"/><rect x="9" y="29" width="46" height="29" rx="5" fill="url(#hgG)" opacity=".92"/><rect x="28" y="29" width="8" height="29" fill="#fff" opacity=".85"/><g class="lid"><rect x="6" y="20" width="52" height="11" rx="4" fill="url(#hgG)"/><rect x="28" y="20" width="8" height="11" fill="#fff"/><path d="M32 20c-6-9-15-6-12-1 2 3 8 1 12 1zM32 20c6-9 15-6 12-1-2 3-8 1-12 1z" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/></g></svg>';
+const HG_CP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>';
+async function holidayBlock(box) {
+  if (!box || me.staff) return;
+  let v; try { v = await api('/holiday'); } catch { return; }
+  if (!v.on) { box.innerHTML = ''; return; }
+  const paint = fresh => {
+    const hn = window.Season?.list().find(x => x.id === v.id), open = !!v.code, used = open && v.state && v.state !== 'ok';
+    box.innerHTML = `<div class="hg${open ? ' open' : ''}${used ? ' used' : ''}"><div class="hgi" ${open ? '' : 'role="button" tabindex="0"'}><span class="hgw">%</span><span class="hgs"><i></i><i></i><i></i></span>
+      <div class="hgr">${HG_BOX}<div class="hgt"><span class="hgk">${esc(v.custom ? '🎁 ' + v.name : ((hn?.e || '') + ' ' + (hn?.name || t('hg_kick'))).trim())}</span><span class="hgh">${t('hg_title', { p: v.pct })}</span><span class="hgsub">${used ? t('hg_used') : open ? t('hg_kick') : t('hg_sub')}</span></div>${open ? '' : `<span class="hgpill">${t('hg_open')}</span>`}</div>
+      ${open ? `<div class="hgcut"></div><div class="hgcode"><div class="hgcv"><small>${t('hg_code')}</small><b>${esc(v.code)}</b></div>${used ? '' : `<button class="hgcp" type="button" aria-label="${esc(t('hg_copy'))}">${HG_CP}</button>`}</div>
+      ${used ? '' : `<button class="btn hgcta" type="button">${t('hg_use')}</button><div class="hgfoot"><span>${t('hg_left', { x: '<b id="hgl"></b>' })}</span></div><p class="hgfine">${t('hg_fine')}</p>`}` : `<div class="hgfoot"><span>${t('hg_left', { x: '<b id="hgl"></b>' })}</span></div>`}
+    </div></div>`;
+    const hgi = box.querySelector('.hgi'), cp = box.querySelector('.hgcp'), use = box.querySelector('.hgcta');
+    if (!open) { const go1 = async () => { if (hgi.dataset.busy) return; hgi.dataset.busy = '1'; try { v = await api('/holiday/claim', { method: 'POST' }); if (!v.on) { box.innerHTML = ''; return; } tg?.HapticFeedback?.notificationOccurred?.('success'); paint(true); window.Season?.burst({ n: 96, y: box.getBoundingClientRect().top + 60 }); } catch { delete hgi.dataset.busy; toast(t('hg_err'), 'error'); } }; hgi.onclick = go1; hgi.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') go1(); }; }
+    if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(v.code); } catch { const x = document.createElement('textarea'); x.value = v.code; document.body.appendChild(x); x.select(); try { document.execCommand('copy'); } catch {} x.remove(); } tg?.HapticFeedback?.impactOccurred?.('light'); toast(t('hg_copied')); };
+    if (use) use.onclick = () => { ls.set('wpromo', v.code); go('new'); };
+    const tick = () => { const e = $('#hgl'); if (!e) return; if (v.until <= Date.now()) { box.innerHTML = ''; return; } e.textContent = fmtLeft(v.until); };
+    tick(); if (!used || !open) addTimer(tick, 1000);
+  };
+  paint(false);
+}
+
 async function openWheel() {
   if ($('.whl')) return;
   let st; try { st = await wheelState(true); } catch { return toast(t('w_err'), 'error'); }
@@ -1818,7 +1890,7 @@ function renderForm() {
   const VIA = ['telegram', 'phone', 'whatsapp'], TIMES = ['any', 'morning', 'day', 'evening'];
   let svc = SERVICES.includes(d.svc) ? d.svc : SERVICES[0], via = VIA.includes(d.via) ? d.via : 'telegram', ctime = TIMES.includes(d.ctime) ? d.ctime : 'any', files = [];
   const main = $('#main');
-  main.innerHTML = `<div id="whb"></div><div id="pb"></div><div class="card fm">
+  main.innerHTML = `<div id="hgb"></div><div id="whb"></div><div id="pb"></div><div class="card fm">
     <div class="field"><label>${t('f_name')}</label><input id="f-name" maxlength="80" value="${esc(d.name ?? u?.first_name ?? '')}"></div>
     <div class="field"><div class="lrow"><label>${t('f_phone')}</label>${tg?.requestContact || me.phone ? `<button type="button" class="lnk2" id="f-tgph">${t('f_tgphone')}</button>` : ''}</div><input id="f-phone" type="tel" inputmode="tel" placeholder="+7 999 000 00 00" value="${esc(d.phone || me.phone || '+7 ')}"></div>
     <div class="field"><label>${t('f_service')}</label><select id="f-svc">${SERVICES.map((s, i) => `<option value="${esc(s)}" ${s === svc ? 'selected' : ''}>${t('svc' + i)}</option>`).join('')}</select></div>
@@ -1830,7 +1902,7 @@ function renderForm() {
     <div class="field"><label>${t('promo_label')}</label><div class="fl"><input id="f-promo" maxlength="24" placeholder="${esc(t('promo_ph'))}" style="text-transform:uppercase"><button type="button" class="btn small line" id="f-papply" style="width:auto;padding:0 14px">${t('promo_apply')}</button></div><p id="f-pmsg" style="font-size:.78rem;margin-top:6px"></p><div class="chips" id="f-pmy"></div></div>
     <label class="sw field"><span>${t('f_sub')}</span><input type="checkbox" id="f-sub" ${me.sub ? 'checked' : ''}></label>
     <button class="btn" id="f-send">${t('f_send')}</button><div class="prog" id="f-prog" hidden><i></i></div></div>`;
-  wheelBanner($('#whb'));
+  holidayBlock($('#hgb')); wheelBanner($('#whb'));
   const save = () => ls.set('draft', JSON.stringify({ name: $('#f-name').value, phone: $('#f-phone').value, desc: $('#f-desc').value, svc, via, ctime }));
   $('#f-svc').onchange = e => { svc = e.target.value; save(); };
   $('#f-time').onchange = e => { ctime = e.target.value; save(); };
@@ -1891,8 +1963,8 @@ function renderForm() {
 let filter = 'ALL', query = '', selMode = false; const sel = new Set(), exp = new Set();
 async function renderList() {
   const main = $('#main'), staff = me.staff, write = me.write;
-  main.innerHTML = `${staff ? '' : '<div id="whb"></div>'}${staff ? '<div id="ctl" class="filters"></div><input class="search" id="q" type="search" placeholder="Поиск: №, имя, телефон, сообщения" autocomplete="off">' : ''}<div id="lst" class="lst"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div><div id="bulk"></div>`;
-  if (!staff) wheelBanner($('#whb'));
+  main.innerHTML = `${staff ? '' : '<div id="hgb"></div><div id="whb"></div>'}${staff ? '<div id="ctl" class="filters"></div><input class="search" id="q" type="search" placeholder="Поиск: №, имя, телефон, сообщения" autocomplete="off">' : ''}<div id="lst" class="lst"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div><div id="bulk"></div>`;
+  if (!staff) { holidayBlock($('#hgb')); wheelBanner($('#whb')); }
   let list = [], sig = '', hits = {};
   const unread = o => staff ? o.unread_admin : o.unread_client, done = o => ['COMPLETED', 'REJECTED'].includes(o.status);
   const FIL = [['ALL', 'Все', 'board'], ['NEW', 'Новые', 'sparkle'], ['IN_PROGRESS', 'В работе', 'play'], ['DONE', 'Готово', 'okc'], ['MINE', 'Мои', 'user'], ['URGENT', 'Срочные', 'fire'], ['UNPAID', 'Не оплачены', 'coin']];
@@ -2447,14 +2519,28 @@ async function renderAudit() {
 
 async function renderPromos() {
   const main = $('#main'); let list; try { list = await api('/promos'); } catch (e) { errorScreen(errKind(e), () => go(tab)); return; }
-  const top = await api('/ref/top').catch(() => ({ top: [] }));
-  main.innerHTML = `<div class="card"><p class="h2">Промокоды и акции</p>${list.length ? list.map(p => `<div class="li"><span><b>${esc(p.code)}</b> −${p.percent}% ${p.banner ? ic('mega','s') : ''}<br><small>${p.mode === 'single' ? 'разовый' : p.mode === 'per_user' ? '1 раз на клиента' : 'многоразовый'} · ${esc(p.title || '')} · использовано ${p.uses}${p.max_uses ? '/' + p.max_uses : ''}${p.expires_at ? ' · до ' + new Date(p.expires_at).toLocaleDateString('ru-RU') : ''}${p.state === 'expired' ? ' · истёк' : p.state === 'used_up' ? ' · исчерпан' : p.active ? '' : ' · выключен'}</small></span><span><button type="button" data-t="${esc(p.code)}" style="background:none;border:0;color:var(--cyan)">${p.active ? 'выкл' : 'вкл'}</button> <button type="button" data-x="${esc(p.code)}" aria-label="delete" style="background:none;border:0;color:var(--rej)">${ic('close','s')}</button></span></div>`).join('') : '<p style="color:var(--muted)">Пока нет</p>'}</div>
+  const top = await api('/ref/top').catch(() => ({ top: [] })), hx = await api('/holiday/custom').catch(() => []), td = new Date().toISOString().slice(0, 10), dd = ms => new Date(ms).toLocaleDateString('ru-RU');
+  main.innerHTML = `<div class="card"><p class="h2">🎁 Праздничные акции</p><p style="color:var(--muted);font-size:.78rem;margin-bottom:10px">В указанные даты каждый клиент увидит красивый блок и получит личный промокод на один заказ. Ваша акция заменяет автоматический праздничный подарок на этот срок.</p>${hx.length ? hx.map(x => `<div class="li"><span><b>${esc(x.name)}</b> −${x.pct}%<br><small>${dd(x.from)} — ${dd(x.to - 864e5)}${x.to < Date.now() ? ' · завершена' : x.from > Date.now() ? ' · скоро' : x.on ? ' · идёт сейчас' : ''}${x.on ? '' : ' · выключена'}</small></span><span><button type="button" data-hx="toggle:${x.id}" style="background:none;border:0;color:var(--cyan)">${x.on ? 'выкл' : 'вкл'}</button> <button type="button" data-hx="delete:${x.id}" aria-label="delete" style="background:none;border:0;color:var(--rej)">${ic('close','s')}</button></span></div>`).join('') : ''}
+      <label style="margin-top:12px">Название акции</label><input id="h-n" maxlength="40" placeholder="Например: День рождения компании">
+      <div class="two" style="margin-top:10px"><div><label>Скидка, %</label><input id="h-p" type="number" inputmode="numeric" min="1" max="90" value="15"></div><div><label>Начало</label><input id="h-f" type="date" value="${td}"></div></div>
+      <label style="margin-top:10px">Последний день акции</label><input id="h-t" type="date" min="${td}"><button class="btn" id="h-add" style="margin-top:12px">Запустить акцию</button></div>
+    <div class="card"><p class="h2">Промокоды и акции</p>${list.length ? list.map(p => `<div class="li"><span><b>${esc(p.code)}</b> −${p.percent}% ${p.banner ? ic('mega','s') : ''}<br><small>${p.mode === 'single' ? 'разовый' : p.mode === 'per_user' ? '1 раз на клиента' : 'многоразовый'} · ${esc(p.title || '')} · использовано ${p.uses}${p.max_uses ? '/' + p.max_uses : ''}${p.expires_at ? ' · до ' + new Date(p.expires_at).toLocaleDateString('ru-RU') : ''}${p.state === 'expired' ? ' · истёк' : p.state === 'used_up' ? ' · исчерпан' : p.active ? '' : ' · выключен'}</small></span><span><button type="button" data-t="${esc(p.code)}" style="background:none;border:0;color:var(--cyan)">${p.active ? 'выкл' : 'вкл'}</button> <button type="button" data-x="${esc(p.code)}" aria-label="delete" style="background:none;border:0;color:var(--rej)">${ic('close','s')}</button></span></div>`).join('') : '<p style="color:var(--muted)">Пока нет</p>'}</div>
     <div class="card"><p class="h2">Новый промокод</p><label>Код (пусто — создать автоматически)</label><input id="p-c" maxlength="20" style="text-transform:uppercase">
       <label style="margin-top:10px">Тип промокода</label><select id="p-mode"><option value="multi">Многоразовый — любое число клиентов (лимит по желанию)</option><option value="per_user">Один раз на каждого клиента</option><option value="single">Разовый — один заказ, потом код недействителен</option></select>
       <div class="two" style="margin-top:10px"><div><label>Скидка, %</label><input id="p-p" type="number" min="1" max="90" value="10"></div><div><label>Лимит</label><input id="p-m" type="number" min="0" placeholder="без лимита"></div></div>
       <label style="margin-top:10px">Название акции</label><input id="p-t" maxlength="40" placeholder="Например: Осенняя скидка"><label style="margin-top:10px">Действует до</label><input id="p-e" type="date" min="${new Date().toISOString().slice(0, 10)}">
       <label class="sw" style="margin-top:12px"><span>Показывать баннер с таймером в форме заявки</span><input type="checkbox" id="p-b" checked></label><button class="btn" id="p-add" style="margin-top:12px">Создать</button></div>
     <div class="card"><p class="h2">Рейтинг приглашающих</p>${top.top.length ? top.top.map((x, i) => `<div class="li"><span>${i + 1}. ${esc(x.name)}</span><b>${x.completed} <small>из ${x.invited}</small></b></div>`).join('') : '<p style="color:var(--muted)">Пока нет приглашённых</p>'}<p style="color:var(--muted);font-size:.75rem;margin-top:8px">Размер бонуса за друга — в разделе «Автоматизация».</p></div>`;
+  $$('[data-hx]').forEach(b => b.onclick = async () => { const [op, id] = b.dataset.hx.split(':'); if (op === 'delete') { const q = 'Удалить акцию? Уже выданные промокоды останутся.'; if (!await new Promise(r => tg?.showConfirm ? tg.showConfirm(q, r) : r(confirm(q)))) return; } try { await api('/holiday/custom', { method: 'POST', body: { op, id } }); renderPromos(); } catch { toast('Не удалось'); } });
+  $('#h-add').onclick = async e => {
+    const btn = e.currentTarget, pct = Number($('#h-p').value);
+    if (!$('#h-n').value.trim()) return toast('Введите название акции');
+    if (!(pct >= 1 && pct <= 90)) return toast('Скидка: от 1 до 90%');
+    if (!$('#h-t').value) return toast('Выберите последний день акции');
+    btn.disabled = true;
+    try { await api('/holiday/custom', { method: 'POST', body: { name: $('#h-n').value, percent: pct, from: $('#h-f').value, to: $('#h-t').value } }); toast('Акция запущена'); renderPromos(); }
+    catch (er) { btn.disabled = false; toast(({ bad_date: 'Проверьте даты: конец не раньше начала', past_date: 'Эта дата уже прошла', too_long: 'Акция не может длиться больше года', limit: 'Слишком много акций — удалите старые' })[er.message] || 'Проверьте поля'); }
+  };
   $$('[data-t]').forEach(b => b.onclick = async () => { try { await api('/promos/toggle', { method: 'POST', body: { code: b.dataset.t } }); renderPromos(); } catch { toast('Не удалось'); } });
   $$('[data-x]').forEach(b => b.onclick = async () => { const q = `Удалить промокод ${b.dataset.x}?`; if (!await new Promise(r => tg?.showConfirm ? tg.showConfirm(q, r) : r(confirm(q)))) return; try { await api('/promos/delete', { method: 'POST', body: { code: b.dataset.x } }); renderPromos(); } catch { toast('Не удалось'); } });
   $('#p-mode').onchange = e => { const one = e.target.value === 'single'; $('#p-m').disabled = one; if (one) $('#p-m').value = ''; $('#p-m').placeholder = one ? 'всегда 1' : 'без лимита'; };
@@ -2476,12 +2562,13 @@ async function renderAuto() {
     <div class="card"><p class="h2">Бонусы за приглашения</p><div class="two"><div><label>Скидка пригласившему, %</label><input id="a-rr" type="number" min="0" max="90" value="${c.ref_reward_pct}"></div><div><label>Скидка другу, %</label><input id="a-rw" type="number" min="0" max="90" value="${c.ref_welcome_pct}"></div></div><p style="color:var(--muted);font-size:.75rem;margin-top:8px">Пригласивший получает личный промокод, когда друг завершит заказ. 0 — не выдавать.</p></div>
     <div class="card"><p class="h2">Колесо удачи</p>
       <label class="sw"><span>Колесо включено (баннер и меню у клиентов)</span><input type="checkbox" id="a-wh" ${c.wheel_on ? 'checked' : ''}></label>
+      <label class="sw" style="margin-top:12px"><span>Праздничный подарок: каждому клиенту — личный промокод в дни праздников (Чёрная пятница, Новый год и др.)</span><input type="checkbox" id="a-hg" ${c.hol_gift_on !== false ? 'checked' : ''}></label>
       <label class="sw" style="margin-top:12px"><span>Напоминания в боте: «вращение готово» (подписчикам) и «приз скоро сгорит»</span><input type="checkbox" id="a-wp" ${c.wheel_push ? 'checked' : ''}></label>
       <div class="two" style="margin-top:12px"><div><label>Вращение раз в, дней</label><input id="a-wd" type="number" min="1" max="30" value="${c.wheel_days}"></div><div><label>Приз действует, дней</label><input id="a-wv" type="number" min="3" max="90" value="${c.wheel_valid}"></div></div>
       <p style="color:var(--muted);font-size:.75rem;margin-top:8px">Призы: скидки −3% · −5% · −7% · −10% · −20% (джекпот), консультация 30 мин, приоритет в очереди, «ещё раз». Пустых секторов нет. Бонусное вращение клиент получает за завершённый заказ, отзыв и друга, завершившего заказ. Каждое 4-е вращение подряд — золотое (без мелких призов). Призы — личные одноразовые промокоды; скидки не суммируются.</p></div>
     <div class="card"><p class="h2">Реквизиты для оплаты</p><p style="color:var(--muted);font-size:.8rem;margin-bottom:10px">Подставляются при завершении заказа. В каждом заказе их можно изменить.</p><label>Банк</label><input id="a-pb" maxlength="40" value="${esc(c.pay_bank)}"><div class="two" style="margin-top:10px"><div><label>Номер телефона</label><input id="a-pp" type="tel" maxlength="30" value="${esc(c.pay_phone)}"></div><div><label>Получатель</label><input id="a-ph" maxlength="40" value="${esc(c.pay_holder)}"></div></div></div>
     <button class="btn" id="a-save">Сохранить</button>`;
-  $('#a-save').onclick = async () => { const sla = $('#a-sla').value.trim(); if (!/^\d+$/.test(sla) || +sla > 1440) return toast('Минуты без ответа: число от 0 до 1440'); try { await api('/cfg', { method: 'PUT', body: { sla_min: +sla, auto_aband: $('#a-ab').checked, auto_review: $('#a-rv').checked, auto_holiday: $('#a-ho').checked, ref_reward_pct: $('#a-rr').value, ref_welcome_pct: $('#a-rw').value, wheel_on: $('#a-wh').checked, wheel_push: $('#a-wp').checked, wheel_days: $('#a-wd').value, wheel_valid: $('#a-wv').value, pay_bank: $('#a-pb').value, pay_phone: $('#a-pp').value, pay_holder: $('#a-ph').value } }); toast('Сохранено'); } catch (e) { toast(e.message === 'bad_phone' ? 'Проверьте номер телефона' : 'Не удалось сохранить'); } };
+  $('#a-save').onclick = async () => { const sla = $('#a-sla').value.trim(); if (!/^\d+$/.test(sla) || +sla > 1440) return toast('Минуты без ответа: число от 0 до 1440'); try { await api('/cfg', { method: 'PUT', body: { sla_min: +sla, auto_aband: $('#a-ab').checked, auto_review: $('#a-rv').checked, auto_holiday: $('#a-ho').checked, hol_gift_on: $('#a-hg').checked, ref_reward_pct: $('#a-rr').value, ref_welcome_pct: $('#a-rw').value, wheel_on: $('#a-wh').checked, wheel_push: $('#a-wp').checked, wheel_days: $('#a-wd').value, wheel_valid: $('#a-wv').value, pay_bank: $('#a-pb').value, pay_phone: $('#a-pp').value, pay_holder: $('#a-ph').value } }); toast('Сохранено'); } catch (e) { toast(e.message === 'bad_phone' ? 'Проверьте номер телефона' : 'Не удалось сохранить'); } };
 }
 async function renderTchat() { // чат команды: упоминания @имя, мгновенная доставка, очередь без сети
   const main = $('#main'); main.className = 'chatmode';
